@@ -74,4 +74,7 @@ Relatórios e Estatísticas:
 - Análise de horas trabalhadas por hospital e período.
 - Sugestões para melhor distribuição de plantões.
 
+Adicionar mais personas, como o o Médico que administra o setor.
+
+
 -->
