@@ -49,7 +49,7 @@ O projeto tem como principal objetivo fornecer uma ferramenta confiável e acess
 <br>
 
 # 🎯 Público-Alvo
-Médicos que atuam em múltiplos hospitais e precisam gerenciar sua escala de forma prática.
+Profissionais que atuam na área da saúde e que trabalham em múltiplos hospitais e precisam gerenciar sua escala de forma prática.
 Clínicas e hospitais que desejam oferecer um sistema eficiente para seus profissionais.
 Empresas e cooperativas médicas que organizam escalas de múltiplos profissionais.
 ## Personas: 
