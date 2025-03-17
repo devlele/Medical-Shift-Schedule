@@ -52,7 +52,14 @@ O projeto tem como principal objetivo fornecer uma ferramenta confiável e acess
 Médicos que atuam em múltiplos hospitais e precisam gerenciar sua escala de forma prática.
 Clínicas e hospitais que desejam oferecer um sistema eficiente para seus profissionais.
 Empresas e cooperativas médicas que organizam escalas de múltiplos profissionais.
-## Persona: [Persona](https://www.canva.com/design/DAGhWN5H9FU/qLdbKu-RaRlco2iIE1MHWA/edit)
+## Personas: 
+- [Persona - Médica](https://www.canva.com/design/DAGhWN5H9FU/qLdbKu-RaRlco2iIE1MHWA/edit)
+- [Persona - Enfermeira](https://www.canva.com/design/DAGh_U7-4Ls/af6_aubGSajBC-boftDY5A/edit)
+
+<br>
+
+# 📚 Histórias de usuários
+- ...
 
 <br>
 
