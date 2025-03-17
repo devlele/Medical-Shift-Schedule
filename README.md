@@ -43,7 +43,7 @@ O projeto tem como principal objetivo fornecer uma ferramenta confiável e acess
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
 
 ### 🖥️ Back-end:
-?
+
 <!--  ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)   -->
 
 <br>
@@ -52,7 +52,7 @@ O projeto tem como principal objetivo fornecer uma ferramenta confiável e acess
 Médicos que atuam em múltiplos hospitais e precisam gerenciar sua escala de forma prática.
 Clínicas e hospitais que desejam oferecer um sistema eficiente para seus profissionais.
 Empresas e cooperativas médicas que organizam escalas de múltiplos profissionais.
-## Persona: link aqui
+## Persona: https://www.canva.com/design/DAGhWN5H9FU/qLdbKu-RaRlco2iIE1MHWA/edit
 
 <br>
 
