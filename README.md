@@ -63,6 +63,11 @@ Empresas e cooperativas médicas que organizam escalas de múltiplos profissiona
 
 <br>
 
+# 💲 Monetização
+...
+
+<br>
+
 # 📅 Próximos Passos
 ...
 
