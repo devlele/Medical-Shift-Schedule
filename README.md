@@ -1,8 +1,8 @@
 #  Medical Shift Schedule 🩺
 
 # 📖 Resumo
-  O Medical Shift Schedule é um sistema web inovador desenvolvido para auxiliar médicos no gerenciamento eficiente de seus plantões em múltiplos hospitais. A plataforma permite que profissionais da saúde organizem suas escalas de trabalho sem o risco de conflitos de horários, garantindo maior controle, eficiência na rotina médica.
-  A desorganização de plantões pode levar a sobrecarga de trabalho, erros operacionais e até comprometer a qualidade do atendimento aos pacientes. Com o Medical Shift Schedule, médicos terão uma solução intuitiva e automatizada para visualizar, cadastrar e ajustar seus plantões, otimizando sua rotina e evitando problemas como sobreposição de turnos.
+  O Medical Shift Schedule é um sistema web inovador desenvolvido para auxiliar plantonistas e escalistar no gerenciamento eficiente de plantões hospitalares. A plataforma permite que profissionais da saúde sejam vinculados a hospitais e setores por intermedio de escalistas. Neste contexto, escalas são definindas e manejadas por escalistas, os quais atribuiem ou desatribuem plantões aos profissionais plantonistas.
+  A desorganização de plantões pode levar a furos na escala e, com isto, sobrecarga de trabalho, erros operacionais e até comprometer a qualidade do atendimento aos pacientes. Com o Medical Shift Schedule, escalas poderão ser organizadas de maneira inteligente visando minizar furos e sobreposições. Além disto, o gerenciamentos de escalas será muito mais rápido e otimizado. 
 
 <br>
   
@@ -12,12 +12,9 @@ O projeto tem como principal objetivo fornecer uma ferramenta confiável e acess
 <br>
 
 # 🚀 Funcionalidades Principais
+### PLANTONISTA:
 ### Cadastro de Usuários:
 - Médicos criam um perfil pessoal contendo informações como nome, especialidade e hospitais nos quais atuam.
-### Gestão de Plantões:
-- Adição, edição e remoção de plantões diretamente pelo usuário.
-- Restrição automática para evitar sobreposição de horários.
-- Possibilidade de marcar plantões como fixos ou variáveis.
 ### Vinculação a Múltiplos Hospitais:
 - O usuário pode adicionar os hospitais onde trabalha e vincular seus plantões a cada instituição.
 ### Visualização da Escala de Trabalho:
@@ -31,6 +28,13 @@ O projeto tem como principal objetivo fornecer uma ferramenta confiável e acess
 ### Interface Responsiva e Acessível:
 - Design adaptável para desktop, tablet e mobile.
 - Layout intuitivo, garantindo facilidade de uso mesmo para usuários sem experiência técnica.
+### ESCALISTA:
+### Gestão de Plantões e Escalas:
+- Adição, edição e remoção de plantões à escala.
+- Possibilidade de definir plantões como fixos ou variáveis.
+- Consulta inteligente sobre profissionais vinculados ao hospital/setor.
+- Notificação de status de plantões.
+- Check-ins e check-outs.
 
 <br>
 
