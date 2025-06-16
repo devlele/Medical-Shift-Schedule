@@ -58,6 +58,7 @@ Empresas e cooperativas médicas que organizam escalas de múltiplos profissiona
 # 👤 Personas
 - [Persona - Médica](https://www.canva.com/design/DAGhWN5H9FU/qLdbKu-RaRlco2iIE1MHWA/edit)
 - [Persona - Enfermeira](https://www.canva.com/design/DAGh_U7-4Ls/af6_aubGSajBC-boftDY5A/edit)
+- [Persona - Escalista](https://www.canva.com/design/DAGqhSH_XMw/ZjFK9Ug9w3W4c7F9r7WqIw/edit)
 
 <br>
 
