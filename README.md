@@ -77,6 +77,11 @@ Empresas e cooperativas médicas que organizam escalas de múltiplos profissiona
 
 <br>
 
+# 📉 Modelo Conceitual
+- [Diagrama](https://lucid.app/lucidchart/287562bc-8c4d-4217-bc7a-526ecf578deb/edit?viewport_loc=-1894%2C-4122%2C4989%2C5841%2C0_0&invitationId=inv_5ff96cf7-bf9c-405e-93b9-e9060d83d425)
+
+<br>
+
 # 🎥 Vídeo
 - [Video Protótipo](https://drive.google.com/drive/folders/15HX0eTlrxslMhcmref_9Fo5VXCu6whhG)
 
