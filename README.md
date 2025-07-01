@@ -87,7 +87,7 @@ Empresas e cooperativas médicas que organizam escalas de múltiplos profissiona
 <br>
 
 # 🎥 Vídeo
-- [Video Protótipo](https://drive.google.com/drive/folders/15HX0eTlrxslMhcmref_9Fo5VXCu6whhG)
+- [Videos ](https://drive.google.com/drive/folders/15HX0eTlrxslMhcmref_9Fo5VXCu6whhG)
 
 <br>
 
