@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Medical Shift Schedule</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="icons/logo.png">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish">
+</head>
+
+<body>
+    <!--  HEADER COM SETA -->
+    <header class="header">
+        <a href="index.html" class="voltar">
+            <img src="icons/arrow.png" alt="Voltar" class="seta">
+        </a>
+        <h1 class="titulo">Voltar para Login</h1>
+    </header>
+
+    <div class="container">
+        <img src="icons/logo.png" alt="Logo Medical Shift Schedule" class="logo">
+
+        <form class="form">
+            <label for="nome">Nome completo</label>
+            <div class="input-group">
+                <input type="text" id="nome" name="nome" placeholder="Digite aqui...">
+                <span class="icon">
+                    <img src="icons/user.png" alt="Ícone de usuário">
+                </span>
+            </div>
+
+            <label for="email">Email</label>
+            <div class="input-group">
+                <input type="email" id="email" name="email" placeholder="Ex: nome@gmail.com">
+            </div>
+
+            <label for="cpf">CPF</label>
+            <div class="input-group">
+                <input type="text" id="cpf" name="cpf" placeholder="Ex: 12345678910">
+            </div>
+
+            <label for="senha">Senha</label>
+            <div class="input-group">
+                <input type="password" id="senha-cadastro" name="senha" placeholder="Digite aqui...">
+                <span class="icon" onclick="toggleSenha('senha-cadastro', 'icone-olho-cadastro')">
+                    <img id="icone-olho-cadastro" src="icons/olho-fechado.png" alt="Mostrar senha" class="icon-img">
+                </span>
+            </div>
+
+            <label for="senha2">Informe a senha novamente</label>
+            <div class="input-group">
+                <input type="password" id="confirma-senha-cadastro" name="senha2" placeholder="Digite aqui...">
+                <span class="icon" onclick="toggleSenha('confirma-senha-cadastro', 'icone-olho2-cadastro')">
+                    <img id="icone-olho2-cadastro" src="icons/olho-fechado.png" alt="Mostrar senha" class="icon-img">
+                </span>
+            </div>
+
+            <button type="submit" class="btn">Cadastrar</button>
+            <a href="index.html" class="link">Voltar para o login</a>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
