@@ -1,0 +1,32 @@
+<!-- Página para recuperação de senha, permite que o usuário solicite instruções por email -->
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Senha - Medical Shift Schedule</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="icons/logo.png">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish">
+</head>
+
+<body>
+    <header class="header"> <a href="login.html" class="voltar"> <img src="icons/arrow.png" alt="Voltar" class="seta">
+        </a>
+        <h1 class="titulo">Voltar para o login</h1>
+    </header>
+    <div class="container"> <img src="icons/logo.png" alt="Logo" class="logo">
+        <form class="form" onsubmit="enviarRecuperacao(event)"> <label for="email-recuperar">Digite seu e-mail
+                cadastrado</label>
+            <div class="input-group"> <input type="email" id="email-recuperar" name="email"
+                    placeholder="Ex: nome@gmail.com" required> </div> <button type="submit" class="btn">Enviar
+                Instruções</button> <a href="login.html" class="link">Voltar para o login</a>
+        </form>
+        <p id="mensagem-recuperar" class="mensagem"></p>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

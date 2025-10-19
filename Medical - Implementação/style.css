@@ -1,3 +1,8 @@
+/* ---------- RESET / BASE ---------- */
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -12,6 +17,7 @@ body {
     align-items: center;
 }
 
+/* ---------- HEADER FIXO (usado em telas de formulário) ---------- */
 .header {
     position: fixed;
     top: 0;
@@ -53,7 +59,7 @@ body {
     margin: 0;
 }
 
-/* CONTAINER */
+/* ---------- CONTAINER BASE ---------- */
 .container {
     width: 90%;
     max-width: 400px;
@@ -66,14 +72,14 @@ body {
     text-align: center;
 }
 
-/* LOGO */
+/* ---------- LOGO ---------- */
 .logo {
     width: 12.5rem;
     margin-bottom: 0.9375rem;
     border-radius: 6.25rem;
 }
 
-/* FORM */
+/* ---------- FORM ---------- */
 .form {
     display: flex;
     flex-direction: column;
@@ -102,13 +108,14 @@ body {
     right: 0.625rem;
 }
 
+.icon img,
 .icon-img {
     width: 1.5rem;
     height: 1.5rem;
     cursor: pointer;
 }
 
-/* BOTÃO */
+/* ---------- BOTÃO ---------- */
 .btn {
     margin-top: 1.25rem;
     padding: 0.625rem;
@@ -124,7 +131,13 @@ body {
     background-color: #5491a0;
 }
 
-/* LINK */
+/* botão pequeno */
+.btn.small {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+}
+
+/* ---------- LINK ---------- */
 .link {
     display: block;
     margin-top: 0.9375rem;
@@ -141,9 +154,15 @@ body {
     text-decoration: underline;
 }
 
-/* MEDIA QUERIES */
+/* ---------- MENSAGEM ---------- */
+.mensagem {
+    color: #0a4f5c;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 1rem;
+}
 
-/* Telas muito pequenas (celulares) */
+/* ---------- RESPONSIVO ---------- */
 @media (max-width: 480px) {
     .container {
         width: 95%;
@@ -171,7 +190,6 @@ body {
     }
 }
 
-/* Tablets (entre 481px e 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
     .container {
         max-width: 500px;
@@ -187,7 +205,6 @@ body {
     }
 }
 
-/* Telas grandes (computadores e notebooks) */
 @media (min-width: 1024px) {
     .container {
         max-width: 500px;
@@ -201,5 +218,155 @@ body {
     .btn {
         font-size: 1.1rem;
         padding: 0.75rem;
+    }
+}
+
+/* ---------- LOADING ---------- */
+.loading-body {
+    background: linear-gradient(to bottom, #befdf298, #0a6379a4);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.loading-container {
+    text-align: center;
+    color: #0a4f5c;
+}
+
+.logo-loading {
+    width: 100px;
+    margin-bottom: 12px;
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #0a6379;
+    border-radius: 50%;
+    margin: 12px auto;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ---------- HOME ---------- */
+.home-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 2.5rem;
+}
+
+.home-header {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 1rem;
+    background: #6b98a3;
+    color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1rem;
+}
+
+.home-logo {
+    width: 120px;
+}
+
+.home-main {
+    width: 100%;
+    max-width: 1100px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1.5rem;
+}
+
+.perfil {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    text-align: center;
+}
+
+.foto-perfil {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #ccc;
+    margin: 1rem auto;
+}
+
+.hospitais {
+    text-align: left;
+    margin: 0 auto;
+    width: 90%;
+}
+
+.calendario {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.dias span,
+.datas span {
+    margin: 0 5px;
+    padding: 5px 10px;
+    display: inline-block;
+}
+
+.datas .ativo {
+    background: #6b98a3;
+    color: white;
+    border-radius: 5px;
+}
+
+.datas .hoje {
+    border-bottom: 2px solid red;
+}
+
+.plantao {
+    margin-top: 1rem;
+    padding: 0 0.5rem;
+}
+
+.btn-premium {
+    display: block;
+    background: #0a4f5c;
+    color: white;
+    text-align: center;
+    padding: 0.75rem;
+    text-decoration: none;
+    margin: 1rem auto;
+    width: 150px;
+    border-radius: 8px;
+}
+
+.btn-premium:hover {
+    background: #5491a0;
+}
+
+/* Ajustes de layout responsivo para a home */
+@media (max-width: 900px) {
+    .home-main {
+        grid-template-columns: 1fr;
+    }
+
+    .home-header {
+        flex-direction: column;
+        gap: 0.5rem;
     }
 }

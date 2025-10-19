@@ -1,3 +1,5 @@
+<!-- Formulário de cadastro - etapa 1: coleta de nome, email, CPF e senha do usuário -->
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -11,9 +13,9 @@
 </head>
 
 <body>
-    <!--  HEADER COM SETA -->
+    <!-- Cabeçalho com botão voltar -->
     <header class="header">
-        <a href="index.html" class="voltar">
+        <a href="login.html" class="voltar">
             <img src="icons/arrow.png" alt="Voltar" class="seta">
         </a>
         <h1 class="titulo">Voltar para Login</h1>
@@ -22,10 +24,11 @@
     <div class="container">
         <img src="icons/logo.png" alt="Logo Medical Shift Schedule" class="logo">
 
-        <form class="form">
+        <!-- Formulário Etapa 1 -->
+        <form class="form" onsubmit="return salvarCadastroBasico(event)">
             <label for="nome">Nome completo</label>
             <div class="input-group">
-                <input type="text" id="nome" name="nome" placeholder="Digite aqui...">
+                <input type="text" id="nome" name="nome" placeholder="Digite aqui..." required>
                 <span class="icon">
                     <img src="icons/user.png" alt="Ícone de usuário">
                 </span>
@@ -33,17 +36,17 @@
 
             <label for="email">Email</label>
             <div class="input-group">
-                <input type="email" id="email" name="email" placeholder="Ex: nome@gmail.com">
+                <input type="email" id="email-cad" name="email" placeholder="Ex: nome@gmail.com" required>
             </div>
 
             <label for="cpf">CPF</label>
             <div class="input-group">
-                <input type="text" id="cpf" name="cpf" placeholder="Ex: 12345678910">
+                <input type="text" id="cpf" name="cpf" placeholder="Ex: 12345678910" required>
             </div>
 
             <label for="senha">Senha</label>
             <div class="input-group">
-                <input type="password" id="senha-cadastro" name="senha" placeholder="Digite aqui...">
+                <input type="password" id="senha-cadastro" name="senha" placeholder="Digite aqui..." required>
                 <span class="icon" onclick="toggleSenha('senha-cadastro', 'icone-olho-cadastro')">
                     <img id="icone-olho-cadastro" src="icons/olho-fechado.png" alt="Mostrar senha" class="icon-img">
                 </span>
@@ -51,14 +54,14 @@
 
             <label for="senha2">Informe a senha novamente</label>
             <div class="input-group">
-                <input type="password" id="confirma-senha-cadastro" name="senha2" placeholder="Digite aqui...">
+                <input type="password" id="confirma-senha-cadastro" name="senha2" placeholder="Digite aqui..." required>
                 <span class="icon" onclick="toggleSenha('confirma-senha-cadastro', 'icone-olho2-cadastro')">
                     <img id="icone-olho2-cadastro" src="icons/olho-fechado.png" alt="Mostrar senha" class="icon-img">
                 </span>
             </div>
 
-            <button type="submit" class="btn">Cadastrar</button>
-            <a href="index.html" class="link">Voltar para o login</a>
+            <button type="submit" class="btn">Próximo</button>
+            <a href="login.html" class="link">Voltar para o login</a>
         </form>
     </div>
 

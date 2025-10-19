@@ -1,0 +1,32 @@
+<!-- Tela de carregamento com animação de spinner, exibida antes de acessar outras páginas -->
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carregando...</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="icons/logo.png">
+</head>
+
+<body class="loading-body">
+    <!-- Tela de carregamento centralizada -->
+    <div class="loading-container">
+        <img src="icons/logo.png" alt="Logo" class="logo-loading">
+        <h2>Medical Shift Schedule</h2>
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+    </div>
+
+    <!-- Redireciona para a página de destino armazenada após atraso -->
+    <script>
+        const destino = localStorage.getItem("destinoLoading") || "login.html";
+        setTimeout(() => {
+            window.location.href = destino;
+        }, 1500);
+    </script>
+</body>
+
+</html>

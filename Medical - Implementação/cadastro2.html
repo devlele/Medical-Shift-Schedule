@@ -1,0 +1,42 @@
+<!-- Formulário de cadastro - etapa 2: permite ao usuário enviar foto de perfil -->
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Foto de Perfil</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="icons/logo.png">
+</head>
+
+<body>
+    <header class="header">
+        <a href="cadastro.html" class="voltar">
+            <img src="icons/arrow.png" alt="Voltar" class="seta">
+        </a>
+        <h1 class="titulo">Etapa 2: Foto de Perfil</h1>
+    </header>
+
+    <div class="container">
+        <img src="icons/logo.png" alt="Logo" class="logo">
+
+        <!-- Formulário para upload de foto -->
+        <form class="form" onsubmit="return salvarFotoPerfil(event)">
+            <label for="foto">Escolha uma foto de perfil</label>
+            <div class="input-group">
+                <input type="file" id="foto" name="foto" accept="image/*" required>
+            </div>
+
+            <button type="submit" class="btn">Próximo</button>
+        </form>
+
+        <!-- Mensagem de feedback -->
+        <p id="mensagem-cadastro" class="mensagem"></p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

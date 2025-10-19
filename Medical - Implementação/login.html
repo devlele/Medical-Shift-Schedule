@@ -1,0 +1,44 @@
+<!-- Página de login do usuário, permite entrar no sistema ou acessar cadastro/recuperação de senha -->
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Medical Shift Schedule</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="icons/logo.png">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Logo -->
+        <img src="icons/logo.png" alt="Logo Medical Shift Schedule" class="logo">
+
+        <!-- Formulário de login -->
+        <form class="form" onsubmit="event.preventDefault(); logarUsuario()">
+            <label for="email">Email</label>
+            <div class="input-group">
+                <input type="email" id="email" name="email" placeholder="Ex: nome@gmail.com" required>
+            </div>
+
+            <label for="senha">Senha</label>
+            <div class="input-group">
+                <input type="password" id="senha" name="senha" placeholder="Digite aqui..." required>
+                <span class="icon" onclick="toggleSenha('senha', 'icone-olho-login')">
+                    <img id="icone-olho-login" src="icons/olho-fechado.png" alt="Mostrar senha" class="icon-img">
+                </span>
+            </div>
+
+            <button type="submit" class="btn">Entrar</button>
+            <a href="cadastro.html" class="link">Não tem uma conta? Cadastre-se</a>
+            <a href="recuperar_senha.html" class="link">Esqueci minha senha</a>
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
