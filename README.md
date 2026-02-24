@@ -11,6 +11,9 @@ O projeto tem como principal objetivo fornecer uma ferramenta confiável e acess
 
 <br>
 
+# Template
+![DOCS](https://docs.google.com/document/d/1TOYYkqhOjWpDCq9UYjCxVv-t8l7QRGcNZAZFxkIMHjI/edit?pli=1&tab=t.0)
+
 # 🚀 Funcionalidades Principais
 ### PLANTONISTA:
 ### Cadastro de Usuários:
