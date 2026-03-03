@@ -1,8 +1,8 @@
 #  Medical Shift Schedule 🩺
 
 # 📖 Resumo
-  O Medical Shift Schedule é um sistema web inovador desenvolvido para auxiliar plantonistas e escalistar no gerenciamento eficiente de plantões hospitalares. A plataforma permite que profissionais da saúde sejam vinculados a hospitais e setores por intermedio de escalistas. Neste contexto, escalas são definindas e manejadas por escalistas, os quais atribuiem ou desatribuem plantões aos profissionais plantonistas.
-  A desorganização de plantões pode levar a furos na escala e, com isto, sobrecarga de trabalho, erros operacionais e até comprometer a qualidade do atendimento aos pacientes. Com o Medical Shift Schedule, escalas poderão ser organizadas de maneira inteligente visando minizar furos e sobreposições. Além disto, o gerenciamentos de escalas será muito mais rápido e otimizado. 
+  O Medical Shift Schedule é um sistema web inovador desenvolvido para auxiliar plantonistas e escalistas no gerenciamento eficiente de plantões hospitalares. A plataforma permite que profissionais da saúde sejam vinculados a hospitais e setores por intermédio de escalistas. Neste contexto, escalas são definindas e manejadas por escalistas, os quais atribuiem ou desatribuem plantões aos profissionais plantonistas.
+  A desorganização de plantões pode levar a furos na escala e, com isto, sobrecarga de trabalho, erros operacionais e até comprometer a qualidade do atendimento aos pacientes. Com o Medical Shift Schedule, escalas poderão ser organizadas de maneira inteligente visando minimizar furos e sobreposições. Além disto, o gerenciamentos de escalas será muito mais rápido e otimizado. 
 
 <br>
   
@@ -107,10 +107,10 @@ Empresas e cooperativas médicas que organizam escalas de múltiplos profissiona
 
 # 👥 Integrantes
 - Alefe Freitas Santos;
-- Gabriela Soglio;
 - Marcos Vinicius do Nascimento Marciano;
 - Maria Eduarda Rodrigues Simões;
-- Rafaela Yumi Shimoda.
+- Rafaela Yumi Shimoda
+- Vinícius de Sousa Andrade
 
 <!--  IDEIAS: Futuro Desenvolvimento
 Relatórios e Estatísticas:
