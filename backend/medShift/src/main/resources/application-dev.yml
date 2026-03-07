@@ -1,4 +1,8 @@
 spring:
+  security:
+    user:
+      name: admin
+      password: admin123
   datasource:
     url: jdbc:h2:mem:msapi2025
     username: admin
