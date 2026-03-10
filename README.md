@@ -14,6 +14,8 @@ O projeto tem como principal objetivo fornecer uma ferramenta confiável e acess
 # Template
 ![DOCS](https://docs.google.com/document/d/1TOYYkqhOjWpDCq9UYjCxVv-t8l7QRGcNZAZFxkIMHjI/edit?pli=1&tab=t.0)
 
+<br>
+
 # 🚀 Funcionalidades Principais
 ### PLANTONISTA:
 ### Cadastro de Usuários:
@@ -113,12 +115,8 @@ Empresas e cooperativas médicas que organizam escalas de múltiplos profissiona
 - Vinícius de Sousa Andrade
 
 <!--  IDEIAS: Futuro Desenvolvimento
-Relatórios e Estatísticas:
-- Geração de relatórios detalhados sobre a carga de trabalho.
-- Análise de horas trabalhadas por hospital e período.
-- Sugestões para melhor distribuição de plantões.
-
-Adicionar mais personas, como o o Médico que administra o setor.
-
+-
+-
+-
 
 -->
