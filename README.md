@@ -11,11 +11,6 @@ O projeto tem como principal objetivo fornecer uma ferramenta confiável e acess
 
 <br>
 
-# Template
-![DOCS](https://docs.google.com/document/d/1TOYYkqhOjWpDCq9UYjCxVv-t8l7QRGcNZAZFxkIMHjI/edit?pli=1&tab=t.0)
-
-<br>
-
 # 🚀 Funcionalidades Principais
 ### PLANTONISTA:
 ### Cadastro de Usuários:
@@ -100,6 +95,9 @@ Empresas e cooperativas médicas que organizam escalas de múltiplos profissiona
 - [Doc Final](https://docs.google.com/document/d/1b8K4RkX1pw4duaf0UXymieVX-m0ZwOfl/edit?usp=drive_link&ouid=103765495616283977154&rtpof=true&sd=true)
 
 <br>
+
+# Template - TG
+- Em breve
 
 # 📅 Próximos Passos
 ...
