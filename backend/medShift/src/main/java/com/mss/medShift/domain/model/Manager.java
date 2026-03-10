@@ -1,5 +1,7 @@
 package com.mss.medShift.domain.model;
 
+import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,14 +13,13 @@ public class Manager extends User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String department;
 
     public Manager() {
     }
 
-    public Manager(String name, String cpf, String birthday, String password, String department) {
-        super(name, cpf, birthday, password);
+    public Manager(String name, String cpf, String email, Date birthday, String password, String department) {
+        super(name, cpf, email,  birthday, password);
         this.department = department;
     }
 

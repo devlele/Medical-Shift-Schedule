@@ -1,0 +1,10 @@
+CREATE TABLE tb_doctor (
+    id BIGINT PRIMARY KEY UNIQUE,
+    crm VARCHAR(20) UNIQUE NOT NULL,
+    specialty VARCHAR(100) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    cpf VARCHAR(14) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    birthday DATE,
+    password VARCHAR(255) NOT NULL,
+)

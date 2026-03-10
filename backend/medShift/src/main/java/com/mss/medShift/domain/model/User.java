@@ -1,21 +1,25 @@
 package com.mss.medShift.domain.model;
 
+import java.util.Date;
+
 import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public class User {
 
     private String name;
+    private String email;
     private String cpf;
-    private String birthday;
+    private Date birthday;
     private String password;
 
     public User() {
 
     }
 
-    public User(String name, String cpf, String birthday, String password) {
+    public User(String name, String email, String cpf, Date birthday, String password) {
         this.name = name;
+        this.email = email;
         this.cpf = cpf;
         this.birthday = birthday;
         this.password = password;
@@ -29,6 +33,14 @@ public class User {
         this.name = name;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getCpf() {
         return cpf;
     }
@@ -37,11 +49,11 @@ public class User {
         this.cpf = cpf;
     }
 
-    public String getBirthday() {
+    public Date getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(String birthday) {
+    public void setBirthday(Date birthday) {
         this.birthday = birthday;
     }
 
