@@ -2,8 +2,10 @@ package com.mss.medShift.domain.model;
 
 import java.sql.Date;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Entity;
@@ -21,14 +23,16 @@ public class Doctor extends User implements UserDetails {
     private Long id;
     private  String crm;
     private String specialty;
+    private UserRole role;
 
     public Doctor() {
     }
 
-    public Doctor(String name, String cpf, String email, Date birthday, String password, String specialty, String crm) {
+    public Doctor(String name, String cpf, String email, Date birthday, String password, String specialty, String crm, UserRole role) {
         super(name, cpf, email, birthday, password);
         this.specialty = specialty;
         this.crm = crm;
+        this.role = role;
     }
 
     public Long getId() {
@@ -58,7 +62,15 @@ public class Doctor extends User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAuthorities'");
+        //throw new UnsupportedOperationException("Unimplemented method 'getAuthorities'");
+        
+        if(this.role == UserRole.ADMIN) {
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"),
+                           new SimpleGrantedAuthority("ROLE_USER"));
+        }
+        else {
+            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        }
     }
 
     @Override

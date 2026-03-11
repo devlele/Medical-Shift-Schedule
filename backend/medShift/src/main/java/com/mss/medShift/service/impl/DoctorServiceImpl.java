@@ -1,7 +1,8 @@
-package com.mss.medShift.service.Impl;
+package com.mss.medShift.service.impl;
 
 import java.util.NoSuchElementException;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.mss.medShift.domain.repository.DoctorRepository;
@@ -14,6 +15,11 @@ public class DoctorServiceImpl implements DoctorService {
 
     public DoctorServiceImpl(DoctorRepository doctorRepository) {
         this.doctorRepository = doctorRepository;
+    }
+
+    @Override
+    public UserDetails findByEmail(String email) {
+        return doctorRepository.findByEmail(email);
     }
 
     @Override
