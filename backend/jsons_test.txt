@@ -1,0 +1,35 @@
+jsons para teste:
+
+POST: localhost:8080/doctor
+{
+  "name": "João Silva",
+  "cpf": "12345678900",
+  "email": "joao@example.com",
+  "birthday": "1990-01-01",
+  "password": "senha123",
+  "specialty": "Cardiologia",
+  "crm": "12345",
+  "role": "USER"
+}
+
+POST: localhost:8080/auth/login
+{
+  "email": "joao@example.com",
+  "password": "senha123"
+}
+
+POST: localhost:8080/manager
+{
+  "name": "Marcos Nascimento",
+  "cpf": "12345678901",
+  "email": "marcos@example.com",
+  "birthday": "1990-01-01",
+  "password": "senha1234",
+  "department": "UTI/Enfermaria"
+}
+
+POST: localhost:8080/auth/login
+{
+  "email": "marcos@example.com",
+  "password": "senha1234"
+}
