@@ -28,8 +28,8 @@ public class Doctor extends User implements UserDetails {
     public Doctor() {
     }
 
-    public Doctor(String name, String cpf, String email, Date birthday, String password, String specialty, String crm, UserRole role) {
-        super(name, cpf, email, birthday, password);
+    public Doctor(String name, String email, String cpf, Date birthday, String password, String specialty, String crm, UserRole role) {
+        super(name, email, cpf, birthday, password);
         this.specialty = specialty;
         this.crm = crm;
         this.role = role;
@@ -98,5 +98,10 @@ public class Doctor extends User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void setRole(UserRole role) {
+        // TODO Auto-generated method stub
+        this.role = role;
     }
 }

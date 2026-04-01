@@ -11,36 +11,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.mss.medShift.domain.model.Doctor;
-import com.mss.medShift.service.DoctorService;
+import com.mss.medShift.domain.model.Manager;
+import com.mss.medShift.service.ManagerService;
 
 @RestController
-@RequestMapping("/doctor")
-public class DoctorController {
-    private DoctorService doctorService;
+@RequestMapping("/manager")
+public class ManagerController {
+    private ManagerService managerService;
 
-    public DoctorController(DoctorService doctorService) {
-        this.doctorService = doctorService;
+    public ManagerController(ManagerService managerService) {
+        this.managerService = managerService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Doctor> getDoctor(@PathVariable Long id) {
+    public ResponseEntity<Manager> getManager(@PathVariable Long id) {
        try {
-            var doctor = doctorService.findById(id);
-            return ResponseEntity.ok(doctor);
+            var manager = managerService.findById(id);
+            return ResponseEntity.ok(manager);
        } catch (Exception e) {
             return ResponseEntity.notFound().build();
        }
     }
 
     @PostMapping
-    public ResponseEntity<Doctor> create(@RequestBody Doctor doctorToCreate) {
-        var doctorCreated = doctorService.create(doctorToCreate);
+    public ResponseEntity<Manager> create(@RequestBody Manager managerToCreate) {
+        var managerCreated = managerService.create(managerToCreate);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                         .path("/{id}")
-                        .buildAndExpand(doctorToCreate.getId())
+                        .buildAndExpand(managerToCreate.getId())
                         .toUri();
 
-        return ResponseEntity.created(location).body(doctorCreated);
+        return ResponseEntity.created(location).body(managerCreated);
     }
 }

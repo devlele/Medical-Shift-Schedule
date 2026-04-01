@@ -1,0 +1,10 @@
+CREATE TABLE tb_manager (
+    id BIGINT PRIMARY KEY UNIQUE,
+    department VARCHAR(100) NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    cpf VARCHAR(14) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    birthday DATE,
+    password VARCHAR(255) NOT NULL
+);

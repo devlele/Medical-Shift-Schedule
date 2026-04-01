@@ -10,5 +10,6 @@ import com.mss.medShift.domain.model.Doctor;
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
         
         boolean existsByCrm(String crm); 
+        boolean existsByEmail(String email);
         UserDetails findByEmail(String email);
 }
