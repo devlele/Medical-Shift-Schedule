@@ -78,6 +78,7 @@ Empresas e cooperativas médicas que organizam escalas de múltiplos profissiona
 
 # ⚙️ Prototipação
 - [Protótipo Figma](https://www.figma.com/design/8YvVTVTlUm5ljI7vkxwxFk/Medical-Shift-Schedule?node-id=0-1&p=f&t=CXRC9VLQ1k8V2cP5-0)
+- [Novo Figma](https://www.figma.com/design/YJEqehz57IY9ngHHfdHkWI/MSS?node-id=14-180&t=33DGUznxVwQwUQwS-1)
 
 <br>
 
