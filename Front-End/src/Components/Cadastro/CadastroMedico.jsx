@@ -31,6 +31,40 @@ function CadastroUsuario() {
         </div>
 
         <div>
+          <label htmlFor="uf">UF</label>
+          <select id="uf" name="uf">
+            <option value="">Selecione a UF</option>
+            <option value="AC">AC</option>
+            <option value="AL">AL</option>
+            <option value="AP">AP</option>
+            <option value="AM">AM</option>
+            <option value="BA">BA</option>
+            <option value="CE">CE</option>
+            <option value="DF">DF</option>
+            <option value="ES">ES</option>
+            <option value="GO">GO</option>
+            <option value="MA">MA</option>
+            <option value="MT">MT</option>
+            <option value="MS">MS</option>
+            <option value="MG">MG</option>
+            <option value="PA">PA</option>
+            <option value="PB">PB</option>
+            <option value="PR">PR</option>
+            <option value="PE">PE</option>
+            <option value="PI">PI</option>
+            <option value="RJ">RJ</option>
+            <option value="RN">RN</option>
+            <option value="RS">RS</option>
+            <option value="RO">RO</option>
+            <option value="RR">RR</option>
+            <option value="SC">SC</option>
+            <option value="SP">SP</option>
+            <option value="SE">SE</option>
+            <option value="TO">TO</option>
+          </select>
+        </div>
+
+        <div>
           <label htmlFor="email">Email</label>
           <input
             type="email"
@@ -58,32 +92,18 @@ function CadastroUsuario() {
         </div>
 
         <div>
-          <label>Gênero</label>
-          <div className="genero">
-            <label>
-              <input type="radio" name="genero" value="masculino" /> Masculino
-            </label>
-
-            <label>
-              <input type="radio" name="genero" value="feminino" /> Feminino
-            </label>
-
-            <label>
-              <input type="radio" name="genero" value="outro" /> Outro
-            </label>
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="area">Área médica</label>
-          <select id="area" name="area_medica">
-            <option value="">Selecione uma área</option>
+          <label htmlFor="especialidade">Especialidade</label>
+          <select id="especialidade" name="especialidade">
+            <option value="">Selecione uma Especialidade</option>
             <option>Cardiologia</option>
-            <option>Pediatria</option>
             <option>Cirurgia Geral</option>
             <option>Oncologia</option>
             <option>Ginecologia</option>
+            <option>Obstetrícia</option>
+            <option>Neonatologia</option>
+            <option>Pediatria</option>
             <option>Ortopedia</option>
+            <option>Fisioterapia</option>
             <option>Dermatologia</option>
             <option>Neurologia</option>
             <option>Psiquiatria</option>
