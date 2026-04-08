@@ -1,0 +1,297 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Arial", sans-serif;
+}
+
+html {
+  font-size: 18px;
+}
+
+.home {
+  background-color: #e2faef;
+  min-height: 100vh;
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 60px;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nomeLogo {
+  width: 120px;
+}
+
+.nav-buttons button {
+  margin-left: 10px;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 16px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btnCadastro {
+  background-color: #43a0a5;
+  color: #000;
+}
+
+.btnLogin {
+  background-color: #b1dfdd;
+  color: #000;
+}
+
+.nav-buttons button:hover {
+  background-color: #4f8c8c;
+}
+
+/* ICONS */
+.inicio {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 550px;
+}
+
+.icons {
+  position: relative;
+  width: 650px;
+  height: 450px;
+}
+
+/* LOGO CENTRAL */
+.center-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.center-logo img {
+  width: 130px;
+}
+
+.center-logo h2 {
+  font-size: 28px;
+}
+
+.center-logo span {
+  font-size: 16px;
+}
+
+/* ICONS */
+.icon {
+  position: absolute;
+  width: 80px;
+  padding: 12px;
+  background: #b1dfdd;
+  border-radius: 16px;
+  box-shadow: 3px 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* POSIÇÕES */
+.i1 {
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.i2 {
+  top: 80px;
+  left: 20px;
+}
+.i3 {
+  top: 80px;
+  right: 20px;
+}
+.i4 {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.i5 {
+  bottom: 80px;
+  left: 20px;
+}
+.i6 {
+  bottom: 80px;
+  right: 20px;
+}
+
+/* CARD INFO */
+.card-info {
+  width: 80%;
+  margin: 50px auto;
+  background: #b1dfdd;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.card-info p {
+  font-size: 16px;
+}
+
+/* IMAGENS */
+.imagem {
+  display: flex;
+  justify-content: center;
+}
+
+.img-grid {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.img-grid img {
+  width: 100%;
+  height: 250px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+/* PLANOS */
+.planos {
+  text-align: center;
+  margin: 70px 0;
+}
+
+.planos h3 {
+  margin-bottom: 40px;
+  font-size: 22px;
+}
+
+.planos-grid {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.plano-card {
+  width: 260px;
+  height: 260px;
+  background: #b1dfdd;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plano-card p {
+  font-size: 15px;
+}
+
+/* BOTÃO FINAL */
+.btn-container {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.btn {
+  padding: 14px 30px;
+  font-size: 16px;
+  background: #43a0a5;
+  color: #000;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #1f6f6f;
+}
+
+/* ========================= */
+/* RESPONSIVIDADE */
+/* ========================= */
+
+@media (max-width: 1024px) {
+  .hero {
+    width: 500px;
+    height: 380px;
+  }
+
+  .icon {
+    width: 65px;
+  }
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+
+  .navbar {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+  }
+
+  .nav-buttons button {
+    width: 120px;
+  }
+
+  .inicio {
+    height: auto;
+    padding: 40px 0;
+  }
+
+  .hero {
+    width: 90%;
+    height: 320px;
+  }
+
+  .icon {
+    width: 55px;
+  }
+
+  .img-grid img {
+    height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    width: 40px;
+  }
+
+  .nomeLogo {
+    width: 140px;
+  }
+
+  .hero {
+    height: 280px;
+  }
+
+  .icon {
+    width: 45px;
+    padding: 8px;
+  }
+
+  .plano-card {
+    width: 90%;
+    height: auto;
+  }
+
+  .btn {
+    width: 80%;
+  }
+}
