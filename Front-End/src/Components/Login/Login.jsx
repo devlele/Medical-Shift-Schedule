@@ -1,60 +1,86 @@
+import React from "react";
 import { Link } from "react-router-dom";
+import { Mail, Lock } from "lucide-react";
 
-import { FaUser, FaLock } from "react-icons/fa";
-import { useState } from "react";
-
+import logo from "../../assets/Logo-H.png";
 import "./Login.css";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    //entrar com o back-end
-    alert("Enviando os dados: " + username + " - " + password);
-  };
-
   return (
-    <div className="container">
-      <form onSubmit={handleSubmit}>
-        <h1>Login</h1>
-        <div className="input-field">
-          <input
-            type="email"
-            placeholder="E-mail"
-            required
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <FaUser className="icon" />
-        </div>
-        <div className="input-field">
-          <input
-            type="password"
-            placeholder="Senha"
-            required
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <FaLock className="icon" />
-        </div>
-        <div className="recall-forget">
-          <label>
-            <input type="checkbox" />
-            Lembre de mim
-          </label>
-
-          {/* criar página de recuperação de senha */}
-          <Link to="/">Esqueceu a senha?</Link>
+    <div className="pagina-login">
+      <div className="conteudo-login">
+        {/* LOGO */}
+        <div className="area-logo">
+          <img src={logo} alt="Logo" className="logo" />
         </div>
 
-        <button>Entrar</button>
+        {/* CARD */}
+        <div className="cartao-login">
+          <form>
+            {/* EMAIL */}
+            <div className="grupo-formulario">
+              <label className="label-formulario">Email</label>
 
-        <div className="signup-link">
-          <p>
-            Não tem uma conta? <Link to="/CadastroMedico">Registrar</Link>
-          </p>
+              <div className="area-input">
+                <Mail className="icone-input" />
+                <input
+                  type="email"
+                  placeholder="nome@hospital.com"
+                  className="campo-input"
+                />
+              </div>
+            </div>
+
+            {/* SENHA */}
+            <div className="grupo-formulario">
+              <div className="linha-label">
+                <label className="label-formulario">Senha</label>
+
+                <button type="button" className="botao-esqueceu">
+                  Esqueci minha senha
+                </button>
+              </div>
+
+              <div className="area-input">
+                <Lock className="icone-input" />
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  className="campo-input"
+                />
+              </div>
+            </div>
+
+            {/* CHECKBOX */}
+            <div className="linha-lembrar">
+              <input type="checkbox" id="lembrar" className="checkbox" />
+              <label htmlFor="lembrar" className="label-lembrar">
+                Lembrar acesso neste dispositivo
+              </label>
+            </div>
+
+            {/* BOTÃO */}
+            <button type="submit" className="botao-principal">
+              Entrar
+            </button>
+          </form>
+
+          {/* CADASTRO */}
+          <div className="texto-cadastro">
+            <p>
+              Não possui uma conta?{" "}
+              <Link to="/cadastro" className="link-cadastro">
+                Criar conta
+              </Link>
+            </p>
+          </div>
         </div>
-      </form>
+      </div>
+
+      {/* FOOTER */}
+      <footer className="rodape-login">
+        © 2026 Medical Shift Schedule. Todos os direitos reservados.
+      </footer>
     </div>
   );
 };

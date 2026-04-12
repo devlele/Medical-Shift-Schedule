@@ -1,141 +1,284 @@
-/* CONTAINER */
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 0 20px;
+:root {
+  --medical-dark: #1f7a63;
+  --medical-teal: #2bbf9c;
 }
 
-/* HEADER */
-.header-conteudo {
+/* PÁGINA */
+.pagina-inicial {
+  min-height: 100vh;
+  background-color: rgba(226, 250, 239, 0.35);
+  font-family: "Inter", sans-serif;
+}
+
+/* CABEÇALHO */
+.cabecalho {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background-color: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(148, 191, 167, 0.15);
+}
+
+.cabecalho-conteudo {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 80px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
 .logo {
-  height: 60px;
+  height: 42px;
 }
 
-.header-botoes {
+/* AÇÕES */
+.acoes-cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.link-login {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(55, 83, 71, 0.8);
+  text-decoration: none;
+}
+
+.botao-cadastro {
+  background-color: var(--medical-dark);
+  color: white;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.botao-cadastro:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+}
+
+/* CONTEÚDO PRINCIPAL */
+.conteudo-principal {
+  padding-top: 140px;
+}
+
+/* HERO */
+.secao-principal {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px 100px;
+  display: grid;
+  gap: 72px;
+}
+
+@media (min-width: 1024px) {
+  .secao-principal {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+}
+
+.titulo-principal {
+  font-size: 64px;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  letter-spacing: -1px;
+  color: #1f3d33;
+}
+
+@media (min-width: 1024px) {
+  .titulo-principal {
+    font-size: 72px;
+  }
+}
+
+.descricao-principal {
+  font-size: 18px;
+  color: rgba(55, 83, 71, 0.7);
+  margin-bottom: 40px;
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+.botao-principal {
+  background-color: var(--medical-dark);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.botao-principal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.texto-rodape-hero {
+  margin-top: 20px;
+  font-size: 14px;
+  color: rgba(55, 83, 71, 0.5);
+}
+
+/* VISUAL HERO */
+.visual-hero {
+  position: relative;
+}
+
+.cartao-previa {
+  padding: 20px;
+}
+
+.imagem-previa {
+  width: 100%;
+  border-radius: 20px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* SELOS FLUTUANTES */
+.selo-flutuante {
+  position: absolute;
+  padding: 14px 18px;
+  border-radius: 14px;
   display: flex;
   gap: 10px;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
-.btn-link {
-  color: #2f4f46;
-  text-decoration: none;
+.selo-topo {
+  top: -30px;
+  right: 40px;
 }
 
-.btn-primario {
-  background: #2f4f46;
+.selo-inferior {
+  bottom: -20px;
+  right: -10px;
+  background-color: var(--medical-dark);
   color: white;
-  padding: 10px 18px;
-  border-radius: 10px;
-  text-decoration: none;
+  padding: 18px 22px;
+  font-weight: 600;
 }
 
-/* DESTAQUE */
-.destaque {
-  display: flex;
-  justify-content: space-between;
-  padding: 60px 0;
+/* RECURSOS */
+.secao-recursos {
+  background-color: white;
+  padding: 100px 0;
+}
+
+.conteudo-recursos {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  text-align: center;
+}
+
+.titulo-secao {
+  font-size: 34px;
+  margin-bottom: 12px;
+  color: #1f3d33;
+}
+
+.descricao-secao {
+  color: rgba(55, 83, 71, 0.6);
+  max-width: 620px;
+  margin: 0 auto 60px;
+  line-height: 1.6;
+}
+
+.grade-recursos {
+  display: grid;
   gap: 40px;
 }
 
-.destaque-texto h1 {
-  font-size: 48px;
+@media (min-width: 768px) {
+  .grade-recursos {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-.btn-principal {
-  display: inline-block;
-  margin-top: 20px;
-  background: #2f4f46;
-  color: white;
-  padding: 14px 26px;
-  border-radius: 12px;
-  text-decoration: none;
-}
-
-/* CARDS */
-.destaque-cards {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 15px;
-}
-
-.card {
-  background: white;
-  padding: 15px;
-  border-radius: 15px;
-}
-
-.pequeno {
-  background: #b1dfdd;
-}
-
-.card-destaque {
-  background: #2f4f46;
-  color: white;
-  padding: 15px;
-  border-radius: 15px;
-}
-
-/* BENEFÍCIOS */
-.beneficios {
-  text-align: center;
-  padding: 80px 0;
-}
-
-.beneficios-grid {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-/* PROFISSIONAL */
-.profissional {
-  display: flex;
-  justify-content: space-between;
-  background: #d7eee5;
-  padding: 40px;
-  margin: 40px;
+.cartao-recurso {
+  padding: 28px;
   border-radius: 20px;
+  background-color: rgba(193, 231, 214, 0.6);
+  border: 1px solid rgba(148, 191, 167, 0.25);
+  text-align: left;
+  transition: 0.25s;
 }
 
-.profissional-img {
-  width: 250px;
+.cartao-recurso:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
 }
 
-/* AÇÃO */
-.acao {
+.icone-recurso {
+  width: 52px;
+  height: 52px;
+  background-color: white;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--medical-teal);
+  margin-bottom: 20px;
+}
+
+.titulo-recurso {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #1f3d33;
+}
+
+.descricao-recurso {
+  font-size: 14px;
+  color: rgba(55, 83, 71, 0.7);
+  line-height: 1.6;
+}
+
+/* RODAPÉ */
+.rodape {
+  background-color: rgba(226, 250, 239, 0.25);
+  padding: 60px 20px;
+  border-top: 1px solid rgba(148, 191, 167, 0.1);
+}
+
+.conteudo-rodape {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  padding: 60px;
 }
 
-/* FOOTER */
-.footer {
-  background: #d7eee5;
-  padding: 40px 20px;
+.logo-rodape {
+  height: 42px;
+  margin-bottom: 20px;
 }
 
-.footer-conteudo {
-  text-align: center;
+.descricao-rodape {
+  color: rgba(55, 83, 71, 0.6);
+  max-width: 420px;
+  line-height: 1.6;
+  margin-bottom: 20px;
 }
 
-.footer-texto {
-  margin-bottom: 15px;
-}
-
-/* RESPONSIVO */
-@media (max-width: 900px) {
-  .destaque {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .profissional {
-    flex-direction: column;
-    text-align: center;
-  }
+.copyright-rodape {
+  font-size: 12px;
+  color: rgba(55, 83, 71, 0.4);
 }

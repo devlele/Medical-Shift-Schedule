@@ -1,157 +1,128 @@
 import { Link } from "react-router-dom";
-import { Calendar, Users, Shield } from "lucide-react";
-import Logo from "../../assets/Logo-H.png";
+import { ArrowRight, Calendar, Users, Shield } from "lucide-react";
+
+import logo from "../../assets/logo-H.png";
 import img1 from "../../assets/imgHome-1.png";
-import img2 from "../../assets/imgHome-2.png";
-import mala from "../../assets/img-mala.png";
+
 import "./Home.css";
 
-export default function HomePage() {
+const Home = () => {
   return (
-    <>
-      <div className="container">
-        {/* HEADER */}
-        <header className="header">
-          <div className="header-conteudo">
-            <img src={Logo} alt="Logo" className="logo" />
+    <div className="pagina-inicial">
+      {/* CABEÇALHO */}
+      <header className="cabecalho">
+        <div className="cabecalho-conteudo">
+          <img src={logo} alt="Logo" className="logo" />
 
-            <div className="header-botoes">
-              <Link to="/Login" className="btn-link">
-                Login
-              </Link>
+          <div className="acoes-cabecalho">
+            <Link to="/login" className="link-login">
+              Login
+            </Link>
 
-              <Link to="/CadastroMedico" className="btn-primario">
-                Sign Up
-              </Link>
-            </div>
+            <Link to="/Cadastro" className="botao-cadastro">
+              Sign Up
+            </Link>
           </div>
-        </header>
+        </div>
+      </header>
 
-        <main>
-          {/* DESTAQUE */}
-          <section className="destaque">
-            <div className="destaque-texto">
-              <h1>A clareza que sua rotina médica merece.</h1>
+      {/* CONTEÚDO */}
+      <main className="conteudo-principal">
+        {/* HERO */}
+        <section className="secao-principal">
+          <div>
+            <h1 className="titulo-principal">
+              A clareza que sua <span>rotina médica</span> merece.
+            </h1>
 
-              <p>
-                Elimine a confusão de planilhas e grupos de mensagens. Uma
-                plataforma intuitiva para o fluxo real de hospitais e clínicas.
-              </p>
-
-              <p className="destaque-sub">
-                Comece agora e se junte a uma instituição de saúde!
-              </p>
-
-              <Link to="/CadastroMedico" className="btn-principal">
-                Começar agora
-              </Link>
-            </div>
-
-            {/* TEM QUE AJUSTAR*/}
-            <div className="destaque-cards">
-              <div className="card">
-                <p>Agenda Mensal</p>
-                <img src={img2} alt="Agenda" />
-              </div>
-
-              <div className="card pequeno">
-                <img src={mala} alt="Plantões" />
-                <p>+12 Plantões</p>
-              </div>
-
-              <div className="card">
-                <p>Conflito Resolvido</p>
-                <span>Plantão das 19:00 delegado.</span>
-              </div>
-
-              <div className="card-destaque">
-                <h2>98%</h2>
-                <p>ocupação</p>
-              </div>
-            </div>
-          </section>
-
-          {/* BENEFÍCIOS */}
-          <section className="beneficios">
-            <h2>Menos atrito, mais eficiência</h2>
-
-            <p className="beneficios-sub">
-              Ferramentas que entendem o fluxo médico, focadas em simplicidade.
+            <p className="descricao-principal">
+              Elimine planilhas e mensagens confusas. Uma plataforma feita para
+              hospitais e clínicas de alto desempenho.
             </p>
 
-            {/* TEM QUE ARRUMAR */}
-            <div className="beneficios-grid">
-              <div className="card">
-                <Calendar size={32} />
-                <h3>Organização de plantões</h3>
-                <p>Visualize escalas por dia, semana ou unidade.</p>
-              </div>
-
-              <div className="card">
-                <Shield size={32} />
-                <h3>Evitar conflitos</h3>
-                <p>Bloqueio automático de horários.</p>
-              </div>
-
-              <div className="card">
-                <Users size={32} />
-                <h3>Gestão centralizada</h3>
-                <p>Escalas e comunicação em um só lugar.</p>
-              </div>
-            </div>
-          </section>
-
-          {/* PROFISSIONAL */}
-          <section className="profissional">
-            <div className="profissional-texto">
-              <h2>Desenhado para profissionais</h2>
-
-              {/* tem que colocar a imagem de check */}
-              <div className="profissional-item">
-                <span>✔</span>
-                <div>
-                  <strong>Tudo na palma da mão</strong>
-                  <p>Confirme plantões direto do celular.</p>
-                </div>
-              </div>
-
-              <div className="profissional-item">
-                <span>✔</span>
-                <div>
-                  <strong>Relatórios em tempo real</strong>
-                  <p>Visualize escalas atualizadas.</p>
-                </div>
-              </div>
-            </div>
-
-            <img src={img1} alt="Tablet" className="profissional-img" />
-          </section>
-
-          {/* AÇÃO */}
-          <section className="acao">
-            <h2>Pronto para transformar sua gestão?</h2>
-
-            <p>Desenvolvido para profissionais da saúde</p>
-
-            <Link to="/CadastroMedico" className="btn-principal">
-              Começar agora
+            <Link to="/cadastro" className="botao-principal">
+              Começar agora <ArrowRight size={18} />
             </Link>
-          </section>
-        </main>
-      </div>
 
-      {/* FOOTER */}
-      <footer className="footer">
-        <div className="footer-conteudo">
-          <img src={Logo} alt="Logo" className="logo" />
+            <p className="texto-rodape-hero">Comece hoje mesmo.</p>
+          </div>
 
-          <p className="footer-texto">
+          {/* VISUAL */}
+          <div className="visual-hero">
+            <div className="cartao-previa">
+              <img src={img1} alt="Preview" className="imagem-previa" />
+            </div>
+
+            <div className="selo-flutuante selo-topo">
+              <Calendar size={18} />
+              <div>
+                <div>Plantões</div>
+                <strong>+12 hoje</strong>
+              </div>
+            </div>
+
+            <div className="selo-flutuante selo-inferior">98% ocupação</div>
+          </div>
+        </section>
+
+        {/* RECURSOS */}
+        <section className="secao-recursos">
+          <div className="conteudo-recursos">
+            <h2 className="titulo-secao">Menos atrito, mais eficiência</h2>
+
+            <p className="descricao-secao">
+              Ferramentas pensadas para o fluxo real de hospitais.
+            </p>
+
+            <div className="grade-recursos">
+              <div className="cartao-recurso">
+                <div className="icone-recurso">
+                  <Calendar />
+                </div>
+                <h3 className="titulo-recurso">Escalas inteligentes</h3>
+                <p className="descricao-recurso">
+                  Visualize e ajuste plantões com facilidade total.
+                </p>
+              </div>
+
+              <div className="cartao-recurso">
+                <div className="icone-recurso">
+                  <Shield />
+                </div>
+                <h3 className="titulo-recurso">Sem conflitos</h3>
+                <p className="descricao-recurso">
+                  Evite sobreposição de horários automaticamente.
+                </p>
+              </div>
+
+              <div className="cartao-recurso">
+                <div className="icone-recurso">
+                  <Users />
+                </div>
+                <h3 className="titulo-recurso">Gestão centralizada</h3>
+                <p className="descricao-recurso">
+                  Tudo em um único lugar para sua equipe.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* RODAPÉ */}
+      <footer className="rodape">
+        <div className="conteudo-rodape">
+          <img src={logo} alt="Logo" className="logo-rodape" />
+
+          <p className="descricao-rodape">
             A plataforma definitiva para médicos e gestores.
           </p>
 
-          <p className="footer-copy">© 2026 Medical Shift Schedule.</p>
+          <div className="copyright-rodape">© 2026 Medical Shift Schedule</div>
         </div>
       </footer>
-    </>
+    </div>
   );
-}
+};
+
+export default Home;
