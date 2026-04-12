@@ -1,0 +1,170 @@
+:root {
+  --medical-dark: #1f7a63;
+  --medical-teal: #2bbf9c;
+  --medical-mint: #e6faf3;
+}
+
+/* PÁGINA */
+.pagina-tipo {
+  min-height: 100vh;
+  background-color: var(--medical-mint);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* CABEÇALHO */
+.cabecalho-tipo {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+/* LOGO */
+.logo-tipo {
+  height: 80px;
+  margin-bottom: 32px;
+}
+
+/* DESCRIÇÃO */
+.descricao-tipo {
+  color: rgba(55, 83, 71, 0.6);
+  max-width: 450px;
+  margin: 0 auto;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* GRID */
+.grade-tipo {
+  display: grid;
+  gap: 32px;
+  width: 100%;
+  max-width: 900px;
+}
+
+@media (min-width: 768px) {
+  .grade-tipo {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* CARTÃO */
+.cartao-tipo {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: transform 0.2s ease;
+}
+
+.cartao-tipo:hover {
+  transform: translateY(-8px);
+}
+
+/* ÍCONE */
+.icone-tipo {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+/* VARIAÇÕES */
+.icone-medico {
+  background-color: rgba(148, 191, 167, 0.2);
+  color: var(--medical-dark);
+}
+
+.icone-hospital {
+  background-color: rgba(67, 160, 165, 0.2);
+  color: var(--medical-teal);
+}
+
+/* ÍCONE LUCIDE */
+.icone-principal {
+  width: 32px;
+  height: 32px;
+}
+
+/* TÍTULO */
+.titulo-tipo {
+  font-size: 28px;
+  margin-bottom: 16px;
+  color: #1f3d33;
+}
+
+/* TEXTO */
+.texto-tipo {
+  color: rgba(55, 83, 71, 0.6);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+/* LINK */
+.link-tipo {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--medical-teal);
+  font-weight: 700;
+  text-decoration: none;
+  transition: gap 0.2s;
+}
+
+.link-tipo:hover {
+  gap: 12px;
+}
+
+/* ÍCONE LINK */
+.icone-link {
+  width: 20px;
+  height: 20px;
+}
+
+/* FUNDO DECORATIVO */
+.icone-fundo {
+  position: absolute;
+  bottom: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  color: rgba(55, 83, 71, 0.05);
+  opacity: 0.1;
+  transform: rotate(12deg);
+  pointer-events: none;
+  transition: transform 0.5s ease;
+}
+
+.cartao-tipo:hover .icone-fundo {
+  transform: rotate(0deg);
+}
+
+/* LOGIN */
+.area-login {
+  margin-top: 48px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(55, 83, 71, 0.6);
+  text-align: center;
+}
+
+.link-login {
+  color: var(--medical-teal);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.link-login:hover {
+  text-decoration: underline;
+}

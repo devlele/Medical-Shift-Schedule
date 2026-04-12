@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Calendar, Users, Shield } from "lucide-react";
 
-import logo from "../../assets/logo-H.png";
+import logo from "../../assets/Logo-H.png";
 import img1 from "../../assets/imgHome-1.png";
 
 import "./Home.css";
@@ -19,7 +19,7 @@ const Home = () => {
               Login
             </Link>
 
-            <Link to="/Cadastro" className="botao-cadastro">
+            <Link to="/CadastroTipo" className="botao-cadastro">
               Sign Up
             </Link>
           </div>
@@ -40,7 +40,7 @@ const Home = () => {
               hospitais e clínicas de alto desempenho.
             </p>
 
-            <Link to="/cadastro" className="botao-principal">
+            <Link to="/CadastroTipo" className="botao-principal">
               Começar agora <ArrowRight size={18} />
             </Link>
 

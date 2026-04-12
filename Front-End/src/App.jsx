@@ -3,6 +3,7 @@ import "./App.css";
 import Login from "./Components/Login/Login";
 import Home from "./Components/Home/Home";
 import CadastroMedico from "./Components/Cadastro/CadastroMedico";
+import CadastroTipo from "./Components/CadastroTipo/CadastroTipo";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/CadastroMedico" element={<CadastroMedico />} />
+        <Route path="/CadastroTipo" element={<CadastroTipo />} />
       </Routes>
     </BrowserRouter>
   );

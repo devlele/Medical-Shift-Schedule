@@ -69,7 +69,7 @@ const Login = () => {
           <div className="texto-cadastro">
             <p>
               Não possui uma conta?{" "}
-              <Link to="/cadastro" className="link-cadastro">
+              <Link to="/CadastroTipo" className="link-cadastro">
                 Criar conta
               </Link>
             </p>
