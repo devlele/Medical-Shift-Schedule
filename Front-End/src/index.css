@@ -1,0 +1,10 @@
+/* /* RESET */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #e2faef;
+  font-family: "Inter", Arial;
+}

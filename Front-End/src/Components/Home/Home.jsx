@@ -1,107 +1,157 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { Calendar, Users, Shield } from "lucide-react";
+import Logo from "../../assets/Logo-H.png";
+import img1 from "../../assets/imgHome-1.png";
+import img2 from "../../assets/imgHome-2.png";
+import mala from "../../assets/img-mala.png";
 import "./Home.css";
 
-import nomeLogo from "../../assets/nomeLogo.png";
-import logo from "../../assets/logo.png";
-import card1 from "../../assets/card-01.png";
-import card2 from "../../assets/card-02.png";
-import card3 from "../../assets/card-03.png";
-import card4 from "../../assets/card-04.png";
-import card5 from "../../assets/card-05.png";
-import home1 from "../../assets/home1.png";
-import home2 from "../../assets/home2.png";
-import home3 from "../../assets/home3.png";
-
-const Home = () => {
-  const navigate = useNavigate();
-
-  function CadastrarMedico() {
-    navigate("/CadastroMedico");
-  }
-
-  function Login() {
-    navigate("/Login");
-  }
-
+export default function HomePage() {
   return (
-    <div className="home">
-      <nav className="navbar">
-        <div className="logo-area">
-          <img className="nomeLogo" src={nomeLogo} alt="nomeLogo" />
-        </div>
+    <>
+      <div className="container">
+        {/* HEADER */}
+        <header className="header">
+          <div className="header-conteudo">
+            <img src={Logo} alt="Logo" className="logo" />
 
-        <div className="nav-buttons">
-          <button className="btnCadastro" onClick={CadastrarMedico}>
-            Cadastro
-          </button>
-          <button className="btnLogin" onClick={Login}>
-            Login
-          </button>
-        </div>
-      </nav>
+            <div className="header-botoes">
+              <Link to="/Login" className="btn-link">
+                Login
+              </Link>
 
-      {/* ICONS */}
-      <section className="inicio">
-        <div className="icons">
-          {/* Ícones ao redor */}
-          <img className="icon i1" src={card4} alt="icon1" />
-          <img className="icon i2" src={card3} alt="icon2" />
-          <img className="icon i3" src={card1} alt="icon3" />
-          <img className="icon i4" src={card2} alt="icon4" />
-          <img className="icon i5" src={card5} alt="icon2" />
-          <img className="icon i6" src={card4} alt="icon2" />
-
-          {/* LOGO CENTRAL */}
-          <div className="center-logo">
-            <img className="logo" src={logo} alt="logo" />
+              <Link to="/CadastroMedico" className="btn-primario">
+                Sign Up
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </header>
 
-      {/* CARD INFO */}
-      <section className="card-info">
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda
-          ratione aliquid dignissimos, officiis deserunt.
-        </p>
-      </section>
+        <main>
+          {/* DESTAQUE */}
+          <section className="destaque">
+            <div className="destaque-texto">
+              <h1>A clareza que sua rotina médica merece.</h1>
 
-      {/* IMAGENS */}
-      <section className="imagem">
-        <div className="img-grid">
-          <img className="home1" src={home1} alt="imageHome1" />
-          <img className="home2" src={home2} alt="imageHome2" />
-          <img className="home3" src={home3} alt="imageHome3" />
-        </div>
-      </section>
+              <p>
+                Elimine a confusão de planilhas e grupos de mensagens. Uma
+                plataforma intuitiva para o fluxo real de hospitais e clínicas.
+              </p>
 
-      {/* PLANOS */}
-      <section className="planos">
-        <h3>Planos :</h3>
+              <p className="destaque-sub">
+                Comece agora e se junte a uma instituição de saúde!
+              </p>
 
-        <div className="planos-grid">
-          <div className="plano-card">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-          </div>
+              <Link to="/CadastroMedico" className="btn-principal">
+                Começar agora
+              </Link>
+            </div>
 
-          <div className="plano-card">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-          </div>
+            {/* TEM QUE AJUSTAR*/}
+            <div className="destaque-cards">
+              <div className="card">
+                <p>Agenda Mensal</p>
+                <img src={img2} alt="Agenda" />
+              </div>
 
-          <div className="plano-card">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-          </div>
-        </div>
-      </section>
+              <div className="card pequeno">
+                <img src={mala} alt="Plantões" />
+                <p>+12 Plantões</p>
+              </div>
 
-      {/* BOTÃO FINAL */}
-      <div className="btn-container">
-        <button className="btn" onClick={CadastrarMedico}>
-          Cadastrar AGORA
-        </button>
+              <div className="card">
+                <p>Conflito Resolvido</p>
+                <span>Plantão das 19:00 delegado.</span>
+              </div>
+
+              <div className="card-destaque">
+                <h2>98%</h2>
+                <p>ocupação</p>
+              </div>
+            </div>
+          </section>
+
+          {/* BENEFÍCIOS */}
+          <section className="beneficios">
+            <h2>Menos atrito, mais eficiência</h2>
+
+            <p className="beneficios-sub">
+              Ferramentas que entendem o fluxo médico, focadas em simplicidade.
+            </p>
+
+            {/* TEM QUE ARRUMAR */}
+            <div className="beneficios-grid">
+              <div className="card">
+                <Calendar size={32} />
+                <h3>Organização de plantões</h3>
+                <p>Visualize escalas por dia, semana ou unidade.</p>
+              </div>
+
+              <div className="card">
+                <Shield size={32} />
+                <h3>Evitar conflitos</h3>
+                <p>Bloqueio automático de horários.</p>
+              </div>
+
+              <div className="card">
+                <Users size={32} />
+                <h3>Gestão centralizada</h3>
+                <p>Escalas e comunicação em um só lugar.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* PROFISSIONAL */}
+          <section className="profissional">
+            <div className="profissional-texto">
+              <h2>Desenhado para profissionais</h2>
+
+              {/* tem que colocar a imagem de check */}
+              <div className="profissional-item">
+                <span>✔</span>
+                <div>
+                  <strong>Tudo na palma da mão</strong>
+                  <p>Confirme plantões direto do celular.</p>
+                </div>
+              </div>
+
+              <div className="profissional-item">
+                <span>✔</span>
+                <div>
+                  <strong>Relatórios em tempo real</strong>
+                  <p>Visualize escalas atualizadas.</p>
+                </div>
+              </div>
+            </div>
+
+            <img src={img1} alt="Tablet" className="profissional-img" />
+          </section>
+
+          {/* AÇÃO */}
+          <section className="acao">
+            <h2>Pronto para transformar sua gestão?</h2>
+
+            <p>Desenvolvido para profissionais da saúde</p>
+
+            <Link to="/CadastroMedico" className="btn-principal">
+              Começar agora
+            </Link>
+          </section>
+        </main>
       </div>
-    </div>
-  );
-};
 
-export default Home;
+      {/* FOOTER */}
+      <footer className="footer">
+        <div className="footer-conteudo">
+          <img src={Logo} alt="Logo" className="logo" />
+
+          <p className="footer-texto">
+            A plataforma definitiva para médicos e gestores.
+          </p>
+
+          <p className="footer-copy">© 2026 Medical Shift Schedule.</p>
+        </div>
+      </footer>
+    </>
+  );
+}
