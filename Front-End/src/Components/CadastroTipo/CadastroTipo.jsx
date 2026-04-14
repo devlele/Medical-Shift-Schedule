@@ -32,7 +32,7 @@ const CadastroTipo = () => {
             pagamentos de forma simplificada e segura.
           </p>
 
-          <Link to="/cadastro/medico" className="link-tipo">
+          <Link to="/CadastroMedico" className="link-tipo">
             Começar jornada profissional <ArrowRight className="icone-link" />
           </Link>
 

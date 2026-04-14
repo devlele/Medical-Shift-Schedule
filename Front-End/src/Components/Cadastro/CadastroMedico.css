@@ -1,0 +1,194 @@
+:root {
+    --medical-dark: #1f7a63;
+    --medical-teal: #2bbf9c;
+    --medical-mint: #e6faf3;
+    --medical-text: rgba(55, 83, 71, 0.85);
+    --medical-soft: rgba(55, 83, 71, 0.6);
+}
+
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.pagina-cadastro {
+    width: 100vw;
+    min-height: 100vh;
+    display: flex;
+}
+
+/* LADO ESQUERDO */
+.painel-esquerdo {
+    width: 40%;
+    background: linear-gradient(180deg, var(--medical-dark) 0%, #145443 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.logo-cadastro {
+    width: 220px;
+    margin-bottom: 30px;
+}
+
+.texto-esquerdo {
+    max-width: 320px;
+    text-align: center;
+    line-height: 1.8;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* LADO DIREITO */
+.painel-direito {
+    width: 60%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.form-cadastro {
+    width: 100%;
+    max-width: 540px;
+    padding: 36px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(148, 191, 167, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+}
+
+.form-cadastro h1 {
+    font-size: 32px;
+    color: var(--medical-text);
+    margin-bottom: 8px;
+}
+
+.subtitulo {
+    display: block;
+    font-size: 14px;
+    color: var(--medical-soft);
+    margin-bottom: 28px;
+}
+
+/* CAMPOS */
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+.campo label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--medical-soft);
+    margin-bottom: 6px;
+    margin-left: 4px;
+}
+
+.campo input,
+.campo select {
+    width: 100%;
+    height: 52px;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 191, 167, 0.25);
+    padding: 0 16px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+    background: white;
+    color: var(--medical-text);
+}
+
+.campo input::placeholder {
+    color: rgba(55, 83, 71, 0.4);
+}
+
+.campo input:focus,
+.campo select:focus {
+    border-color: var(--medical-teal);
+    box-shadow: 0 0 0 3px rgba(43, 191, 156, 0.15);
+}
+
+/* DUAS COLUNAS */
+.linha-2 {
+    display: flex;
+    gap: 16px;
+}
+
+.linha-2 .campo {
+    flex: 1;
+}
+
+/* BOTÃO */
+.btn-cadastrar {
+    width: 100%;
+    height: 52px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 12px;
+    background-color: var(--medical-dark);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cadastrar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(31, 122, 99, 0.2);
+}
+
+/* LINK LOGIN */
+.link-login {
+    display: block;
+    text-align: center;
+    margin-top: 18px;
+    font-size: 14px;
+    text-decoration: none;
+    color: var(--medical-teal);
+    font-weight: 600;
+}
+
+.link-login:hover {
+    text-decoration: underline;
+}
+
+/* RODAPÉ */
+.rodape-cadastro {
+    display: flex;
+    flex-direction: column;
+    margin-top: 40px;
+    font-size: 12px;
+    color: rgba(55, 83, 71, 0.4);
+    text-align: center;
+}
+
+/* RESPONSIVO */
+@media (max-width: 900px) {
+    .pagina-cadastro {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .painel-esquerdo,
+    .painel-direito {
+        width: 100%;
+    }
+
+    .linha-2 {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .form-cadastro {
+        padding: 24px;
+    }
+}
