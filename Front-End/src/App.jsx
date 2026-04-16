@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Login from "./Components/Login/Login";
 import Home from "./Components/Home/Home";
-import CadastroMedico from "./Components/Cadastro/CadastroMedico";
+import CadastroMedico from "./Components/CadastroMedico/CadastroMedico";
 import CadastroTipo from "./Components/CadastroTipo/CadastroTipo";
 
 function App() {

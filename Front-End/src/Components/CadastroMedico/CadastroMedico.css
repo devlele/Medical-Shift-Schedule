@@ -1,0 +1,203 @@
+/*CONTAINER*/
+.pagina-cadastro {
+  min-height: 100vh;
+  background-color: var(--medical-mint);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 24px;
+}
+
+/*CARD (os dois lados juntos)*/
+.pagina-cadastro > .painel-esquerdo,
+.pagina-cadastro > .painel-direito {
+  height: 800px;
+}
+
+/*LEFT*/
+.painel-esquerdo {
+  background-color: var(--medical-dark);
+  padding: 48px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  color: white;
+  width: 40%;
+
+  border-top-left-radius: 32px;
+  border-bottom-left-radius: 32px;
+}
+
+/*RIGHT*/
+.painel-direito {
+  background-color: white;
+  padding: 48px;
+
+  width: 60%;
+  overflow: visible;
+
+  border-top-right-radius: 32px;
+  border-bottom-right-radius: 32px;
+}
+
+/*SOMBRA (efeito card único)*/
+.painel-esquerdo {
+  box-shadow: -10px 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+.painel-direito {
+  box-shadow: 10px 25px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+/*LOGO*/
+.logo-cadastro {
+  margin-bottom: 48px;
+  transform: scale(1.2);
+}
+
+/*TEXTO ESQUERDO*/
+.texto-esquerdo {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  max-width: 320px;
+}
+
+/*FORM*/
+.form-cadastro {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-cadastro h1 {
+  font-size: 30px;
+  margin-bottom: 8px;
+}
+
+.subtitulo {
+  color: rgba(55, 83, 71, 0.5);
+  font-size: 14px;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 32px;
+}
+
+/*CAMPOS*/
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.campo input,
+.campo select {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #dcdcdc;
+  font-size: 14px;
+}
+
+.campo input:focus,
+.campo select:focus {
+  outline: none;
+  border-color: var(--medical-teal);
+}
+
+/*GRID*/
+.linha-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+/*BOTÃO*/
+.btn-cadastrar {
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
+  background-color: var(--medical-teal);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-cadastrar:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/*LINK*/
+.link-login {
+  display: block;
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--medical-teal);
+}
+
+.link-login:hover {
+  text-decoration: underline;
+}
+
+/*FOOTER*/
+.rodape {
+  background-color: rgba(226, 250, 239, 0.25);
+  padding: 12px 16px; /* ↓ bem menor */
+  border-top: 1px solid rgba(148, 191, 167, 0.1);
+}
+
+.conteudo-rodape {
+  max-width: 1200px;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px; /* controla espaçamento */
+}
+
+/* LOGO */
+.logo-rodape {
+  height: 24px; /* bem menor */
+  margin: 0;
+}
+
+/* TEXTO */
+.descricao-rodape {
+  font-size: 13px;
+  margin: 0;
+  color: rgba(55, 83, 71, 0.6);
+}
+
+/* COPYRIGHT */
+.copyright-rodape {
+  font-size: 10px;
+  margin: 0;
+  color: rgba(55, 83, 71, 0.4);
+}
+
+/*RESPONSIVO*/
+@media (max-width: 1024px) {
+  .pagina-cadastro {
+    flex-direction: column;
+  }
+
+  .painel-esquerdo,
+  .painel-direito {
+    width: 100%;
+    height: auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
