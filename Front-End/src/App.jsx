@@ -3,6 +3,7 @@ import "./App.css";
 import Login from "./Components/Login/Login";
 import Home from "./Components/Home/Home";
 import CadastroMedico from "./Components/CadastroMedico/CadastroMedico";
+import CadastroHospital from "./Components/CadastroHospital/CadastroHospital";
 import CadastroTipo from "./Components/CadastroTipo/CadastroTipo";
 
 function App() {
@@ -11,8 +12,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/Login" element={<Login />} />
-        <Route path="/CadastroMedico" element={<CadastroMedico />} />
         <Route path="/CadastroTipo" element={<CadastroTipo />} />
+        <Route path="/CadastroHospital" element={<CadastroHospital />} />
+        <Route path="/CadastroMedico" element={<CadastroMedico />} />
       </Routes>
     </BrowserRouter>
   );

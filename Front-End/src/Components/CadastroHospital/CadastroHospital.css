@@ -1,0 +1,181 @@
+.hospital-container {
+  min-height: 100vh;
+  background-color: #e8f5f1;
+  padding: 24px;
+}
+
+/* HEADER */
+.hospital-cabecalho {
+  margin-bottom: 32px;
+}
+
+.hospital-cabecalho-conteudo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.voltar-home {
+  color: #0f766e;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.voltar-home:hover {
+  text-decoration: underline;
+}
+
+/* MAIN */
+.hospital-principal {
+  display: grid;
+  gap: 40px;
+}
+
+@media (min-width: 1024px) {
+  .hospital-principal {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* TEXTO */
+.hospital-titulo-principal {
+  font-size: 36px;
+  margin-bottom: 16px;
+}
+
+.texto-verde {
+  color: #14b8a6;
+}
+
+.hospital-descricao {
+  margin-bottom: 24px;
+  color: #555;
+}
+
+/* BENEFÍCIOS */
+.grade-beneficios {
+  display: grid;
+  gap: 16px;
+}
+
+.card-beneficio {
+  padding: 20px;
+  border-radius: 16px;
+}
+
+.beneficio-verde {
+  background-color: #ccfbf1;
+}
+
+.beneficio-escuro {
+  background-color: #0f172a;
+  color: white;
+}
+
+.icone-box {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.icone-escuro {
+  background-color: #0f766e;
+  color: white;
+}
+
+.icone-branco {
+  background-color: white;
+  color: #0f172a;
+}
+
+.titulo-beneficio {
+  font-weight: bold;
+}
+
+.descricao-beneficio {
+  font-size: 14px;
+}
+
+/* FORM */
+.card-formulario {
+  background-color: white;
+  padding: 32px;
+  border-radius: 20px;
+}
+
+.cabecalho-formulario {
+  margin-bottom: 24px;
+}
+
+.titulo-formulario {
+  font-size: 22px;
+}
+
+.subtitulo-formulario {
+  color: #666;
+  font-size: 14px;
+}
+
+.formulario {
+  display: grid;
+  gap: 16px;
+}
+
+.grade-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.grupo-campo {
+  display: flex;
+  flex-direction: column;
+}
+
+.rotulo {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.campo-input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.textarea {
+  min-height: 100px;
+}
+
+/* BOTÃO */
+.botao-primario {
+  background-color: #14b8a6;
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.botao-primario:hover {
+  background-color: #0f766e;
+}
+
+/* SUCESSO */
+.caixa-sucesso {
+  margin-top: 16px;
+  background-color: #dcfce7;
+  padding: 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

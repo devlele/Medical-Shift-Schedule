@@ -51,8 +51,7 @@ const CadastroTipo = () => {
             Organize escalas complexas, visualize a disponibilidade da equipe em
             tempo real e reduza a sobrecarga administrativa.
           </p>
-
-          <Link to="/cadastro/hospital" className="link-tipo">
+          <Link to="/CadastroHospital" className="link-tipo">
             Fazer requisição dos serviços <ArrowRight className="icone-link" />
           </Link>
 
@@ -64,7 +63,7 @@ const CadastroTipo = () => {
       <div className="area-login">
         <p>
           Já possui uma conta?{" "}
-          <Link to="/login" className="link-login">
+          <Link to="/Login" className="link-login">
             Login
           </Link>
         </p>

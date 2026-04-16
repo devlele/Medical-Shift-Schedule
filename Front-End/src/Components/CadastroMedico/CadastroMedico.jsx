@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import logo from "../../assets/Logo-H.png";
+import Footer from "../../Components/Footer/Footer.jsx";
 
 import "./CadastroMedico.css";
 
@@ -137,17 +138,8 @@ function CadastroUsuario() {
         </div>
       </div>
 
-      <footer className="rodape">
-        <div className="conteudo-rodape">
-          <img src={logo} alt="Logo" className="logo-rodape" />
-
-          <p className="descricao-rodape">
-            A plataforma definitiva para médicos e gestores.
-          </p>
-
-          <div className="copyright-rodape">© 2026 Medical Shift Schedule</div>
-        </div>
-      </footer>
+      {/* FOOTER */}
+      <Footer />
     </div>
   );
 }
