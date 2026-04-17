@@ -5,6 +5,7 @@ import Home from "./Components/Home/Home";
 import CadastroMedico from "./Components/CadastroMedico/CadastroMedico";
 import CadastroHospital from "./Components/CadastroHospital/CadastroHospital";
 import CadastroTipo from "./Components/CadastroTipo/CadastroTipo";
+import Perfil from "./Components/Perfil/Perfil";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/CadastroTipo" element={<CadastroTipo />} />
         <Route path="/CadastroHospital" element={<CadastroHospital />} />
         <Route path="/CadastroMedico" element={<CadastroMedico />} />
+        <Route path="/Perfil" element={<Perfil />} />
       </Routes>
     </BrowserRouter>
   );

@@ -61,7 +61,11 @@ const Login = () => {
 
             {/* BOTÃO */}
             <button type="submit" className="botao-principal">
-              Entrar
+              {/* LINK PRO PERFIL PARA TESTES */}
+              <Link to="/Perfil" className="link-perfil">
+                Entrar
+              </Link>
+              {/* Entrar */}
             </button>
           </form>
 

@@ -1,0 +1,288 @@
+:root {
+    --medical-dark: #1f7a63;
+    --medical-teal: #2bbf9c;
+    --medical-mint: #e8f6ef;
+    --medical-soft: #d9ebe3;
+    --medical-card: #eef7f2;
+    --medical-text: #24332d;
+    --medical-muted: #6b7d75;
+    --white: #ffffff;
+}
+
+/* PÁGINA */
+.pagina-perfil {
+    min-height: 100vh;
+    display: flex;
+    background: var(--medical-mint);
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 260px;
+    background: #dcece4;
+    padding: 25px 20px;
+}
+
+.area-logo {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.logo {
+    width: 200px;
+}
+
+.menu-lateral {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.item-menu {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    cursor: pointer;
+    color: var(--medical-text);
+    transition: 0.3s;
+}
+
+.icone {
+    color: #333;
+    width: 20px;
+    height: 20px;
+}
+
+.item-menu:hover,
+.item-menu.ativo {
+    background: #cdded6;
+}
+
+/* CONTEÚDO */
+.conteudo-perfil {
+    flex: 1;
+    padding: 30px;
+}
+
+/* TOPO */
+.topo-perfil {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+}
+
+.titulo-pagina {
+    font-size: 42px;
+    color: var(--medical-text);
+}
+
+.subtitulo-pagina {
+    color: var(--medical-muted);
+    margin-top: 5px;
+}
+
+.acoes-topo {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: #dff0e8;
+    padding: 10px 18px;
+    border-radius: 40px;
+}
+
+.icone-click {
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.icone-click:hover {
+    color: var(--medical-dark);
+    transform: scale(1.1);
+}
+
+.usuario-topo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-left: 12px;
+    border-left: 1px solid #c6d8cf;
+}
+
+.foto-usuario-topo {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* CARD PERFIL */
+.card-perfil {
+    background: #dff0e8;
+    border-radius: 28px;
+    padding: 30px 40px;
+    display: flex;
+    align-items: center;
+    gap: 35px;
+    margin-bottom: 30px;
+}
+
+.lado-foto {
+    position: relative;
+}
+
+.foto-perfil {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.botao-foto {
+    position: absolute;
+    right: -8px;
+    bottom: -8px;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 12px;
+    background: var(--white);
+    cursor: pointer;
+}
+
+.dados-perfil h2 {
+    font-size: 30px;
+    color: var(--medical-text);
+}
+
+.dados-perfil p {
+    margin-top: 8px;
+    font-size: 20px;
+    color: #0f7e73;
+}
+
+/* ÁREA INFERIOR */
+.area-baixo {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 25px;
+}
+
+/* CARD INFO */
+.card-info {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 30px;
+}
+
+.card-info h3,
+.card-historico h3 {
+    font-size: 22px;
+    color: var(--medical-text);
+    margin-bottom: 25px;
+}
+
+.grupo-campo {
+    margin-bottom: 20px;
+}
+
+.grupo-campo label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--medical-muted);
+    margin-bottom: 8px;
+}
+
+.campo-fixo {
+    background: #cfe2d8;
+    padding: 14px;
+    border-radius: 10px;
+}
+
+.linha-dupla {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* HISTÓRICO */
+.card-historico {
+    background: #dff0e8;
+    border-radius: 24px;
+    padding: 25px;
+}
+
+.topo-historico-geral {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.item-historico {
+    background: var(--white);
+    border-radius: 18px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.linha-historico {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.tag {
+    background: #d8f3ea;
+    color: var(--medical-dark);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.tag.azul {
+    background: #c7f1f4;
+}
+
+.item-historico strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--medical-text);
+}
+
+.item-historico p {
+    color: var(--medical-muted);
+    font-size: 14px;
+}
+
+/* RESPONSIVO */
+@media (max-width: 1100px) {
+    .area-baixo {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 850px) {
+    .pagina-perfil {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .topo-perfil,
+    .card-perfil {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .linha-dupla {
+        grid-template-columns: 1fr;
+    }
+}
