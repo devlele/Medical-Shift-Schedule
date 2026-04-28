@@ -1,0 +1,79 @@
+:root {
+    --medical-dark: #1f7a63;
+    --medical-teal: #2bbf9c;
+    --medical-mint: #e8f6ef;
+    --medical-soft: #d9ebe3;
+    --medical-card: #eef7f2;
+    --medical-text: #24332d;
+    --medical-muted: #6b7d75;
+    --white: #ffffff;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 260px;
+    height: 100vh; 
+    background: #dcece4;
+    padding: 25px 20px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+}
+
+/* LOGO */
+.area-logo {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.logo {
+    width: 90px;
+}
+
+/* MENU */
+.menu-lateral {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ITEM */
+.item-menu {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    cursor: pointer;
+    color: var(--medical-text);
+    text-decoration: none; 
+    transition: 0.3s;
+}
+
+/* ÍCONE */
+.icone {
+    color: var(--medical-muted);
+    width: 20px;
+    height: 20px;
+}
+
+/* HOVER */
+.item-menu:hover {
+    background: #cdded6;
+}
+
+.item-menu:active {
+    transform: scale(0.97);
+}
+
+/* ATIVO (React Router) */
+.item-menu.active {
+    background: #cdded6;
+    font-weight: 600;
+}
+
+/* ÍCONE ATIVO */
+.item-menu.active .icone {
+    color: var(--medical-dark);
+}
+

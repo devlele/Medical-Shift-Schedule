@@ -6,6 +6,7 @@ import CadastroMedico from "./Components/CadastroMedico/CadastroMedico";
 import CadastroHospital from "./Components/CadastroHospital/CadastroHospital";
 import CadastroTipo from "./Components/CadastroTipo/CadastroTipo";
 import Perfil from "./Components/Perfil/Perfil";
+import TelaPrincipal from "./Components/TelaPrincipal/TelaPrincipal";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/CadastroHospital" element={<CadastroHospital />} />
         <Route path="/CadastroMedico" element={<CadastroMedico />} />
         <Route path="/Perfil" element={<Perfil />} />
+        <Route path="/TelaPrincipal" element={<TelaPrincipal />} />
       </Routes>
     </BrowserRouter>
   );

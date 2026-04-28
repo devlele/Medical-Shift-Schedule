@@ -3,43 +3,13 @@ import {Bell, Settings, Home, ClipboardPlus, History, User, ImagePlus, CalendarD
 import logo from "../../assets/Logo-H.png";
 import fotoPerfil from "../../assets/drhouse.png"; 
 import "./Perfil.css";
+import Sidebar from "../Sidebar/Sidebar";
 
 const Perfil = () => {
     return (
         <div className="pagina-perfil">
             {/* MENU LATERAL */}
-            <aside className="sidebar">
-                <div className="area-logo">
-                    <img src={logo} alt="Logo MSS" className="logo" />
-                </div>
-
-                <nav className="menu-lateral">
-                    <div className="item-menu">
-                        <Home className="icone" />
-                        <span>Home</span>
-                    </div>
-
-                    <div className="item-menu">
-                        <CalendarDays className="icone" />
-                        <span>Agenda</span>
-                    </div>
-
-                    <div className="item-menu">
-                        <ClipboardPlus className="icone" />
-                        <span>Plantões</span>
-                    </div>
-
-                    <div className="item-menu">
-                        <History className="icone" />
-                        <span>Histórico</span>
-                    </div>
-
-                    <div className="item-menu ativo">
-                        <User className="icone" />
-                        <span>Perfil</span>
-                    </div>
-                </nav>
-            </aside>
+                <Sidebar />
 
             {/* CONTEÚDO */}
             <main className="conteudo-perfil">

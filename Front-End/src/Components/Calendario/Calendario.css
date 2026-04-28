@@ -1,0 +1,55 @@
+.calendario-container {
+    background: #dcece4;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.fc {
+    background: transparent;
+}
+
+/* título */
+.fc-toolbar-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #242833;
+}
+
+/* botões */
+.fc-button {
+    background: #cdded6 !important;
+    border: none !important;
+    color: #332424 !important;
+    border-radius: 8px !important;
+}
+
+.fc .fc-button-group {
+    display: flex;
+    gap: 10px; 
+}
+
+/* hover */
+.fc-button:hover {
+    background: #bcd0c8 !important;
+}
+
+.fc .fc-button:focus,
+.fc .fc-button:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 2px #7c9e96 !important;
+}
+
+/* dias */
+.fc-daygrid-day {
+    background: #ffffff;
+    border-radius: 10px;
+}
+
+/* evento */
+.fc-event {
+    border: none;
+    border-radius: 6px;
+    padding: 2px;
+    font-size: 12px;
+}
+

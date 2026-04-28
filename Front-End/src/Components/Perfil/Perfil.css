@@ -16,50 +16,6 @@
     background: var(--medical-mint);
 }
 
-/* SIDEBAR */
-.sidebar {
-    width: 260px;
-    background: #dcece4;
-    padding: 25px 20px;
-}
-
-.area-logo {
-    text-align: center;
-    margin-bottom: 50px;
-}
-
-.logo {
-    width: 200px;
-}
-
-.menu-lateral {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.item-menu {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
-    border-radius: 14px;
-    cursor: pointer;
-    color: var(--medical-text);
-    transition: 0.3s;
-}
-
-.icone {
-    color: #333;
-    width: 20px;
-    height: 20px;
-}
-
-.item-menu:hover,
-.item-menu.ativo {
-    background: #cdded6;
-}
-
 /* CONTEÚDO */
 .conteudo-perfil {
     flex: 1;
@@ -150,6 +106,10 @@
     border-radius: 12px;
     background: var(--white);
     cursor: pointer;
+}
+
+.botao-foto:hover {
+    background: #d1d9da;
 }
 
 .dados-perfil h2 {

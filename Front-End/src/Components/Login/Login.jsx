@@ -62,7 +62,7 @@ const Login = () => {
             {/* BOTÃO */}
             <button type="submit" className="botao-principal">
               {/* LINK PRO PERFIL PARA TESTES */}
-              <Link to="/Perfil" className="link-perfil">
+              <Link to="/TelaPrincipal" className="link-perfil">
                 Entrar
               </Link>
               {/* Entrar */}
