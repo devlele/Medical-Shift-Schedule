@@ -35,7 +35,7 @@ public class ManagerServiceImple implements ManagerService {
             throw new IllegalArgumentException("This email is already registered");
         }
 
-        managerToCreate.setRole(UserRole.ADMIN);
+        managerToCreate.setRole(UserRole.MANAGER);
         managerToCreate.setPassword(passwordEncoder.encode(managerToCreate.getPassword()));
 
         return managerRepository.save(managerToCreate);

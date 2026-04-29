@@ -40,7 +40,7 @@ public class DoctorServiceImple implements DoctorService {
             throw new IllegalArgumentException("This email is already registered");
         }
 
-        doctorToCreate.setRole(UserRole.USER);
+        doctorToCreate.setRole(UserRole.DOCTOR);
         doctorToCreate.setPassword(passwordEncoder.encode(doctorToCreate.getPassword()));
 
         return doctorRepository.save(doctorToCreate);

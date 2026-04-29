@@ -12,6 +12,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Table(name = "tb_manager")
@@ -23,6 +24,12 @@ public class Manager extends User implements UserDetails {
     private Long id;
     private String department;
     private UserRole role;
+
+    @ManyToOne
+    private Hospital hospital;
+
+    @ManyToOne
+    private Setor setor;
 
     public Manager() {
     }
@@ -57,14 +64,35 @@ public class Manager extends User implements UserDetails {
         this.role = role;
     }
 
+    public Hospital getHospital() {
+        return hospital;
+    }
+
+    public void setHospital(Hospital hospital) {
+        this.hospital = hospital;
+    }
+
+    public Setor getSetor() {
+        return setor;
+    }
+
+    public void setSetor(Setor setor) {
+        this.setor = setor;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if(this.role == UserRole.ADMIN) {
-            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"),
-                           new SimpleGrantedAuthority("ROLE_USER"));
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
+        else if (this.role == UserRole.HOSPITAL) {
+            return List.of(new SimpleGrantedAuthority("ROLE_HOSPITAL"));
+        }
+        else if (this.role == UserRole.MANAGER) {
+            return List.of(new SimpleGrantedAuthority("ROLE_MANAGER"));
         }
         else {
-            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+            return List.of(new SimpleGrantedAuthority("ROLE_DOCTOR"));
         }
     }
 
