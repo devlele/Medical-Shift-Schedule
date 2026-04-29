@@ -1,6 +1,8 @@
 :root {
   --medical-dark: #1f7a63;
   --medical-teal: #2bbf9c;
+  --bg-elements: #1f7a6323;
+  --bg-section: #d6eee3;
 }
 
 /* PÁGINA */
@@ -32,8 +34,20 @@
   justify-content: space-between;
 }
 
-.logo {
-  height: 42px;
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  height: 50px;
+  width: auto;
+}
+
+.logo-texto {
+  height: 35px;
+  width: auto;
 }
 
 /* AÇÕES */
@@ -43,17 +57,34 @@
   gap: 18px;
 }
 
-.link-login {
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(55, 83, 71, 0.8);
-  text-decoration: none;
+/* ESSA PARTE RESOLVE DE VEZ */
+.acoes-cabecalho a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  line-height: 1; /* remove desalinhamento do texto */
 }
 
+/* LOGIN */
+.botao-login {
+  color: var(--medical-dark);
+  padding: 0 22px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: 0.2s;
+}
+.botao-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+}
+
+/* CADASTRO */
 .botao-cadastro {
   background-color: var(--medical-dark);
   color: white;
-  padding: 10px 22px;
+  padding: 0 22px;
   border-radius: 10px;
   font-weight: 600;
   text-decoration: none;
@@ -103,7 +134,7 @@
 .descricao-principal {
   font-size: 18px;
   color: rgba(55, 83, 71, 0.7);
-  margin-bottom: 40px;
+  margin-bottom: 50px;
   max-width: 480px;
   line-height: 1.6;
 }
@@ -124,12 +155,6 @@
 .botao-principal:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-}
-
-.texto-rodape-hero {
-  margin-top: 20px;
-  font-size: 14px;
-  color: rgba(55, 83, 71, 0.5);
 }
 
 /* VISUAL HERO */
@@ -177,8 +202,10 @@
 
 /* RECURSOS */
 .secao-recursos {
-  background-color: white;
+  background-color: var(--bg-section);
   padding: 100px 0;
+  border-radius: 2rem;
+  margin: 0 2rem;
 }
 
 .conteudo-recursos {
@@ -190,7 +217,7 @@
 
 .titulo-secao {
   font-size: 34px;
-  margin-bottom: 12px;
+  margin-bottom: 20px;
   color: #1f3d33;
 }
 
@@ -215,7 +242,7 @@
 .cartao-recurso {
   padding: 28px;
   border-radius: 20px;
-  background-color: rgba(193, 231, 214, 0.6);
+  background-color: var(--bg-elements);
   border: 1px solid rgba(148, 191, 167, 0.25);
   text-align: left;
   transition: 0.25s;
@@ -281,4 +308,199 @@
 .copyright-rodape {
   font-size: 12px;
   color: rgba(55, 83, 71, 0.4);
+}
+
+/* PRICING SECTION */
+.pricing-section {
+  padding: 120px 0;
+}
+
+/* HEADER */
+.section-header-centered {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.section-header-centered h2 {
+  font-size: 40px;
+  color: #1f3d33;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+
+.section-header-centered p {
+  color: rgba(31, 61, 51, 0.6);
+  font-size: 14px;
+}
+
+/* GRID */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* CARD BASE */
+.pricing-card {
+  background: var(--bg-elements);
+  padding: 36px 32px;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: 0.25s ease;
+  border: 1px solid transparent;
+  position: relative;
+}
+
+/* HOVER */
+.pricing-card:hover {
+  transform: translateY(-6px);
+}
+
+.pricing-card.featured:hover {
+  transform: translateY(-6px);
+}
+
+/* CARD DESTAQUE (MEIO) */
+.pricing-card.featured {
+  background: #2f4f46;
+  color: white;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  z-index: 2;
+}
+
+/* TITLE */
+.pricing-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* PRICE */
+.pricing-price {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+/* DESCRIPTION */
+.pricing-desc {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+/* FEATURES */
+.pricing-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pricing-features li {
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  color: inherit;
+}
+
+/* BUTTON */
+.pricing-btn {
+  margin-top: auto;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #67857b;
+  font-weight: 600;
+  background: transparent;
+  color: #1f3d33;
+  cursor: pointer;
+  transition: 0.2s;
+  background-color: #ffff;
+}
+
+.pricing-btn:hover {
+  background: var(--medical-dark);
+  color: var(--bg-section);
+  border: none;
+}
+
+/* BUTTON DO CARD DESTACADO */
+.pricing-card.featured .pricing-btn {
+  background: white;
+  color: #2f4f46;
+  border: none;
+}
+
+.pricing-card.featured .pricing-btn:hover {
+  background: var(--medical-dark);
+  color: var(--bg-section);
+}
+
+/* RESPONSIVO PRICING SECTION */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .pricing-card.featured {
+    transform: scale(1); /* remove zoom no tablet */
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .pricing-section {
+    padding: 80px 20px;
+  }
+
+  .section-header-centered h2 {
+    font-size: 28px;
+  }
+
+  .section-header-centered p {
+    font-size: 13px;
+  }
+
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .pricing-card {
+    padding: 28px 24px;
+  }
+
+  .pricing-card.featured {
+    transform: scale(1); /* evita quebrar layout */
+  }
+}
+
+/* Mobile pequeno */
+@media (max-width: 480px) {
+  .pricing-card h3 {
+    font-size: 16px;
+  }
+
+  .pricing-price {
+    font-size: 24px;
+  }
+
+  .pricing-desc {
+    font-size: 12px;
+  }
+
+  .pricing-btn {
+    padding: 12px;
+    font-size: 13px;
+  }
 }
