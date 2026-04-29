@@ -32,6 +32,11 @@
   box-shadow: 0 10px 20px rgba(31, 122, 99, 0.2);
 }
 
+.link-perfil {
+  color: #ffffff;
+  text-decoration: none;
+}
+
 /* PÁGINA */
 .pagina-login {
   min-height: 100vh;
@@ -58,6 +63,7 @@
 
 .area-logo .logo {
   height: 80px;
+  width: auto;
 }
 
 /* CARD */

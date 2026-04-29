@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { Stethoscope, Building2, ArrowRight } from "lucide-react";
 
-import logo from "../../assets/Logo-H.png";
+import logo from "../../assets/apenasLogo.png";
+import logoEscrito from "../../assets/nomeLogo.png";
 import "./CadastroTipo.css";
 
 const CadastroTipo = () => {
@@ -10,6 +11,7 @@ const CadastroTipo = () => {
       {/* CABEÇALHO */}
       <div className="cabecalho-tipo">
         <img src={logo} alt="Logo" className="logo-tipo" />
+        <img src={logoEscrito} alt="Logo escrito" className="logo-escrito" />
 
         <p className="descricao-tipo">
           Escolha como deseja acessar a plataforma para gerenciar seus plantões

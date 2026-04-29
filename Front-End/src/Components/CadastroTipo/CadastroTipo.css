@@ -81,7 +81,7 @@
 /* VARIAÇÕES */
 .icone-medico {
   background-color: rgba(148, 191, 167, 0.2);
-  color: var(--medical-dark);
+  color: var(--medical-teal);
 }
 
 .icone-hospital {
