@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import logo from "../../assets/Logo-H.png";
+import logo from "../../assets/logo-icon.png";
 import Footer from "../../Components/Footer/Footer.jsx";
 import "./CadastroHospital.css";
 
