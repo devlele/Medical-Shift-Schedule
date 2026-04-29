@@ -2,9 +2,34 @@ import { Link } from "react-router-dom";
 import logo from "../../assets/logo-icon.png";
 import Footer from "../../Components/Footer/Footer.jsx";
 
+import { validarCPF } from "../../utils/validarCPF";
+import { useState } from "react";
+
 import "./CadastroMedico.css";
 
 function CadastroUsuario() {
+  const [cpf, setCpf] = useState("");
+  const [erroCpf, setErroCpf] = useState("");
+
+  const formatarCPF = (valor) => {
+    valor = valor.replace(/\D/g, "");
+    valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+    valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
+    valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    return valor;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!validarCPF(cpf)) {
+      setErroCpf("CPF inválido");
+      return;
+    }
+
+    setErroCpf("");
+  };
+
   return (
     <div>
       <div className="pagina-cadastro">
@@ -20,7 +45,7 @@ function CadastroUsuario() {
 
         {/* LADO DIREITO */}
         <div className="painel-direito">
-          <form className="form-cadastro">
+          <form className="form-cadastro" onSubmit={handleSubmit}>
             <h1>Cadastro de Usuários</h1>
             <span className="subtitulo">
               Preencha os dados abaixo para criar sua conta profissional.
@@ -74,10 +99,28 @@ function CadastroUsuario() {
               </div>
             </div>
 
-            {/* Email */}
-            <div className="campo">
-              <label>E-mail Profissional</label>
-              <input type="email" placeholder="exemplo@clinica.com.br" />
+            {/* Email + CPF */}
+            <div className="linha-2">
+              <div className="campo">
+                <label>E-mail Profissional</label>
+                <input type="email" placeholder="exemplo@clinica.com.br" />
+              </div>
+
+              <div className="campo">
+                <label>CPF</label>
+                <input
+                  type="text"
+                  placeholder="000.000.000-00"
+                  value={cpf}
+                  onChange={(e) => setCpf(formatarCPF(e.target.value))}
+                />
+
+                {erroCpf && (
+                  <span style={{ color: "red", fontSize: "12px" }}>
+                    {erroCpf}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Data + Telefone */}
