@@ -33,7 +33,7 @@ public class DoctorController {
        }
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<Doctor> create(@RequestBody Doctor doctorToCreate) {
         var doctorCreated = doctorService.create(doctorToCreate);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()

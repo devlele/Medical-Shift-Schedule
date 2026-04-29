@@ -32,10 +32,28 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/doctor").permitAll()
+                        // Public endpoints
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/hospital").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/doctor/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/manager").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/doctor/**").hasRole("ADMIN")
+                        
+                        // Hospital endpoints - only HOSPITAL role
+                        .requestMatchers(HttpMethod.POST, "/setor").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.POST, "/manager/**").hasRole("HOSPITAL")
+                        
+                        // Manager endpoints - MANAGER or HOSPITAL role
+                        .requestMatchers(HttpMethod.GET, "/doctor").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/doctor/**").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
+                        
+                        // Doctor endpoints - only DOCTOR role for their own data
+                        .requestMatchers(HttpMethod.GET, "/doctor/me").hasRole("DOCTOR")
+                        
+                        // Admin only
+                        .requestMatchers(HttpMethod.GET, "/hospital/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")
+                        
+                        // Authenticated users
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))

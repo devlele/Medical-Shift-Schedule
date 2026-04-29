@@ -1,0 +1,35 @@
+Contexto de hierarquia para segurança:
+
+0 - Relação de ROLES:
+
+        ADMIN - acesso a todos os recursos (este ira cadastrar o hospital). Apenas acessado por desenvolvedores.
+        HOSPITAL - acesso a recursos para cadastro de escalistar de cada setor.
+        MANAGER - representa o escalista e tem acesso a todos os recursos referentes a pesquisa de médicos,
+                  atribuição de plantões, inserção de médicos em escalas e vinculação de medicos com o hospital e setor.
+        DOCTOR - representa o médico. Este terá acesso apenas a recursos referentes a seus plantões, assim como demonstrar
+                 interesse em cobrir furos na escala do hospital e setor a qual é vinculado.
+
+1 - Hospital (HOSPITAL) é uma ententidade que terá acesso ao recurso de cadastrar escalistas para cada setor.
+    Ou seja, o hospital terá uma lista de setores e, para cada um, um escalista vinculado que irá
+    realizar o gerenciamento da escala de plantões deste setor. Neste sentido, apenas o hospital poderá cadastrar
+    um escalista. Uma vez cadastrado o escalista poderá realizar o loggin normalmente.
+
+    Deste modo, Hopsital tera:
+        - Nome Fantasia
+        - CNPJ
+        - Endereço
+        - Nome do Gestor
+        - Email (username)
+        - Senha
+
+2 - Escalista (MANAGER) será responsavel pelo gerenciamento de escalas do setor. Deste modo, teŕa acesso a recursos
+    que possibilitarão este - o escalista - adicionar médicos à escala do setor ao qual representa. Por fim, 
+    o médico vinculado setor também será vinculado ao hospital.
+
+        O escalista terá:
+            - Nome
+            - CPF
+            - Email (username)
+            - Data Nascimento
+            - Hospital vinculado (seŕa definido ao ser cadastrado pelo Hospital)
+            - Setor (seŕa definido ao ser cadastrado pelo Hospital)

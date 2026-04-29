@@ -2,7 +2,9 @@ package com.mss.medShift.domain.model;
 
 public enum UserRole {
     ADMIN("admin"),
-    USER("user");
+    HOSPITAL("hospital"),
+    MANAGER("manager"),
+    DOCTOR("doctor");
 
     private String role;
 
