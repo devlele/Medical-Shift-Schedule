@@ -94,21 +94,19 @@ backend/medShift/
 - Autorização baseada em roles por endpoint
 
 ## Endpoints da API
-| Método | Endpoint | Descrição | Acesso |
-|--------|----------|-----------|--------|
-| POST | /hospital | Cadastrar hospital | Público |
-| POST | /setor | Cadastrar setor | ROLE_HOSPITAL |
-| POST | /doctor/register | Cadastrar médico | Público |
-| POST | /manager | Cadastrar escalista | ROLE_HOSPITAL |
-| GET | /manager | Listar managers do hospital logado | ROLE_HOSPITAL |
-| POST | /auth/login | Fazer login | Público |
+| Método | Endpoint | Descrição | Acesso | Status |
+|--------|----------|-----------|--------|--------|
+| POST | /hospital | Cadastrar hospital | Público | OK
+| POST | /setor | Cadastrar setor | ROLE_HOSPITAL | OK
+| POST | /doctor/register | Cadastrar médico | Público | OK 
+| POST | /manager | Cadastrar escalista | ROLE_HOSPITAL | OK
+| GET | /manager | Listar managers do hospital logado | ROLE_HOSPITAL | OK
+| POST | /auth/login | Fazer login | Público | OK
 | GET | /hospital/{id} | Buscar hospital | ROLE_ADMIN |
 | GET | /doctor | Listar médicos | ROLE_MANAGER, HOSPITAL, ADMIN |
 | GET | /doctor/{id} | Buscar médico por ID | ROLE_ADMIN |
-| GET | /doctor/me | Meus dados | ROLE_DOCTOR |
-| GET | /setor | Listar setores do hospital logado | ROLE_HOSPITAL |
-
-#ADMIN
+| GET | /doctor/me | Meus dados | ROLE_DOCTOR | OK
+| GET | /setor | Listar setores do hospital logado | ROLE_HOSPITAL | OK
 | GET | /setor/hospital/{id} | Listar setores por hospital | ROLE_ADMIN|
 | DELETE | /** | Deletar recursos | ROLE_ADMIN |
 
@@ -124,6 +122,7 @@ backend/medShift/
    - Migrações Flyway para tabelas.
    - Validações de unicidade (email, CPF, CRM).
 6. **Refatoração**: Nomes de classes ajustados (Impl -> Imple para consistência).
+7. **Endpoint Doctor /me**: Implementado GET /doctor/me para médicos autenticados retornarem seus próprios dados.
 
 ### Novas Implementações (Hierarquia de Segurança)
 - **UserRole atualizado**: ADMIN, HOSPITAL, MANAGER, DOCTOR

@@ -3,6 +3,7 @@ package com.mss.medShift.controller;
 import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,11 @@ public class DoctorController {
        } catch (Exception e) {
             return ResponseEntity.notFound().build();
        }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Doctor> getMyProfile(@AuthenticationPrincipal Doctor doctorLogado) {
+        return ResponseEntity.ok(doctorLogado);
     }
 
     @PostMapping("/register")
