@@ -36,10 +36,14 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/hospital").permitAll()
                         .requestMatchers(HttpMethod.POST, "/doctor/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/manager").permitAll()
                         
                         // Hospital endpoints - only HOSPITAL role
+                        //.requestMatchers(HttpMethod.POST, "/hospital/setor/**").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.POST, "/setor").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.GET, "/setor/**").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.GET, "/setor/hospital/**").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.GET, "/manager").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.POST, "/manager").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.POST, "/manager/**").hasRole("HOSPITAL")
                         
                         // Manager endpoints - MANAGER or HOSPITAL role
@@ -50,7 +54,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/doctor/me").hasRole("DOCTOR")
                         
                         // Admin only
-                        .requestMatchers(HttpMethod.GET, "/hospital/**").hasRole("ADMIN")
+                        //.requestMatchers(HttpMethod.GET, "/hospital/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")
                         
                         // Authenticated users

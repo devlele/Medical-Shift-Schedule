@@ -63,6 +63,12 @@ public class SetorController {
         }
     }
 
+    @GetMapping
+    public ResponseEntity<List<Setor>> getSetoresDoHospitalLogado(@AuthenticationPrincipal Hospital hospitalLogado) {
+        var setores = setorService.findByHospitalId(hospitalLogado.getId());
+        return ResponseEntity.ok(setores);
+    }
+
     @GetMapping("/hospital/{hospitalId}")
     public ResponseEntity<List<Setor>> getSetoresByHospital(@PathVariable Long hospitalId) {
         var setores = setorService.findByHospitalId(hospitalId);

@@ -3,6 +3,8 @@ package com.mss.medShift.domain.model;
 import java.util.Collection;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,9 +32,11 @@ public class Hospital implements UserDetails {
     private UserRole role;
 
     @OneToMany(mappedBy = "hospital")
+    @JsonIgnore
     private List<Manager> managers;
 
     @OneToMany(mappedBy = "hospital")
+    @JsonIgnore
     private List<Doctor> doctors;
 
     public Hospital() {

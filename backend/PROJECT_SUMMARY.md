@@ -100,12 +100,16 @@ backend/medShift/
 | POST | /setor | Cadastrar setor | ROLE_HOSPITAL |
 | POST | /doctor/register | Cadastrar médico | Público |
 | POST | /manager | Cadastrar escalista | ROLE_HOSPITAL |
+| GET | /manager | Listar managers do hospital logado | ROLE_HOSPITAL |
 | POST | /auth/login | Fazer login | Público |
 | GET | /hospital/{id} | Buscar hospital | ROLE_ADMIN |
 | GET | /doctor | Listar médicos | ROLE_MANAGER, HOSPITAL, ADMIN |
 | GET | /doctor/{id} | Buscar médico por ID | ROLE_ADMIN |
 | GET | /doctor/me | Meus dados | ROLE_DOCTOR |
-| GET | /setor/hospital/{id} | Listar setores por hospital | Autenticado |
+| GET | /setor | Listar setores do hospital logado | ROLE_HOSPITAL |
+
+#ADMIN
+| GET | /setor/hospital/{id} | Listar setores por hospital | ROLE_ADMIN|
 | DELETE | /** | Deletar recursos | ROLE_ADMIN |
 
 ## Alterações Realizadas Durante o Desenvolvimento
@@ -198,13 +202,16 @@ POST /manager
   "birthday": "1985-05-15",
   "password": "senha456",
   "department": "Cardiologia",
-  "hospital": {
-    "id": 1
-  },
   "setor": {
     "id": 1
   }
 }
+```
+
+### Listar managers do hospital logado
+```bash
+GET /manager
+Header: Authorization: Bearer <token>
 ```
 
 ### Login (funciona para Hospital, Doctor ou Manager)
@@ -226,6 +233,12 @@ Header: Authorization: Bearer <token>
 ### Listar médicos (requer token de Manager/Hospital/Admin)
 ```bash
 GET /doctor
+Header: Authorization: Bearer <token>
+```
+
+### Listar setores do hospital logado
+```bash
+GET /setor
 Header: Authorization: Bearer <token>
 ```
 
