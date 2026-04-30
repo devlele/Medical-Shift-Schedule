@@ -11,7 +11,7 @@
 - Falhas: 0
 - Erros: 0
 - Ignorados: 0
-- Status: ✅ BUILD SUCCESS
+- Status: BUILD SUCCESS
 
 ## Observações
 - Foi necessário ajustar a classe de testes para gerar CNPJs únicos por hospital, evitando conflitos de dados entre métodos.
