@@ -35,6 +35,11 @@ public class ManagerServiceImple implements ManagerService {
         return managerRepository.findById(id).orElseThrow();
     }
 
+    public Manager findById(Long id, Hospital hospitalLogado) {
+        return managerRepository.findByIdAndHospitalId(id, hospitalLogado.getId())
+                .orElseThrow();
+    }
+
     public List<Manager> findByHospitalId(Long hospitalId) {
         return managerRepository.findByHospitalId(hospitalId);
     }
@@ -72,6 +77,7 @@ public class ManagerServiceImple implements ManagerService {
     public void delete(Long id) {
         if(managerRepository.existsById(id)) {
             managerRepository.deleteById(id);
+            return;
         }
         throw new IllegalArgumentException("Id not founded");
     }

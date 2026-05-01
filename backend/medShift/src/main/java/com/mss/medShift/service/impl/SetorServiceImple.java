@@ -31,6 +31,12 @@ public class SetorServiceImple implements SetorService {
     }
 
     @Override
+    public Setor findById(Long id, Hospital hospitalLogado) {
+        return setorRepository.findByIdAndHospitalId(id, hospitalLogado.getId())
+                .orElseThrow(() -> new RuntimeException("Setor não encontrado para o hospital logado"));
+    }
+
+    @Override
     public List<Setor> findByHospitalId(Long hospitalId) {
         return setorRepository.findByHospitalId(hospitalId);
     }
@@ -38,6 +44,16 @@ public class SetorServiceImple implements SetorService {
     @Override
     public Setor update(Long id, Setor setor) {
         Setor existingSetor = findById(id);
+        return updateFields(existingSetor, setor);
+    }
+
+    @Override
+    public Setor update(Long id, Setor setor, Hospital hospitalLogado) {
+        Setor existingSetor = findById(id, hospitalLogado);
+        return updateFields(existingSetor, setor);
+    }
+
+    private Setor updateFields(Setor existingSetor, Setor setor) {
         
         if (setor.getNome() != null) {
             existingSetor.setNome(setor.getNome());

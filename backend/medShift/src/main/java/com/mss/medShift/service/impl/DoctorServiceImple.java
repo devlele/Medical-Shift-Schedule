@@ -50,6 +50,7 @@ public class DoctorServiceImple implements DoctorService {
     public void delete(Long id) {
         if(doctorRepository.existsById(id)) {
             doctorRepository.deleteById(id);
+            return;
         }
         throw new NoSuchElementException("Id not founded");
     }

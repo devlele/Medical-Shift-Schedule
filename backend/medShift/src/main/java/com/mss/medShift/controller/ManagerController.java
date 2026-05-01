@@ -27,9 +27,10 @@ public class ManagerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Manager> getManager(@PathVariable Long id) {
+    public ResponseEntity<Manager> getManager(@PathVariable Long id,
+            @AuthenticationPrincipal Hospital hospitalLogado) {
        try {
-            var manager = managerService.findById(id);
+            var manager = managerService.findById(id, hospitalLogado);
             return ResponseEntity.ok(manager);
        } catch (Exception e) {
             return ResponseEntity.notFound().build();

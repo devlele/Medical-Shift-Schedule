@@ -64,14 +64,102 @@ class MedShiftApplicationTests {
         var doctorEmail = "doctor-test@example.com";
         var doctorPassword = "senha123";
 
-        createDoctor(doctorEmail, doctorPassword, "João Silva", "12345678900", "1990-01-01", "Cardiologia", "12345");
+        var doctorId = createDoctor(doctorEmail, doctorPassword, "João Silva", "12345678900", "1990-01-01", "Cardiologia", "12345");
 
         var doctorLogin = login(doctorEmail, doctorPassword);
         assertThat(doctorLogin).containsKey("token");
         assertThat(doctorLogin.get("token")).isInstanceOf(String.class);
+
+        var doctorToken = (String) doctorLogin.get("token");
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(doctorToken);
+
+        ResponseEntity<Map> myProfileResponse = restTemplate.exchange(
+                "/doctor/me",
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                Map.class
+        );
+        assertThat(myProfileResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(myProfileResponse.getBody()).containsEntry("email", doctorEmail);
+
+        ResponseEntity<Map> adminOnlyDoctorResponse = restTemplate.exchange(
+                "/doctor/" + doctorId,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                Map.class
+        );
+        assertThat(adminOnlyDoctorResponse.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
-    private void createHospital(String email, String password) {
+    @Test
+    @Order(4)
+    void hospitalNaoAcessaEndpointsAdministrativos() {
+        var hospitalId = createHospital("hospital-admin-scope@example.com", "senha123");
+        var hospitalToken = loginAndGetToken("hospital-admin-scope@example.com", "senha123");
+
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(hospitalToken);
+
+        ResponseEntity<Map> hospitalAdminResponse = restTemplate.exchange(
+                "/hospital/" + hospitalId,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                Map.class
+        );
+        assertThat(hospitalAdminResponse.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+
+        ResponseEntity<Map> setorByHospitalResponse = restTemplate.exchange(
+                "/setor/hospital/" + hospitalId,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                Map.class
+        );
+        assertThat(setorByHospitalResponse.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @Order(5)
+    void hospitalNaoAcessaSetorDeOutroHospital() {
+        createHospital("hospital-owner@example.com", "senha123");
+        var ownerToken = loginAndGetToken("hospital-owner@example.com", "senha123");
+        var setorId = createSetor(ownerToken, "Pediatria", "Setor de Pediatria");
+        var managerId = createManager(ownerToken, setorId, "Ana Manager", "09876543212",
+                "ana.manager@example.com", "senha456", "Pediatria");
+
+        createHospital("hospital-intruder@example.com", "senha123");
+        var intruderToken = loginAndGetToken("hospital-intruder@example.com", "senha123");
+
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(intruderToken);
+
+        ResponseEntity<Map> getResponse = restTemplate.exchange(
+                "/setor/" + setorId,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                Map.class
+        );
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+        var updateRequest = Map.of("nome", "Nome indevido");
+        ResponseEntity<Map> updateResponse = restTemplate.exchange(
+                "/setor/" + setorId,
+                HttpMethod.PUT,
+                new HttpEntity<>(updateRequest, headers),
+                Map.class
+        );
+        assertThat(updateResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+        ResponseEntity<Map> managerResponse = restTemplate.exchange(
+                "/manager/" + managerId,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                Map.class
+        );
+        assertThat(managerResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    private Long createHospital(String email, String password) {
         String cnpjSuffix = String.format("%04d", Math.abs(email.hashCode()) % 10000);
         var hospitalRequest = Map.of(
                 "nomeFantasia", "Hospital Teste",
@@ -86,6 +174,7 @@ class MedShiftApplicationTests {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).containsEntry("email", email);
+        return ((Number) response.getBody().get("id")).longValue();
     }
 
     private Long createSetor(String token, String nome, String descricao) {
@@ -109,7 +198,7 @@ class MedShiftApplicationTests {
         return ((Number) response.getBody().get("id")).longValue();
     }
 
-    private void createManager(String token, Long setorId, String name, String cpf, String email, String password, String department) {
+    private Long createManager(String token, Long setorId, String name, String cpf, String email, String password, String department) {
         var headers = new HttpHeaders();
         headers.setBearerAuth(token);
 
@@ -133,9 +222,10 @@ class MedShiftApplicationTests {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).containsEntry("email", email);
+        return ((Number) response.getBody().get("id")).longValue();
     }
 
-    private void createDoctor(String email, String password, String name, String cpf, String birthday, String specialty, String crm) {
+    private Long createDoctor(String email, String password, String name, String cpf, String birthday, String specialty, String crm) {
         var doctorRequest = Map.of(
                 "name", name,
                 "cpf", cpf,
@@ -150,6 +240,7 @@ class MedShiftApplicationTests {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).containsEntry("email", email);
+        return ((Number) response.getBody().get("id")).longValue();
     }
 
     private Map<String, Object> login(String email, String password) {

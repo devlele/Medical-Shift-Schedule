@@ -63,7 +63,8 @@ backend/medShift/
 │           └── SetorServiceImple.java    # Implementação SetorService
 ├── src/main/resources/
 │   ├── application.properties            # Configurações (JWT secret, profiles)
-│   └── db/migrations/
+│   ├── application-dev.yml               # Configuração dev com Hibernate validate
+│   └── db/migration/
 │       ├── V1__create-doctor-table.sql   # Migração tabela tb_doctor
 │       ├── V2__create-manager-table.sql  # Migração tabela tb_manager
 │       └── V3__create-hospital-table.sql # Migração tabelas tb_hospital, tb_setor e FKs
@@ -94,21 +95,74 @@ backend/medShift/
 - Autorização baseada em roles por endpoint
 
 ## Endpoints da API
+Legenda de status:
+- **OK**: implementado e funcionando no estado atual.
+- **FAIL**: implementado, mas com erro conhecido.
+- **Not Imple**: ainda nao implementado.
+
+### Público
 | Método | Endpoint | Descrição | Acesso | Status |
 |--------|----------|-----------|--------|--------|
-| POST | /hospital | Cadastrar hospital | Público | OK
-| POST | /setor | Cadastrar setor | ROLE_HOSPITAL | OK
-| POST | /doctor/register | Cadastrar médico | Público | OK 
-| POST | /manager | Cadastrar escalista | ROLE_HOSPITAL | OK
-| GET | /manager | Listar managers do hospital logado | ROLE_HOSPITAL | OK
-| POST | /auth/login | Fazer login | Público | OK
-| GET | /hospital/{id} | Buscar hospital | ROLE_ADMIN |
-| GET | /doctor | Listar médicos | ROLE_MANAGER, HOSPITAL, ADMIN |
-| GET | /doctor/{id} | Buscar médico por ID | ROLE_ADMIN |
-| GET | /doctor/me | Meus dados | ROLE_DOCTOR | OK
-| GET | /setor | Listar setores do hospital logado | ROLE_HOSPITAL | OK
-| GET | /setor/hospital/{id} | Listar setores por hospital | ROLE_ADMIN|
-| DELETE | /** | Deletar recursos | ROLE_ADMIN |
+| POST | `/auth/login` | Autentica Hospital, Doctor ou Manager por email/senha e retorna token JWT. | Público | OK |
+| POST | `/hospital` | Cadastra um hospital, define role `HOSPITAL` e salva senha com BCrypt. | Público | OK |
+| POST | `/doctor/register` | Cadastra um médico, define role `DOCTOR` e salva senha com BCrypt. | Público | OK |
+
+### ROLE_ADMIN
+| Método | Endpoint | Descrição | Acesso | Status |
+|--------|----------|-----------|--------|--------|
+| GET | `/hospital` | Lista todos os hospitais cadastrados. Endpoint administrativo. | ROLE_ADMIN | OK |
+| GET | `/hospital/{id}` | Busca um hospital por ID. Endpoint administrativo. | ROLE_ADMIN | OK |
+| PUT | `/hospital/{id}` | Atualiza dados cadastrais de um hospital por ID. Endpoint administrativo. | ROLE_ADMIN | OK |
+| DELETE | `/hospital/{id}` | Remove um hospital por ID. Endpoint administrativo via regra global de delete. | ROLE_ADMIN | OK |
+| GET | `/doctor/{id}` | Busca um médico por ID. Endpoint administrativo. | ROLE_ADMIN | OK |
+| DELETE | `/doctor/{id}` | Deveria remover médico por ID, mas nao ha método no controller. | ROLE_ADMIN | Not Imple |
+| PUT | `/manager/{id}` | Deveria atualizar manager, mas nao ha método no controller. | ROLE_HOSPITAL ou ROLE_ADMIN | Not Imple |
+| DELETE | `/manager/{id}` | Deveria remover manager por ID, mas nao ha método no controller. | ROLE_ADMIN | Not Imple |
+| GET | `/setor/hospital/{hospitalId}` | Lista setores de um hospital específico. Endpoint administrativo. | ROLE_ADMIN | OK |
+| DELETE | `/setor/{id}` | Remove setor por ID via regra global de delete. | ROLE_ADMIN | OK |
+| GET | `/doctor` | Deveria listar médicos para Manager/Hospital/Admin, mas nao ha método no controller. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| PUT | `/doctor/{id}` | Deveria atualizar/vincular médico, mas nao ha método no controller. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| GET | `/plantao/{id}` | Deveria buscar plantão por ID. | ROLE_MANAGER, ROLE_DOCTOR, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| DELETE | `/plantao/{id}` | Deveria cancelar/remover plantão. | ROLE_MANAGER ou ROLE_ADMIN | Not Imple |
+| GET | `/agenda/setor/{setorId}` | Deveria listar escala por setor e período. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+
+### ROLE_HOSPITAL
+| Método | Endpoint | Descrição | Acesso | Status |
+|--------|----------|-----------|--------|--------|
+| GET | `/doctor` | Deveria listar médicos para Manager/Hospital/Admin, mas nao ha método no controller. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| PUT | `/doctor/{id}` | Deveria atualizar/vincular médico, mas nao ha método no controller. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| POST | `/manager` | Cadastra escalista para o hospital autenticado, vinculando-o a um setor do próprio hospital. | ROLE_HOSPITAL | OK |
+| GET | `/manager` | Lista managers/escalistas pertencentes ao hospital autenticado. | ROLE_HOSPITAL | OK |
+| GET | `/manager/{id}` | Busca manager por ID, somente se pertencer ao hospital autenticado. | ROLE_HOSPITAL | OK |
+| PUT | `/manager/{id}` | Deveria atualizar manager, mas nao ha método no controller. | ROLE_HOSPITAL ou ROLE_ADMIN | Not Imple |
+| POST | `/setor` | Cadastra setor e associa automaticamente ao hospital autenticado. | ROLE_HOSPITAL | OK |
+| GET | `/setor` | Lista setores pertencentes ao hospital autenticado. | ROLE_HOSPITAL | OK |
+| GET | `/setor/{id}` | Busca setor por ID, somente se pertencer ao hospital autenticado. | ROLE_HOSPITAL | OK |
+| PUT | `/setor/{id}` | Atualiza nome/descrição de setor, somente se pertencer ao hospital autenticado. | ROLE_HOSPITAL | OK |
+| GET | `/plantao/{id}` | Deveria buscar plantão por ID. | ROLE_MANAGER, ROLE_DOCTOR, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| GET | `/agenda/setor/{setorId}` | Deveria listar escala por setor e período. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+
+### ROLE_MANAGER
+| Método | Endpoint | Descrição | Acesso | Status |
+|--------|----------|-----------|--------|--------|
+| GET | `/doctor` | Deveria listar médicos para Manager/Hospital/Admin, mas nao ha método no controller. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| PUT | `/doctor/{id}` | Deveria atualizar/vincular médico, mas nao ha método no controller. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| POST | `/plantao` | Deveria cadastrar plantão/escala. | ROLE_MANAGER | Not Imple |
+| GET | `/plantao/{id}` | Deveria buscar plantão por ID. | ROLE_MANAGER, ROLE_DOCTOR, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| PUT | `/plantao/{id}` | Deveria atualizar plantão/escala. | ROLE_MANAGER | Not Imple |
+| DELETE | `/plantao/{id}` | Deveria cancelar/remover plantão. | ROLE_MANAGER ou ROLE_ADMIN | Not Imple |
+| GET | `/agenda/setor/{setorId}` | Deveria listar escala por setor e período. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+
+### ROLE_DOCTOR
+| Método | Endpoint | Descrição | Acesso | Status |
+|--------|----------|-----------|--------|--------|
+| GET | `/doctor/me` | Retorna os dados do médico autenticado pelo token. | ROLE_DOCTOR | OK |
+| GET | `/plantao/{id}` | Deveria buscar plantão por ID. | ROLE_MANAGER, ROLE_DOCTOR, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| GET | `/agenda/doctor/me` | Deveria listar agenda do médico autenticado por período. | ROLE_DOCTOR | Not Imple |
+| POST | `/plantao/{id}/check-in` | Deveria registrar check-in do médico responsável. | ROLE_DOCTOR | Not Imple |
+| POST | `/plantao/{id}/check-out` | Deveria registrar check-out do médico responsável. | ROLE_DOCTOR | Not Imple |
+| POST | `/plantao/{id}/troca` | Deveria disponibilizar plantão para troca/cobertura. | ROLE_DOCTOR | Not Imple |
+| POST | `/plantao/{id}/interesse` | Deveria registrar interesse de médico em cobrir plantão. | ROLE_DOCTOR | Not Imple |
 
 ## Alterações Realizadas Durante o Desenvolvimento
 1. **Configuração Inicial**: Spring Boot com JPA, Security e JWT.
@@ -123,6 +177,26 @@ backend/medShift/
    - Validações de unicidade (email, CPF, CRM).
 6. **Refatoração**: Nomes de classes ajustados (Impl -> Imple para consistência).
 7. **Endpoint Doctor /me**: Implementado GET /doctor/me para médicos autenticados retornarem seus próprios dados.
+8. **Correção da base técnica (Prioridade 1)**:
+   - Pasta de migrations renomeada de `db/migrations` para `db/migration`, seguindo o padrão do Flyway.
+   - Migration `V1__create-doctor-table.sql` corrigida, removendo SQL inválido e adicionando `AUTO_INCREMENT`.
+   - IDs das tabelas principais ajustados para geração identity compatível com `GenerationType.IDENTITY`.
+   - Coluna `role` incluída nas tabelas `tb_doctor` e `tb_hospital`.
+   - Roles persistidas como texto via `@Enumerated(EnumType.STRING)` em Doctor, Manager e Hospital.
+   - Campo `birthday` mapeado como `DATE` para alinhar entidade e schema.
+   - `spring.jpa.hibernate.ddl-auto` alterado de `update` para `validate` no perfil dev.
+   - Métodos `delete` de Doctor e Manager corrigidos para encerrar após deleção bem-sucedida.
+   - Testes executados com sucesso: `./mvnw test` retornou 3 testes, 0 falhas e 0 erros.
+9. **Correção de segurança e isolamento (Prioridade 2)**:
+   - `SecurityConfiguration` ajustada para refletir endpoints administrativos documentados.
+   - `GET /doctor/me` ordenado antes de `GET /doctor/{id}` para evitar conflito de matcher.
+   - `GET /hospital`, `GET /hospital/{id}`, `PUT /hospital/{id}`, `GET /doctor/{id}` e `GET /setor/hospital/{hospitalId}` restritos a `ROLE_ADMIN`.
+   - `GET /setor/{id}` e `PUT /setor/{id}` passaram a validar se o setor pertence ao hospital autenticado.
+   - `GET /manager/{id}` passou a validar se o manager pertence ao hospital autenticado.
+   - Adicionados métodos `findByIdAndHospitalId` nos repositories de Setor e Manager.
+   - Respostas de segurança separadas: `401` para nao autenticado e `403` para autenticado sem permissao.
+   - Testes de regressao adicionados para autorização e isolamento entre hospitais.
+   - Testes executados com sucesso: `./mvnw test` retornou 5 testes, 0 falhas e 0 erros.
 
 ### Novas Implementações (Hierarquia de Segurança)
 - **UserRole atualizado**: ADMIN, HOSPITAL, MANAGER, DOCTOR
@@ -139,11 +213,16 @@ backend/medShift/
 - **AuthorizationService**: Atualizado para buscar também por Hospital
 - **SecurityConfiguration**: Regras de autorização baseadas em roles
 - **Migração V3**: Criação das tabelas tb_hospital, tb_setor e FKs
+- **Flyway validado**: Migrations executadas antes do Hibernate, com schema validado em vez de criado por `ddl-auto=update`
+- **Isolamento por hospital**: Setores e managers buscados por ID agora sao filtrados pelo hospital autenticado.
 
 ## Próximos Passos
-- Implementar endpoints de escala de plantões
-- Adicionar sistema de interesse de médicos em cobrir furos
-- Implementar testes unitários/integração
+- Implementar vínculo formal Doctor-Hospital-Setor.
+- Implementar endpoints de escala de plantões.
+- Adicionar sistema de interesse de médicos em cobrir furos.
+- Separar DTOs de entrada/saída para nao expor entidades diretamente.
+- Padronizar tratamento de erros com `@RestControllerAdvice`.
+- Expandir testes unitários/integração.
 - Configurar produção (MySQL, variáveis de ambiente para JWT secret)
 - Adicionar validações adicionais (ex.: formato de CPF/CNPJ, data de nascimento)
 
@@ -223,13 +302,15 @@ POST /auth/login
 ```
 **Resposta**: `{"token": "jwt-token-aqui"}`
 
-### Acesso Protegido (com token)
+### Acesso Administrativo (requer ROLE_ADMIN)
 ```bash
 GET /doctor/1
 Header: Authorization: Bearer <token>
 ```
 
-### Listar médicos (requer token de Manager/Hospital/Admin)
+### Listar médicos
+Ainda nao implementado no controller.
+
 ```bash
 GET /doctor
 Header: Authorization: Bearer <token>

@@ -6,7 +6,8 @@ CREATE TABLE tb_hospital (
     endereco VARCHAR(500),
     nome_gestor VARCHAR(255),
     email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL
 );
 
 -- Migration V4: Create Setor table

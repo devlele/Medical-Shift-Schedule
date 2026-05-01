@@ -3,6 +3,8 @@ package com.mss.medShift.domain.model;
 import java.util.Date;
 
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 @MappedSuperclass
 public class User {
@@ -10,6 +12,7 @@ public class User {
     private String name;
     private String email;
     private String cpf;
+    @Temporal(TemporalType.DATE)
     private Date birthday;
     private String password;
 

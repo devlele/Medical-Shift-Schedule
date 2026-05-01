@@ -36,31 +36,41 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/hospital").permitAll()
                         .requestMatchers(HttpMethod.POST, "/doctor/register").permitAll()
-                        
-                        // Hospital endpoints - only HOSPITAL role
-                        //.requestMatchers(HttpMethod.POST, "/hospital/setor/**").hasRole("HOSPITAL")
-                        .requestMatchers(HttpMethod.POST, "/setor").hasRole("HOSPITAL")
-                        .requestMatchers(HttpMethod.GET, "/setor/**").hasRole("HOSPITAL")
-                        .requestMatchers(HttpMethod.GET, "/setor/hospital/**").hasRole("HOSPITAL")
-                        .requestMatchers(HttpMethod.GET, "/manager").hasRole("HOSPITAL")
-                        .requestMatchers(HttpMethod.POST, "/manager").hasRole("HOSPITAL")
-                        .requestMatchers(HttpMethod.POST, "/manager/**").hasRole("HOSPITAL")
-                        
-                        // Manager endpoints - MANAGER or HOSPITAL role
-                        .requestMatchers(HttpMethod.GET, "/doctor").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/doctor/**").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
-                        
+
                         // Doctor endpoints - only DOCTOR role for their own data
                         .requestMatchers(HttpMethod.GET, "/doctor/me").hasRole("DOCTOR")
                         
+                        // Admin-only lookups documented as administrative endpoints.
+                        .requestMatchers(HttpMethod.GET, "/hospital").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/hospital/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/hospital/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/doctor/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/setor/hospital/**").hasRole("ADMIN")
+                        
+                        // Hospital-scoped endpoints.
+                        .requestMatchers(HttpMethod.POST, "/setor").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.GET, "/setor").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.GET, "/setor/{id}").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.PUT, "/setor/{id}").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.GET, "/manager").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.GET, "/manager/{id}").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.POST, "/manager").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.POST, "/manager/**").hasRole("HOSPITAL")
+
+                        // Manager endpoints - MANAGER, HOSPITAL or ADMIN role
+                        .requestMatchers(HttpMethod.GET, "/doctor").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/doctor/**").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
+                        
                         // Admin only
-                        //.requestMatchers(HttpMethod.GET, "/hospital/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")
                         
                         // Authenticated users
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                response.setStatus(HttpStatus.FORBIDDEN.value())))
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
