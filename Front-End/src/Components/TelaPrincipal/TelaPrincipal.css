@@ -1,121 +1,123 @@
 .layout {
-    display: flex;
+  display: flex;
 }
 
 .conteudo {
-    flex: 1;
-    padding: 30px;
-    background: #eef7f2;
+  flex: 1;
+  padding: var(--spacing-2xl);
+  background: var(--medical-card);
 }
 
 /* TOPO */
 .topo {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .topo-direita {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
 }
 
-.icone-topo{
-    cursor: pointer;
-    transition: 0.3s;
+.icone-topo {
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 .icone-topo:hover {
-    color: var(--medical-dark);
-    transform: scale(1.1);
+  color: var(--medical-dark);
+  transform: scale(1.1);
 }
 
 .user {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #dcece4;
-    padding: 6px 12px;
-    border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: var(--medical-soft);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--border-radius-xl);
 }
 
 .user img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-} 
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
 
 /* CARDS */
 .cards {
-    display: flex;
-    gap: 20px;
-    margin: 20px 0;
+  display: flex;
+  gap: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
 }
 
 .card {
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    width: 220px;
+  background: var(--white);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-xl);
+  width: 220px;
+  box-shadow: var(--shadow-sm);
 }
 
 .card.alerta {
-    background: #f8d7d7;
+  background: #f8d7d7;
 }
 
 /* GRID */
 .grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 20px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--spacing-lg);
 }
 
 /* CALENDÁRIO */
 .calendario {
-    background: #dcece4;
-    padding: 20px;
-    border-radius: 20px;
+  background: var(--medical-soft);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-xl);
 }
 
 .dias {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--spacing-sm);
 }
 
 .dia {
-    background: white;
-    padding: 15px;
-    border-radius: 12px;
-    text-align: center;
+  background: var(--white);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
 }
 
 .dia.ativo {
-    background: #1f7a63;
-    color: white;
+  background: var(--medical-dark);
+  color: var(--white);
 }
 
 .bolinha {
-    width: 6px;
-    height: 6px;
-    background: red;
-    border-radius: 50%;
-    margin: 5px auto 0;
+  width: 6px;
+  height: 6px;
+  background: red;
+  border-radius: 50%;
+  margin: 5px auto 0;
 }
 
 /* LATERAL */
 .proximos {
-    background: #dcece4;
-    padding: 20px;
-    border-radius: 20px;
+  background: #dcece4;
+  padding: 20px;
+  border-radius: 20px;
 }
 
 .plantao {
-    display: flex;
-    gap: 10px;
-    background: white;
-    padding: 10px;
-    border-radius: 12px;
-    margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+  margin-top: 10px;
 }

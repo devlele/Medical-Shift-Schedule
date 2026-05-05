@@ -1,15 +1,8 @@
-:root {
-  --medical-dark: #1f7a63;
-  --medical-teal: #2bbf9c;
-  --bg-elements: #1f7a6323;
-  --bg-section: #d6eee3;
-}
-
 /* PÁGINA */
 .pagina-inicial {
   min-height: 100vh;
   background-color: rgba(226, 250, 239, 0.35);
-  font-family: "Inter", sans-serif;
+  font-family: var(--font-primary);
 }
 
 /* CABEÇALHO */
@@ -27,7 +20,7 @@
 .cabecalho-conteudo {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 32px;
+  padding: 0 var(--spacing-2xl);
   height: 80px;
   display: flex;
   align-items: center;
@@ -37,7 +30,7 @@
 .logo-container {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--spacing-sm);
 }
 
 .logo-icon {

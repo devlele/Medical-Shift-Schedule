@@ -1,22 +1,16 @@
-:root {
-  --medical-dark: #1f7a63;
-  --medical-teal: #2bbf9c;
-  --medical-mint: #e6faf3;
-}
-
 /* BOTÃO PRINCIPAL (GLOBAL) */
 .botao-principal {
   width: 100%;
   height: 52px;
 
   background-color: var(--medical-dark);
-  color: white;
+  color: var(--white);
 
   border: none;
-  border-radius: 12px;
+  border-radius: var(--border-radius-md);
 
   font-weight: 600;
-  font-size: 15px;
+  font-size: var(--font-size-base);
 
   cursor: pointer;
   transition: all 0.2s ease;
@@ -24,28 +18,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
 .botao-principal:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(31, 122, 99, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .link-perfil {
-  color: #ffffff;
+  color: var(--white);
   text-decoration: none;
 }
 
 /* PÁGINA */
 .pagina-login {
   min-height: 100vh;
-  background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%);
+  background: linear-gradient(
+    180deg,
+    var(--medical-mint) 0%,
+    var(--white) 100%
+  );
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: var(--spacing-xl);
 }
 
 /* CONTEÚDO */
@@ -58,7 +56,7 @@
 .area-logo {
   display: flex;
   justify-content: center;
-  margin-bottom: 40px;
+  margin-bottom: var(--spacing-2xl);
 }
 
 .area-logo .logo {
@@ -68,31 +66,31 @@
 
 /* CARD */
 .cartao-login {
-  padding: 36px;
-  border-radius: 20px;
+  padding: var(--spacing-2xl);
+  border-radius: var(--border-radius-xl);
 
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(14px);
 
   border: 1px solid rgba(148, 191, 167, 0.2);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-lg);
 }
 
 /* FORM */
 .grupo-formulario {
-  margin-bottom: 22px;
+  margin-bottom: var(--spacing-lg);
 }
 
 /* LABEL */
 .label-formulario {
   display: block;
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.2px;
   color: rgba(55, 83, 71, 0.6);
-  margin-bottom: 6px;
-  margin-left: 4px;
+  margin-bottom: var(--spacing-xs);
+  margin-left: var(--spacing-xs);
 }
 
 /* LINHA LABEL */
@@ -125,12 +123,13 @@
 
 .icone-input {
   position: absolute;
-  left: 20rem;
+  right: 16px;
   top: 50%;
   transform: translateY(-50%);
   width: 18px;
   height: 18px;
   color: var(--medical-teal);
+  pointer-events: none;
 }
 
 .campo-input {
@@ -138,7 +137,7 @@
   height: 52px;
   border-radius: 12px;
   border: 1px solid rgba(148, 191, 167, 0.25);
-  padding: 0 16px 0 52px;
+  padding: 0 52px 0 16px;
   font-size: 14px;
   outline: none;
   transition: 0.2s;

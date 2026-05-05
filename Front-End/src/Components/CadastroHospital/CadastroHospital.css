@@ -1,12 +1,12 @@
 .hospital-container {
   min-height: 100vh;
-  background-color: #e8f5f1;
-  padding: 24px;
+  background-color: var(--medical-mint);
+  padding: var(--spacing-xl);
 }
 
 /* HEADER */
 .hospital-cabecalho {
-  margin-bottom: 32px;
+  margin-bottom: var(--spacing-2xl);
 }
 
 .hospital-cabecalho-conteudo {
@@ -16,7 +16,7 @@
 }
 
 .voltar-home {
-  color: #0f766e;
+  color: var(--medical-dark);
   font-weight: bold;
   text-decoration: none;
 }
@@ -28,7 +28,7 @@
 /* MAIN */
 .hospital-principal {
   display: grid;
-  gap: 40px;
+  gap: var(--spacing-2xl);
 }
 
 @media (min-width: 1024px) {
@@ -39,37 +39,38 @@
 
 /* TEXTO */
 .hospital-titulo-principal {
-  font-size: 36px;
-  margin-bottom: 16px;
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--spacing-md);
 }
 
 .texto-verde {
-  color: #14b8a6;
+  color: var(--medical-teal);
 }
 
 .hospital-descricao {
-  margin-bottom: 24px;
-  color: #555;
+  margin-bottom: var(--spacing-xl);
+  color: var(--medical-muted);
 }
 
 /* BENEFÍCIOS */
 .grade-beneficios {
   display: grid;
-  gap: 16px;
+  gap: var(--spacing-md);
 }
 
 .card-beneficio {
-  padding: 20px;
-  border-radius: 16px;
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .beneficio-verde {
-  background-color: #ccfbf1;
+  background-color: var(--medical-card);
 }
 
 .beneficio-escuro {
-  background-color: #0f172a;
-  color: white;
+  background-color: var(--gray-dark);
+  color: var(--white);
 }
 
 .icone-box {
@@ -78,18 +79,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  margin-bottom: 10px;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: var(--spacing-sm);
 }
 
 .icone-escuro {
-  background-color: #0f766e;
-  color: white;
+  background-color: var(--medical-dark);
+  color: var(--white);
 }
 
 .icone-branco {
-  background-color: white;
-  color: #0f172a;
+  background-color: var(--white);
+  color: var(--gray-dark);
 }
 
 .titulo-beneficio {
@@ -97,7 +98,7 @@
 }
 
 .descricao-beneficio {
-  font-size: 14px;
+  font-size: var(--font-size-sm);
 }
 
 /* FORM */

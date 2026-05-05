@@ -1,55 +1,54 @@
 .calendario-container {
-    background: #dcece4;
-    padding: 20px;
-    border-radius: 20px;
+  background: var(--medical-soft);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-xl);
 }
 
 .fc {
-    background: transparent;
+  background: transparent;
 }
 
 /* título */
 .fc-toolbar-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #242833;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--medical-text);
 }
 
 /* botões */
 .fc-button {
-    background: #cdded6 !important;
-    border: none !important;
-    color: #332424 !important;
-    border-radius: 8px !important;
+  background: var(--medical-card) !important;
+  border: none !important;
+  color: var(--medical-text) !important;
+  border-radius: var(--border-radius-sm) !important;
 }
 
 .fc .fc-button-group {
-    display: flex;
-    gap: 10px; 
+  display: flex;
+  gap: var(--spacing-sm);
 }
 
 /* hover */
 .fc-button:hover {
-    background: #bcd0c8 !important;
+  background: var(--gray-light) !important;
 }
 
 .fc .fc-button:focus,
 .fc .fc-button:focus-visible {
-    outline: none !important;
-    box-shadow: 0 0 0 2px #7c9e96 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--medical-teal) !important;
 }
 
 /* dias */
 .fc-daygrid-day {
-    background: #ffffff;
-    border-radius: 10px;
+  background: var(--white);
+  border-radius: var(--border-radius-md);
 }
 
 /* evento */
 .fc-event {
-    border: none;
-    border-radius: 6px;
-    padding: 2px;
-    font-size: 12px;
+  border: none;
+  border-radius: 6px;
+  padding: 2px;
+  font-size: 12px;
 }
-
