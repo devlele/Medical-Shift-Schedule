@@ -26,6 +26,17 @@
   box-shadow: var(--shadow-md);
 }
 
+.botao-principal:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.botao-principal:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 .link-perfil {
   color: var(--white);
   text-decoration: none;

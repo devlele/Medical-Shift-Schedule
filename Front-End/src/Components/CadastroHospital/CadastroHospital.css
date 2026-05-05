@@ -180,3 +180,170 @@
   align-items: center;
   gap: 8px;
 }
+
+/* FORMULÁRIO DE CADASTRO */
+.pagina-cadastro {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  background: var(--white);
+}
+
+.painel-esquerdo {
+  background: linear-gradient(135deg, var(--medical-dark) 0%, var(--medical-teal) 100%);
+  color: var(--white);
+  padding: var(--spacing-2xl);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.logo-cadastro {
+  height: 80px;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.titulo-esquerdo {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--spacing-lg);
+  font-weight: 700;
+}
+
+.texto-esquerdo {
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.painel-direito {
+  padding: var(--spacing-2xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-cadastro {
+  width: 100%;
+  max-width: 500px;
+}
+
+.form-cadastro h1 {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--spacing-sm);
+  color: var(--medical-text);
+}
+
+.subtitulo {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--medical-muted);
+  margin-bottom: var(--spacing-lg);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--spacing-lg);
+}
+
+.campo label {
+  font-weight: 600;
+  margin-bottom: var(--spacing-xs);
+  color: var(--medical-text);
+  font-size: var(--font-size-sm);
+}
+
+.campo input,
+.campo textarea {
+  padding: var(--spacing-md);
+  border: 1px solid var(--gray-medium);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.campo input:focus,
+.campo textarea:focus {
+  outline: none;
+  border-color: var(--medical-teal);
+  box-shadow: 0 0 0 3px rgba(43, 191, 156, 0.1);
+}
+
+.campo textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* BOTÃO CADASTRAR */
+.btn-cadastrar {
+  width: 100%;
+  padding: var(--spacing-md);
+  background-color: var(--medical-dark);
+  color: var(--white);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  transition: all 0.2s ease;
+  margin-top: var(--spacing-lg);
+}
+
+.btn-cadastrar:hover {
+  background-color: var(--medical-teal);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-cadastrar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-cadastrar:disabled:hover {
+  background-color: var(--medical-dark);
+  box-shadow: none;
+}
+
+/* LINK LOGIN */
+.link-login {
+  display: block;
+  text-align: center;
+  margin-top: var(--spacing-lg);
+  color: var(--medical-teal);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.link-login:hover {
+  text-decoration: underline;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+  .pagina-cadastro {
+    grid-template-columns: 1fr;
+  }
+
+  .painel-esquerdo {
+    min-height: 200px;
+    padding: var(--spacing-xl);
+  }
+
+  .painel-direito {
+    padding: var(--spacing-lg);
+  }
+
+  .titulo-esquerdo {
+    font-size: var(--font-size-xl);
+  }
+}

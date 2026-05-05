@@ -147,6 +147,17 @@
   transform: translateY(-1px);
 }
 
+.btn-cadastrar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-cadastrar:disabled:hover {
+  opacity: 0.5;
+  transform: none;
+}
+
 /* LINK */
 .link-login {
   display: block;

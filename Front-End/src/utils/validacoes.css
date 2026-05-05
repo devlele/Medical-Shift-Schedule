@@ -1,0 +1,74 @@
+/* ESTILOS DE VALIDAÇÃO */
+
+.campo-com-erro input,
+.campo-com-erro select,
+.campo-com-erro textarea {
+  border-color: var(--error);
+  background-color: rgba(220, 53, 69, 0.05);
+}
+
+.campo-com-erro input:focus,
+.campo-com-erro select:focus,
+.campo-com-erro textarea:focus {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.mensagem-erro {
+  color: var(--error);
+  font-size: var(--font-size-xs);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mensagem-sucesso {
+  color: var(--success);
+  font-size: var(--font-size-xs);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.campo-com-sucesso input,
+.campo-com-sucesso select,
+.campo-com-sucesso textarea {
+  border-color: var(--success);
+  background-color: rgba(40, 167, 69, 0.05);
+}
+
+.campo-com-sucesso input:focus,
+.campo-com-sucesso select:focus,
+.campo-com-sucesso textarea:focus {
+  border-color: var(--success);
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+.campo {
+  position: relative;
+  margin-bottom: var(--spacing-md);
+}
+
+.campo-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icone-validacao {
+  position: absolute;
+  right: 12px;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+.icone-validacao.erro {
+  color: var(--error);
+}
+
+.icone-validacao.sucesso {
+  color: var(--success);
+}

@@ -1,15 +1,37 @@
 import { Link } from "react-router-dom";
+import { AlertCircle } from "lucide-react";
 import logo from "../../assets/logo-icon.png";
 import Footer from "../../Components/Footer/Footer.jsx";
 
 import { validarCPF } from "../../utils/validarCPF";
+import {
+  validarEmail,
+  validarTelefone,
+  validarCRM,
+  validarCampoObrigatorio,
+  formatarTelefone,
+} from "../../utils/validacoes";
 import { useState } from "react";
 
 import "./CadastroMedico.css";
+import "../../utils/validacoes.css";
 
 function CadastroUsuario() {
-  const [cpf, setCpf] = useState("");
-  const [erroCpf, setErroCpf] = useState("");
+  const [formData, setFormData] = useState({
+    nome: "",
+    crm: "",
+    uf: "",
+    email: "",
+    cpf: "",
+    dataNascimento: "",
+    telefone: "",
+    especialidade: "",
+    senha: "",
+    confirmaSenha: "",
+  });
+
+  const [erros, setErros] = useState({});
+  const [formularioTocado, setFormularioTocado] = useState({});
 
   const formatarCPF = (valor) => {
     valor = valor.replace(/\D/g, "");
@@ -19,15 +41,112 @@ function CadastroUsuario() {
     return valor;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const validarFormulario = () => {
+    const novoErros = {};
 
-    if (!validarCPF(cpf)) {
-      setErroCpf("CPF inválido");
-      return;
+    if (!validarCampoObrigatorio(formData.nome)) {
+      novoErros.nome = "Nome é obrigatório";
     }
 
-    setErroCpf("");
+    if (!validarCampoObrigatorio(formData.crm)) {
+      novoErros.crm = "CRM é obrigatório";
+    } else if (!validarCRM(formData.crm)) {
+      novoErros.crm = "CRM inválido (5-8 dígitos)";
+    }
+
+    if (!validarCampoObrigatorio(formData.uf)) {
+      novoErros.uf = "UF é obrigatória";
+    }
+
+    if (!validarCampoObrigatorio(formData.email)) {
+      novoErros.email = "Email é obrigatório";
+    } else if (!validarEmail(formData.email)) {
+      novoErros.email = "Email inválido";
+    }
+
+    if (!validarCampoObrigatorio(formData.cpf)) {
+      novoErros.cpf = "CPF é obrigatório";
+    } else if (!validarCPF(formData.cpf)) {
+      novoErros.cpf = "CPF inválido";
+    }
+
+    if (!validarCampoObrigatorio(formData.dataNascimento)) {
+      novoErros.dataNascimento = "Data de nascimento é obrigatória";
+    }
+
+    if (!validarCampoObrigatorio(formData.telefone)) {
+      novoErros.telefone = "Telefone é obrigatório";
+    } else if (!validarTelefone(formData.telefone)) {
+      novoErros.telefone = "Telefone inválido. Formato: (XX) XXXXX-XXXX";
+    }
+
+    if (!validarCampoObrigatorio(formData.especialidade)) {
+      novoErros.especialidade = "Especialidade é obrigatória";
+    }
+
+    if (!validarCampoObrigatorio(formData.senha)) {
+      novoErros.senha = "Senha é obrigatória";
+    } else if (formData.senha.length < 6) {
+      novoErros.senha = "Senha deve ter pelo menos 6 caracteres";
+    }
+
+    if (!validarCampoObrigatorio(formData.confirmaSenha)) {
+      novoErros.confirmaSenha = "Confirmação de senha é obrigatória";
+    } else if (formData.confirmaSenha !== formData.senha) {
+      novoErros.confirmaSenha = "Senhas não conferem";
+    }
+
+    return novoErros;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    let novoValor = value;
+
+    // Aplicar formatação automática
+    if (name === "telefone") {
+      novoValor = formatarTelefone(value);
+    } else if (name === "cpf") {
+      novoValor = formatarCPF(value);
+    }
+
+    setFormData({ ...formData, [name]: novoValor });
+
+    // Validação em tempo real se o campo foi tocado
+    if (formularioTocado[name]) {
+      const novoErros = validarFormulario();
+      setErros(novoErros);
+    }
+  };
+
+  const handleBlur = (field) => {
+    setFormularioTocado({ ...formularioTocado, [field]: true });
+    const novoErros = validarFormulario();
+    setErros(novoErros);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const novoErros = validarFormulario();
+
+    if (Object.keys(novoErros).length === 0) {
+      console.log("Formulário válido! Dados:", formData);
+      // Aqui irá a lógica de cadastro
+    } else {
+      setErros(novoErros);
+      setFormularioTocado({
+        nome: true,
+        crm: true,
+        uf: true,
+        email: true,
+        cpf: true,
+        dataNascimento: true,
+        telefone: true,
+        especialidade: true,
+        senha: true,
+        confirmaSenha: true,
+      });
+    }
   };
 
   return (
@@ -52,22 +171,53 @@ function CadastroUsuario() {
             </span>
 
             {/* Nome */}
-            <div className="campo">
+            <div className={`campo ${erros.nome ? "campo-com-erro" : ""}`}>
               <label>Nome Completo</label>
-              <input type="text" placeholder="Dr(a). Seu Nome" />
+              <input
+                type="text"
+                name="nome"
+                placeholder="Dr(a). Seu Nome"
+                value={formData.nome}
+                onChange={handleChange}
+                onBlur={() => handleBlur("nome")}
+              />
+              {erros.nome && (
+                <span className="mensagem-erro">
+                  <AlertCircle size={14} />
+                  {erros.nome}
+                </span>
+              )}
             </div>
 
             {/* CRM + UF */}
             <div className="linha-2">
-              <div className="campo">
+              <div className={`campo ${erros.crm ? "campo-com-erro" : ""}`}>
                 <label>CRM</label>
-                <input type="text" placeholder="000000" />
+                <input
+                  type="text"
+                  name="crm"
+                  placeholder="000000"
+                  value={formData.crm}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("crm")}
+                />
+                {erros.crm && (
+                  <span className="mensagem-erro">
+                    <AlertCircle size={14} />
+                    {erros.crm}
+                  </span>
+                )}
               </div>
 
-              <div className="campo">
+              <div className={`campo ${erros.uf ? "campo-com-erro" : ""}`}>
                 <label>UF</label>
-                <select>
-                  <option>Selecione</option>
+                <select
+                  name="uf"
+                  value={formData.uf}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("uf")}
+                >
+                  <option value="">Selecione</option>
                   <option value="AC">AC</option>
                   <option value="AL">AL</option>
                   <option value="AP">AP</option>
@@ -96,28 +246,49 @@ function CadastroUsuario() {
                   <option value="SE">SE</option>
                   <option value="TO">TO</option>
                 </select>
+                {erros.uf && (
+                  <span className="mensagem-erro">
+                    <AlertCircle size={14} />
+                    {erros.uf}
+                  </span>
+                )}
               </div>
             </div>
 
             {/* Email + CPF */}
             <div className="linha-2">
-              <div className="campo">
+              <div className={`campo ${erros.email ? "campo-com-erro" : ""}`}>
                 <label>E-mail Profissional</label>
-                <input type="email" placeholder="exemplo@clinica.com.br" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="exemplo@clinica.com.br"
+                  value={formData.email}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("email")}
+                />
+                {erros.email && (
+                  <span className="mensagem-erro">
+                    <AlertCircle size={14} />
+                    {erros.email}
+                  </span>
+                )}
               </div>
 
-              <div className="campo">
+              <div className={`campo ${erros.cpf ? "campo-com-erro" : ""}`}>
                 <label>CPF</label>
                 <input
                   type="text"
+                  name="cpf"
                   placeholder="000.000.000-00"
-                  value={cpf}
-                  onChange={(e) => setCpf(formatarCPF(e.target.value))}
+                  value={formData.cpf}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("cpf")}
                 />
-
-                {erroCpf && (
-                  <span style={{ color: "red", fontSize: "12px" }}>
-                    {erroCpf}
+                {erros.cpf && (
+                  <span className="mensagem-erro">
+                    <AlertCircle size={14} />
+                    {erros.cpf}
                   </span>
                 )}
               </div>
@@ -125,52 +296,126 @@ function CadastroUsuario() {
 
             {/* Data + Telefone */}
             <div className="linha-2">
-              <div className="campo">
+              <div
+                className={`campo ${erros.dataNascimento ? "campo-com-erro" : ""}`}
+              >
                 <label>Data de Nascimento</label>
-                <input type="date" />
+                <input
+                  type="date"
+                  name="dataNascimento"
+                  value={formData.dataNascimento}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("dataNascimento")}
+                />
+                {erros.dataNascimento && (
+                  <span className="mensagem-erro">
+                    <AlertCircle size={14} />
+                    {erros.dataNascimento}
+                  </span>
+                )}
               </div>
 
-              <div className="campo">
+              <div
+                className={`campo ${erros.telefone ? "campo-com-erro" : ""}`}
+              >
                 <label>Telefone</label>
-                <input type="tel" placeholder="(11) 99999-9999" />
+                <input
+                  type="tel"
+                  name="telefone"
+                  placeholder="(11) 99999-9999"
+                  value={formData.telefone}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("telefone")}
+                />
+                {erros.telefone && (
+                  <span className="mensagem-erro">
+                    <AlertCircle size={14} />
+                    {erros.telefone}
+                  </span>
+                )}
               </div>
             </div>
 
             {/* Especialidade */}
-            <div className="campo">
+            <div
+              className={`campo ${erros.especialidade ? "campo-com-erro" : ""}`}
+            >
               <label>Especialidade</label>
-              <select>
-                <option>Selecione sua especialidade</option>
-                <option>Cardiologia</option>
-                <option>Cirurgia Geral</option>
-                <option>Oncologia</option>
-                <option>Ginecologia</option>
-                <option>Obstetrícia</option>
-                <option>Neonatologia</option>
-                <option>Pediatria</option>
-                <option>Ortopedia</option>
-                <option>Fisioterapia</option>
-                <option>Dermatologia</option>
-                <option>Neurologia</option>
-                <option>Psiquiatria</option>
-                <option>Endocrinologia</option>
+              <select
+                name="especialidade"
+                value={formData.especialidade}
+                onChange={handleChange}
+                onBlur={() => handleBlur("especialidade")}
+              >
+                <option value="">Selecione sua especialidade</option>
+                <option value="Cardiologia">Cardiologia</option>
+                <option value="Cirurgia Geral">Cirurgia Geral</option>
+                <option value="Oncologia">Oncologia</option>
+                <option value="Ginecologia">Ginecologia</option>
+                <option value="Obstetrícia">Obstetrícia</option>
+                <option value="Neonatologia">Neonatologia</option>
+                <option value="Pediatria">Pediatria</option>
+                <option value="Ortopedia">Ortopedia</option>
+                <option value="Fisioterapia">Fisioterapia</option>
+                <option value="Dermatologia">Dermatologia</option>
+                <option value="Neurologia">Neurologia</option>
+                <option value="Psiquiatria">Psiquiatria</option>
+                <option value="Endocrinologia">Endocrinologia</option>
               </select>
+              {erros.especialidade && (
+                <span className="mensagem-erro">
+                  <AlertCircle size={14} />
+                  {erros.especialidade}
+                </span>
+              )}
             </div>
 
             {/* Senha */}
             <div className="linha-2">
-              <div className="campo">
+              <div className={`campo ${erros.senha ? "campo-com-erro" : ""}`}>
                 <label>Senha</label>
-                <input type="password" placeholder="••••••••" />
+                <input
+                  type="password"
+                  name="senha"
+                  placeholder="••••••••"
+                  value={formData.senha}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("senha")}
+                />
+                {erros.senha && (
+                  <span className="mensagem-erro">
+                    <AlertCircle size={14} />
+                    {erros.senha}
+                  </span>
+                )}
               </div>
 
-              <div className="campo">
+              <div
+                className={`campo ${erros.confirmaSenha ? "campo-com-erro" : ""}`}
+              >
                 <label>Confirmar Senha</label>
-                <input type="password" placeholder="••••••••" />
+                <input
+                  type="password"
+                  name="confirmaSenha"
+                  placeholder="••••••••"
+                  value={formData.confirmaSenha}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("confirmaSenha")}
+                />
+                {erros.confirmaSenha && (
+                  <span className="mensagem-erro">
+                    <AlertCircle size={14} />
+                    {erros.confirmaSenha}
+                  </span>
+                )}
               </div>
             </div>
 
-            <button type="submit" className="btn-cadastrar">
+            <button
+              type="submit"
+              className="btn-cadastrar"
+              disabled={Object.keys(erros).length > 0}
+            >
               Cadastrar
             </button>
 
