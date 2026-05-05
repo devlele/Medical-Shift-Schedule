@@ -1,6 +1,5 @@
 import React from "react";
 import {Bell, Settings, Home, ClipboardPlus, History, User, ImagePlus, CalendarDays,} from "lucide-react";
-import logo from "../../assets/Logo-H.png";
 import fotoPerfil from "../../assets/drhouse.png"; 
 import "./Perfil.css";
 import Sidebar from "../Sidebar/Sidebar";

@@ -1,31 +1,35 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, AlertCircle } from "lucide-react";
 import {
   validarEmail,
-  validarTelefone,
   validarCNPJ,
   validarCampoObrigatorio,
-  formatarTelefone,
   formatarCNPJ,
 } from "../../utils/validacoes";
+import { cadastrarHospital } from "../../services/api";
 import logo from "../../assets/logo-icon.png";
 import Footer from "../../Components/Footer/Footer.jsx";
 import "./CadastroHospital.css";
 import "../../utils/validacoes.css";
 
 export default function CadastroHospital() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nome: "",
     cnpj: "",
+    endereco: "",
     responsavel: "",
-    telefone: "",
     email: "",
-    descricao: "",
+    senha: "",
+    confirmaSenha: "",
   });
 
   const [erros, setErros] = useState({});
   const [formularioTocado, setFormularioTocado] = useState({});
+  const [enviando, setEnviando] = useState(false);
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
+  const [erroEnvio, setErroEnvio] = useState("");
 
   const validarFormulario = () => {
     const novoErros = {};
@@ -40,14 +44,12 @@ export default function CadastroHospital() {
       novoErros.cnpj = "CNPJ inválido";
     }
 
-    if (!validarCampoObrigatorio(formData.responsavel)) {
-      novoErros.responsavel = "Responsável é obrigatório";
+    if (!validarCampoObrigatorio(formData.endereco)) {
+      novoErros.endereco = "Endereço é obrigatório";
     }
 
-    if (!validarCampoObrigatorio(formData.telefone)) {
-      novoErros.telefone = "Telefone é obrigatório";
-    } else if (!validarTelefone(formData.telefone)) {
-      novoErros.telefone = "Telefone inválido. Formato: (XX) XXXXX-XXXX";
+    if (!validarCampoObrigatorio(formData.responsavel)) {
+      novoErros.responsavel = "Responsável é obrigatório";
     }
 
     if (!validarCampoObrigatorio(formData.email)) {
@@ -56,8 +58,16 @@ export default function CadastroHospital() {
       novoErros.email = "Email inválido";
     }
 
-    if (!validarCampoObrigatorio(formData.descricao)) {
-      novoErros.descricao = "Descrição é obrigatória";
+    if (!validarCampoObrigatorio(formData.senha)) {
+      novoErros.senha = "Senha é obrigatória";
+    } else if (formData.senha.length < 6) {
+      novoErros.senha = "Senha deve ter pelo menos 6 caracteres";
+    }
+
+    if (!validarCampoObrigatorio(formData.confirmaSenha)) {
+      novoErros.confirmaSenha = "Confirmação de senha é obrigatória";
+    } else if (formData.confirmaSenha !== formData.senha) {
+      novoErros.confirmaSenha = "Senhas não conferem";
     }
 
     return novoErros;
@@ -67,14 +77,13 @@ export default function CadastroHospital() {
     const { name, value } = e.target;
     let novoValor = value;
 
-    // Aplicar formatação automática
-    if (name === "telefone") {
-      novoValor = formatarTelefone(value);
-    } else if (name === "cnpj") {
+    if (name === "cnpj") {
       novoValor = formatarCNPJ(value);
     }
 
     setFormData({ ...formData, [name]: novoValor });
+    setErroEnvio("");
+    setMensagemSucesso("");
 
     // Validação em tempo real se o campo foi tocado
     if (formularioTocado[name]) {
@@ -89,22 +98,46 @@ export default function CadastroHospital() {
     setErros(novoErros);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const novoErros = validarFormulario();
+    setErroEnvio("");
+    setMensagemSucesso("");
 
     if (Object.keys(novoErros).length === 0) {
-      console.log("Formulário válido! Dados:", formData);
-      // Aqui irá a lógica de envio
+      const payload = {
+        nomeFantasia: formData.nome.trim(),
+        cnpj: formData.cnpj.replace(/\D/g, ""),
+        endereco: formData.endereco.trim(),
+        nomeGestor: formData.responsavel.trim(),
+        email: formData.email.trim(),
+        password: formData.senha,
+      };
+
+      try {
+        setEnviando(true);
+        await cadastrarHospital(payload);
+        setMensagemSucesso("Hospital cadastrado com sucesso. Redirecionando para login...");
+        setTimeout(() => navigate("/Login"), 1200);
+      } catch (error) {
+        setErroEnvio(
+          error.message.includes("Failed to fetch")
+            ? "Nao foi possivel conectar à API. Confirme se o backend está rodando em http://localhost:8080."
+            : "Nao foi possivel cadastrar o hospital. Verifique se email ou CNPJ já estao cadastrados."
+        );
+      } finally {
+        setEnviando(false);
+      }
     } else {
       setErros(novoErros);
       setFormularioTocado({
         nome: true,
         cnpj: true,
+        endereco: true,
         responsavel: true,
-        telefone: true,
         email: true,
-        descricao: true,
+        senha: true,
+        confirmaSenha: true,
       });
     }
   };
@@ -171,6 +204,24 @@ export default function CadastroHospital() {
               )}
             </div>
 
+            <div className={`campo ${erros.endereco ? "campo-com-erro" : ""}`}>
+              <label>Endereço</label>
+              <input
+                type="text"
+                name="endereco"
+                placeholder="Rua, número, bairro e cidade"
+                value={formData.endereco}
+                onChange={handleChange}
+                onBlur={() => handleBlur("endereco")}
+              />
+              {erros.endereco && (
+                <span className="mensagem-erro">
+                  <AlertCircle size={14} />
+                  {erros.endereco}
+                </span>
+              )}
+            </div>
+
             <div
               className={`campo ${erros.responsavel ? "campo-com-erro" : ""}`}
             >
@@ -187,24 +238,6 @@ export default function CadastroHospital() {
                 <span className="mensagem-erro">
                   <AlertCircle size={14} />
                   {erros.responsavel}
-                </span>
-              )}
-            </div>
-
-            <div className={`campo ${erros.telefone ? "campo-com-erro" : ""}`}>
-              <label>Telefone</label>
-              <input
-                type="tel"
-                name="telefone"
-                placeholder="(11) 99999-9999"
-                value={formData.telefone}
-                onChange={handleChange}
-                onBlur={() => handleBlur("telefone")}
-              />
-              {erros.telefone && (
-                <span className="mensagem-erro">
-                  <AlertCircle size={14} />
-                  {erros.telefone}
                 </span>
               )}
             </div>
@@ -227,33 +260,62 @@ export default function CadastroHospital() {
               )}
             </div>
 
-            <div className={`campo ${erros.descricao ? "campo-com-erro" : ""}`}>
-              <label>Descrição</label>
-              <textarea
-                name="descricao"
-                placeholder="Descreva sua necessidade..."
-                value={formData.descricao}
-                onChange={handleChange}
-                onBlur={() => handleBlur("descricao")}
-              ></textarea>
-              {erros.descricao && (
-                <span className="mensagem-erro">
-                  <AlertCircle size={14} />
-                  {erros.descricao}
-                </span>
-              )}
+            <div className="linha-2">
+              <div className={`campo ${erros.senha ? "campo-com-erro" : ""}`}>
+                <label>Senha</label>
+                <input
+                  type="password"
+                  name="senha"
+                  placeholder="••••••••"
+                  value={formData.senha}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("senha")}
+                />
+                {erros.senha && (
+                  <span className="mensagem-erro">
+                    <AlertCircle size={14} />
+                    {erros.senha}
+                  </span>
+                )}
+              </div>
+
+              <div
+                className={`campo ${erros.confirmaSenha ? "campo-com-erro" : ""}`}
+              >
+                <label>Confirmar senha</label>
+                <input
+                  type="password"
+                  name="confirmaSenha"
+                  placeholder="••••••••"
+                  value={formData.confirmaSenha}
+                  onChange={handleChange}
+                  onBlur={() => handleBlur("confirmaSenha")}
+                />
+                {erros.confirmaSenha && (
+                  <span className="mensagem-erro">
+                    <AlertCircle size={14} />
+                    {erros.confirmaSenha}
+                  </span>
+                )}
+              </div>
             </div>
+
+            {erroEnvio && <div className="alerta-formulario erro">{erroEnvio}</div>}
+            {mensagemSucesso && (
+              <div className="alerta-formulario sucesso">{mensagemSucesso}</div>
+            )}
 
             <button
               type="submit"
               className="btn-cadastrar"
-              disabled={Object.keys(erros).length > 0}
+              disabled={enviando || Object.keys(erros).length > 0}
             >
-              Enviar Solicitação <ArrowRight size={18} />
+              {enviando ? "Enviando..." : "Cadastrar hospital"}{" "}
+              <ArrowRight size={18} />
             </button>
 
             {/*LINK PARA LOGIN */}
-            <Link to="/login" className="link-login">
+            <Link to="/Login" className="link-login">
               Voltar para o login
             </Link>
           </form>

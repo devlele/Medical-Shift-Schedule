@@ -248,6 +248,12 @@
   margin-bottom: var(--spacing-lg);
 }
 
+.linha-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
 .campo label {
   font-weight: 600;
   margin-bottom: var(--spacing-xs);
@@ -313,6 +319,25 @@
   box-shadow: none;
 }
 
+.alerta-formulario {
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+}
+
+.alerta-formulario.erro {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.alerta-formulario.sucesso {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
 /* LINK LOGIN */
 .link-login {
   display: block;
@@ -341,6 +366,11 @@
 
   .painel-direito {
     padding: var(--spacing-lg);
+  }
+
+  .linha-2 {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 
   .titulo-esquerdo {
