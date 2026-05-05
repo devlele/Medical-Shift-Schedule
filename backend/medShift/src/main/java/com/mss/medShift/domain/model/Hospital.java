@@ -3,11 +3,15 @@ package com.mss.medShift.domain.model;
 import java.util.Collection;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,12 +31,15 @@ public class Hospital implements UserDetails {
     private String nomeGestor;
     private String email;
     private String password;
+    @Enumerated(EnumType.STRING)
     private UserRole role;
 
     @OneToMany(mappedBy = "hospital")
+    @JsonIgnore
     private List<Manager> managers;
 
     @OneToMany(mappedBy = "hospital")
+    @JsonIgnore
     private List<Doctor> doctors;
 
     public Hospital() {

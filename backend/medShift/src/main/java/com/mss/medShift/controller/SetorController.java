@@ -54,13 +54,19 @@ public class SetorController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Setor> getSetor(@PathVariable Long id) {
+    public ResponseEntity<Setor> getSetor(@PathVariable Long id, @AuthenticationPrincipal Hospital hospitalLogado) {
         try {
-            var setor = setorService.findById(id);
+            var setor = setorService.findById(id, hospitalLogado);
             return ResponseEntity.ok(setor);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Setor>> getSetoresDoHospitalLogado(@AuthenticationPrincipal Hospital hospitalLogado) {
+        var setores = setorService.findByHospitalId(hospitalLogado.getId());
+        return ResponseEntity.ok(setores);
     }
 
     @GetMapping("/hospital/{hospitalId}")
@@ -70,9 +76,10 @@ public class SetorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Setor> update(@PathVariable Long id, @RequestBody Setor setor) {
+    public ResponseEntity<Setor> update(@PathVariable Long id, @RequestBody Setor setor,
+            @AuthenticationPrincipal Hospital hospitalLogado) {
         try {
-            var setorUpdated = setorService.update(id, setor);
+            var setorUpdated = setorService.update(id, setor, hospitalLogado);
             return ResponseEntity.ok(setorUpdated);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
