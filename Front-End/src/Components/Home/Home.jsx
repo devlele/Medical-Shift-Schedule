@@ -8,27 +8,6 @@ import img1 from "../../assets/imgHome-1.png";
 
 import "./Home.css";
 
-/* COMPONENTE PRICING */
-const PricingCard = ({ title, price, desc, features, btnText, featured }) => {
-  return (
-    <div className={`pricing-card ${featured ? "featured" : ""}`}>
-      <h3>{title}</h3>
-
-      <div className="pricing-price">{price}</div>
-
-      <p className="pricing-desc">{desc}</p>
-
-      <ul className="pricing-features">
-        {features.map((item, index) => (
-          <li key={index}>✓ {item}</li>
-        ))}
-      </ul>
-
-      <button className="pricing-btn">{btnText}</button>
-    </div>
-  );
-};
-
 const Home = () => {
   return (
     <div className="pagina-inicial">
@@ -113,43 +92,6 @@ const Home = () => {
                   Tudo em um único lugar para sua equipe.
                 </p>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* PRICING */}
-        <section className="pricing-section">
-          <div className="section-container">
-            <div className="section-header-centered">
-              <h2>Escolha o plano ideal</h2>
-              <p>Transparência total para escalar sua operação</p>
-            </div>
-
-            <div className="pricing-grid">
-              <PricingCard
-                title="SOU MÉDICO"
-                price="Gratuito"
-                desc="Para uso individual"
-                features={["Gestão de escalas", "Alertas", "Mobile"]}
-                btnText="Começar"
-              />
-
-              <PricingCard
-                title="CLÍNICAS"
-                price="R$ 299/mês"
-                desc="Para equipes"
-                features={["Dashboard", "Relatórios", "Suporte"]}
-                btnText="Teste grátis"
-                featured
-              />
-
-              <PricingCard
-                title="HOSPITAIS"
-                price="Consultar"
-                desc="Solução enterprise"
-                features={["API", "Integração", "Gerente dedicado"]}
-                btnText="Contato"
-              />
             </div>
           </div>
         </section>
