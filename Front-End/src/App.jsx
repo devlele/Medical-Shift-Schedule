@@ -8,6 +8,7 @@ import CadastroTipo from "./Components/CadastroTipo/CadastroTipo";
 import Perfil from "./Components/Perfil/Perfil";
 import TelaPrincipal from "./Components/TelaPrincipal/TelaPrincipal";
 import RecuperarSenha from "./Components/RecuperarSenha/RecuperarSenha";
+import Agenda from "./Components/Agenda/Agenda";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/Perfil" element={<Perfil />} />
         <Route path="/TelaPrincipal" element={<TelaPrincipal />} />
         <Route path="/RecuperarSenha" element={<RecuperarSenha />} />
+        <Route path="/Agenda" element={<Agenda />} /> 
       </Routes>
     </BrowserRouter>
   );
