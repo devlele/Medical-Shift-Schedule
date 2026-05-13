@@ -1,51 +1,46 @@
 /* CONTAINER */
 .pagina-cadastro {
   min-height: 100vh;
-  background-color: var(--medical-mint);
-
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: 5fr 3fr;
+  gap: 2rem;
+  padding: 2rem;
+  background: var(--medical-mint);
   align-items: stretch;
-
-  padding: 0 24px; /* só lateral */
 }
 
-/* PAINÉIS */
 .painel-esquerdo,
 .painel-direito {
-  min-height: 750px;
+  width: 100%;
   display: flex;
-}
-
-/* ESQUERDO */
-.painel-esquerdo {
-  background-color: var(--medical-dark);
-  padding: 20px 0 48px;
-  margin-top: 20px;
-
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-
-  color: white;
-  width: 30%;
-
-  border-radius: 32px 0 0 32px;
-  box-shadow: -10px 25px 50px -12px rgba(0, 0, 0, 0.15);
-}
-
-/* DIREITO */
-.painel-direito {
-  background-color: white;
-  padding: 48px;
-  margin-top: 20px;
-
-  width: 60%;
   flex-direction: column;
   justify-content: center;
+  border-radius: 32px;
+}
 
-  border-radius: 0 32px 32px 0;
-  box-shadow: 10px 25px 50px -12px rgba(0, 0, 0, 0.15);
+/* FORMULÁRIO À DIREITA */
+.painel-direito {
+  order: 1;
+  align-items: flex-start;
+  background: var(--white);
+  padding: 3rem 2.5rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+}
+
+/* INFORMATIVO À ESQUERDA */
+.painel-esquerdo {
+  order: 2;
+  justify-content: flex-start;
+  align-items: center;
+  background: linear-gradient(
+    135deg,
+    var(--medical-dark) 0%,
+    var(--medical-teal) 100%
+  );
+  color: var(--white);
+  padding: 4.5rem 2rem 3rem;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
 }
 
 /* LOGO */

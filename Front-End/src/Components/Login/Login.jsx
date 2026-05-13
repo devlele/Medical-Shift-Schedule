@@ -156,9 +156,9 @@ const Login = () => {
               <div className="linha-label">
                 <label className="label-formulario">Senha</label>
 
-                <button type="button" className="botao-esqueceu">
+                <Link to="/RecuperarSenha" className="botao-esqueceu">
                   Esqueci minha senha
-                </button>
+                </Link>
               </div>
 
               <div className="area-input">

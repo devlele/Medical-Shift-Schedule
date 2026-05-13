@@ -19,7 +19,7 @@ export default function Sidebar() {
                     <span>Home</span>
                 </NavLink>
 
-                <NavLink to="/agenda" className="item-menu">
+                <NavLink to="/Agenda" className="item-menu">
                     <CalendarDays className="icone" />
                     <span>Agenda</span>
                 </NavLink>
