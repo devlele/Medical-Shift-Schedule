@@ -209,3 +209,18 @@
   color: rgba(55, 83, 71, 0.4);
   text-align: center;
 }
+
+@media (max-width: 600px) {
+  .pagina-login {
+    padding: 24px;
+  }
+
+  .conteudo-login {
+    max-width: 100%;
+  }
+
+  .linha-lembrar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

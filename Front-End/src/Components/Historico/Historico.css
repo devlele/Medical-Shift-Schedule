@@ -1,0 +1,278 @@
+.historico-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--medical-mint);
+}
+
+.historico-content {
+  flex: 1;
+  padding: 32px;
+  background: var(--medical-mint);
+}
+
+.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.topo h1 {
+  font-size: 36px;
+  margin-bottom: 8px;
+  color: var(--medical-dark);
+}
+
+.topo p {
+  color: var(--medical-muted);
+  font-size: 16px;
+}
+
+.topo-direita {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icone-topo {
+  width: 22px;
+  height: 22px;
+  color: #5f7f75;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.icone-topo:hover {
+  color: var(--medical-dark);
+  transform: scale(1.1);
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ecf6f1;
+  padding: 10px 14px;
+  border-radius: 999px;
+}
+
+.user img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user span {
+  font-weight: 600;
+  color: var(--medical-dark);
+}
+
+.historico-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.historico-header {
+  display: flex;
+  justify-content: flex-end;
+  background: var(--medical-card);
+  padding: 22px;
+  border-radius: 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+.historico-header span {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--medical-muted);
+  margin-bottom: 10px;
+}
+
+.historico-header select {
+  width: 260px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid #d7e8df;
+  background: white;
+  color: var(--medical-text);
+  font-weight: 600;
+}
+
+.historico-table-card {
+  background: white;
+  border-radius: 32px;
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+.table-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.table-top strong {
+  font-size: 18px;
+  color: var(--medical-dark);
+}
+
+.table-top p {
+  color: var(--medical-muted);
+  font-size: 14px;
+}
+
+.historico-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.historico-table th,
+.historico-table td {
+  text-align: left;
+  padding: 18px 16px;
+  border-bottom: 1px solid #edf3f0;
+}
+
+.historico-table th {
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: #7f998f;
+  text-transform: uppercase;
+}
+
+.historico-table tbody tr:hover {
+  background: #f5fbf7;
+}
+
+.date-cell strong,
+.time-cell strong {
+  display: block;
+  color: var(--medical-dark);
+  margin-bottom: 6px;
+}
+
+.date-cell span {
+  color: var(--medical-muted);
+  font-size: 13px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.status-badge.completed {
+  background: #dcf7e8;
+  color: #1e6f51;
+}
+
+.status-badge.cancelled {
+  background: #f6e6e7;
+  color: #a5333a;
+}
+
+.status-badge.absent {
+  background: #f7e5e5;
+  color: #b8454d;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 18px;
+}
+
+.page-button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 12px;
+  background: #f6faf7;
+  color: var(--medical-text);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.page-button.active,
+.page-button:hover {
+  background: var(--medical-dark);
+  color: white;
+}
+
+@media (max-width: 1100px) {
+  .historico-table {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .historico-layout,
+  .historico-content {
+    display: block;
+  }
+
+  .historico-content {
+    padding: 20px;
+  }
+
+  .topo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .historico-header {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 760px) {
+  .historico-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .historico-header select {
+    width: 100%;
+  }
+
+  .table-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .historico-table {
+    min-width: auto;
+  }
+
+  .historico-table th,
+  .historico-table td {
+    padding: 14px 10px;
+  }
+
+  .pagination {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .page-button {
+    min-width: 36px;
+    padding: 10px 12px;
+  }
+}
