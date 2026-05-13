@@ -1,16 +1,20 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, AlertCircle } from "lucide-react";
 
 import { validarEmail, validarSenha } from "../../utils/validacoes";
+import { loginHospital } from "../../services/api";
 import logo from "../../assets/Logo-H.png";
 import "./Login.css";
 import "../../utils/validacoes.css";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erros, setErros] = useState({});
+  const [enviando, setEnviando] = useState(false);
+  const [erroLogin, setErroLogin] = useState("");
   const [formularioTocado, setFormularioTocado] = useState({
     email: false,
     senha: false,
@@ -34,21 +38,46 @@ const Login = () => {
     return novoErros;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const novoErros = validarFormulario();
+    setErroLogin("");
 
     if (Object.keys(novoErros).length === 0) {
-      // Validação passou
-      console.log("Formulário válido! Email:", email);
-      // Aqui irá a lógica de login
+      const payload = {
+        email: email.trim(),
+        password: senha,
+      };
+
+      try {
+        setEnviando(true);
+        const resposta = await loginHospital(payload);
+
+        localStorage.setItem("token", resposta.token);
+        localStorage.setItem("emailUsuario", payload.email);
+
+        navigate("/TelaPrincipal");
+      } catch (error) {
+        setErroLogin(
+          error.message.includes("Failed to fetch")
+            ? "Nao foi possivel conectar à API. Confirme se o backend está rodando em http://localhost:8080."
+            : "Email ou senha inválidos."
+        );
+      } finally {
+        setEnviando(false);
+      }
     } else {
       setErros(novoErros);
+      setFormularioTocado({
+        email: true,
+        senha: true,
+      });
     }
   };
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
+    setErroLogin("");
     if (formularioTocado.email && erros.email) {
       const novoErros = { ...erros };
       if (!e.target.value) {
@@ -64,6 +93,7 @@ const Login = () => {
 
   const handleSenhaChange = (e) => {
     setSenha(e.target.value);
+    setErroLogin("");
     if (formularioTocado.senha && erros.senha) {
       const novoErros = { ...erros };
       if (!e.target.value) {
@@ -158,15 +188,15 @@ const Login = () => {
               </label>
             </div>
 
+            {erroLogin && <div className="alerta-login erro">{erroLogin}</div>}
+
             {/* BOTÃO */}
             <button
               type="submit"
               className="botao-principal"
-              disabled={Object.keys(erros).length > 0}
+              disabled={enviando || Object.keys(erros).length > 0}
             >
-              <Link to="/TelaPrincipal" className="link-perfil">
-                Entrar
-              </Link>
+              {enviando ? "Entrando..." : "Entrar"}
             </button>
           </form>
 

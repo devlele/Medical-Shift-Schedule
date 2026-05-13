@@ -27,3 +27,17 @@ export function cadastrarHospital(payload) {
     body: JSON.stringify(payload),
   });
 }
+
+export function loginHospital(payload) {
+  return request("/auth/login", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function cadastrarMedico(payload) {
+  return request("/doctor/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}

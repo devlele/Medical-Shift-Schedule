@@ -12,6 +12,7 @@ import {
   formatarTelefone,
 } from "../../utils/validacoes";
 import { useState } from "react";
+import { cadastrarMedico } from "../../services/api";
 
 import "./CadastroMedico.css";
 import "../../utils/validacoes.css";
@@ -32,6 +33,8 @@ function CadastroUsuario() {
 
   const [erros, setErros] = useState({});
   const [formularioTocado, setFormularioTocado] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [mensagem, setMensagem] = useState("");
 
   const formatarCPF = (valor) => {
     valor = valor.replace(/\D/g, "");
@@ -72,12 +75,6 @@ function CadastroUsuario() {
 
     if (!validarCampoObrigatorio(formData.dataNascimento)) {
       novoErros.dataNascimento = "Data de nascimento é obrigatória";
-    }
-
-    if (!validarCampoObrigatorio(formData.telefone)) {
-      novoErros.telefone = "Telefone é obrigatório";
-    } else if (!validarTelefone(formData.telefone)) {
-      novoErros.telefone = "Telefone inválido. Formato: (XX) XXXXX-XXXX";
     }
 
     if (!validarCampoObrigatorio(formData.especialidade)) {
@@ -125,13 +122,39 @@ function CadastroUsuario() {
     setErros(novoErros);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("handleSubmit chamado");
     const novoErros = validarFormulario();
+    console.log("Erros:", novoErros);
 
     if (Object.keys(novoErros).length === 0) {
-      console.log("Formulário válido! Dados:", formData);
-      // Aqui irá a lógica de cadastro
+      setLoading(true);
+      setMensagem("");
+
+      try {
+        // Map form data to API payload
+        const payload = {
+          name: formData.nome,
+          email: formData.email,
+          cpf: formData.cpf.replace(/\D/g, ""), // Remove formatting
+          birthday: formData.dataNascimento,
+          password: formData.senha,
+          specialty: formData.especialidade,
+          crm: formData.crm + "/" + formData.uf, // Combine CRM and UF
+          role: "DOCTOR"
+        };
+        console.log("Payload:", payload);
+
+        await cadastrarMedico(payload);
+        setMensagem("Cadastro realizado com sucesso! Você pode fazer login agora.");
+        // Optionally reset form or redirect
+      } catch (error) {
+        console.error("Erro no cadastro:", error);
+        setMensagem("Erro ao cadastrar: " + error.message);
+      } finally {
+        setLoading(false);
+      }
     } else {
       setErros(novoErros);
       setFormularioTocado({
@@ -141,7 +164,6 @@ function CadastroUsuario() {
         email: true,
         cpf: true,
         dataNascimento: true,
-        telefone: true,
         especialidade: true,
         senha: true,
         confirmaSenha: true,
@@ -169,6 +191,12 @@ function CadastroUsuario() {
             <span className="subtitulo">
               Preencha os dados abaixo para criar sua conta profissional.
             </span>
+
+            {mensagem && (
+              <div className={`mensagem ${mensagem.includes("Erro") ? "erro" : "sucesso"}`}>
+                {mensagem}
+              </div>
+            )}
 
             {/* Nome */}
             <div className={`campo ${erros.nome ? "campo-com-erro" : ""}`}>
@@ -414,9 +442,9 @@ function CadastroUsuario() {
             <button
               type="submit"
               className="btn-cadastrar"
-              disabled={Object.keys(erros).length > 0}
+              disabled={loading}
             >
-              Cadastrar
+              {loading ? "Cadastrando..." : "Cadastrar"}
             </button>
 
             <Link to="/Login" className="link-login">

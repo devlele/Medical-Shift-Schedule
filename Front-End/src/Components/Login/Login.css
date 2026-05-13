@@ -42,6 +42,20 @@
   text-decoration: none;
 }
 
+.alerta-login {
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+}
+
+.alerta-login.erro {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
 /* PÁGINA */
 .pagina-login {
   min-height: 100vh;

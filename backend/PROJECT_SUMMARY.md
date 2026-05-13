@@ -31,7 +31,9 @@ backend/medShift/
 │   │   ├── DoctorController.java         # CRUD de Doctors (/doctor)
 │   │   ├── ManagerController.java        # CRUD de Managers (/manager)
 │   │   ├── HospitalController.java       # CRUD de Hospitals (/hospital)
-│   │   └── SetorController.java          # CRUD de Setores (/setor)
+│   │   ├── SetorController.java          # CRUD de Setores (/setor)
+│   │   ├── PlantaoController.java        # CRUD de Plantões (/plantao)
+│   │   └── AgendaController.java         # Agendas (/agenda)
 │   ├── domain/
 │   │   ├── model/
 │   │   │   ├── User.java                 # Classe base (nome, email, cpf, etc.)
@@ -39,12 +41,15 @@ backend/medShift/
 │   │   │   ├── Manager.java              # Escalista (department, role=MANAGER)
 │   │   │   ├── Hospital.java             # Hospital (nomeFantasia, cnpj, role=HOSPITAL)
 │   │   │   ├── Setor.java                # Setor (nome, descricao, hospital)
+│   │   │   ├── Plantao.java              # Plantão/Escala (setor, doctor, data, status)
+│   │   │   ├── PlantaoStatus.java        # Enum (SCHEDULED, CHECK_IN, CHECK_OUT, CANCELLED, PENDING_INTEREST)
 │   │   │   └── UserRole.java             # Enum (ADMIN, HOSPITAL, MANAGER, DOCTOR)
 │   │   └── repository/
 │   │       ├── DoctorRepository.java     # Repositório JPA para Doctors
 │   │       ├── ManagerRepository.java    # Repositório JPA para Managers
 │   │       ├── HospitalRepository.java   # Repositório JPA para Hospitals
-│   │       └── SetorRepository.java      # Repositório JPA para Setores
+│   │       ├── SetorRepository.java      # Repositório JPA para Setores
+│   │       └── PlantaoRepository.java    # Repositório JPA para Plantões
 │   ├── infra/security/
 │   │   ├── SecurityConfiguration.java    # Configuração Spring Security
 │   │   └── SecurityFilter.java           # Filtro JWT para validação de tokens
@@ -56,18 +61,21 @@ backend/medShift/
 │       ├── ManagerService.java           # Interface para Managers
 │       ├── HospitalService.java          # Interface para Hospitals
 │       ├── SetorService.java             # Interface para Setores
+│       ├── PlantaoService.java           # Interface para Plantões
 │       └── impl/
 │           ├── DoctorServiceImple.java   # Implementação DoctorService
 │           ├── ManagerServiceImple.java  # Implementação ManagerService
 │           ├── HospitalServiceImple.java # Implementação HospitalService
-│           └── SetorServiceImple.java    # Implementação SetorService
+│           ├── SetorServiceImple.java    # Implementação SetorService
+│           └── PlantaoServiceImple.java  # Implementação PlantaoService
 ├── src/main/resources/
 │   ├── application.properties            # Configurações (JWT secret, profiles)
 │   ├── application-dev.yml               # Configuração dev com Hibernate validate
 │   └── db/migration/
 │       ├── V1__create-doctor-table.sql   # Migração tabela tb_doctor
 │       ├── V2__create-manager-table.sql  # Migração tabela tb_manager
-│       └── V3__create-hospital-table.sql # Migração tabelas tb_hospital, tb_setor e FKs
+│       ├── V3__create-hospital-table.sql # Migração tabelas tb_hospital, tb_setor e FKs
+│       └── V4__create-plantao-table.sql  # Migração tabelas tb_plantao e tb_plantao_interest
 └── pom.xml                               # Dependências Maven
 ```
 
@@ -115,54 +123,56 @@ Legenda de status:
 | PUT | `/hospital/{id}` | Atualiza dados cadastrais de um hospital por ID. Endpoint administrativo. | ROLE_ADMIN | OK |
 | DELETE | `/hospital/{id}` | Remove um hospital por ID. Endpoint administrativo via regra global de delete. | ROLE_ADMIN | OK |
 | GET | `/doctor/{id}` | Busca um médico por ID. Endpoint administrativo. | ROLE_ADMIN | OK |
-| DELETE | `/doctor/{id}` | Deveria remover médico por ID, mas nao ha método no controller. | ROLE_ADMIN | Not Imple |
-| PUT | `/manager/{id}` | Deveria atualizar manager, mas nao ha método no controller. | ROLE_HOSPITAL ou ROLE_ADMIN | Not Imple |
-| DELETE | `/manager/{id}` | Deveria remover manager por ID, mas nao ha método no controller. | ROLE_ADMIN | Not Imple |
+| DELETE | `/doctor/{id}` | Remove médico por ID. Endpoint administrativo. | ROLE_ADMIN | OK |
+| PUT | `/manager/{id}` | Atualiza manager. Endpoint para ROLE_HOSPITAL ou ROLE_ADMIN. | ROLE_HOSPITAL ou ROLE_ADMIN | OK |
+| DELETE | `/manager/{id}` | Remove manager por ID. Endpoint administrativo. | ROLE_ADMIN | OK |
 | GET | `/setor/hospital/{hospitalId}` | Lista setores de um hospital específico. Endpoint administrativo. | ROLE_ADMIN | OK |
 | DELETE | `/setor/{id}` | Remove setor por ID via regra global de delete. | ROLE_ADMIN | OK |
-| GET | `/doctor` | Deveria listar médicos para Manager/Hospital/Admin, mas nao ha método no controller. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
-| PUT | `/doctor/{id}` | Deveria atualizar/vincular médico, mas nao ha método no controller. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
-| GET | `/plantao/{id}` | Deveria buscar plantão por ID. | ROLE_MANAGER, ROLE_DOCTOR, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
-| DELETE | `/plantao/{id}` | Deveria cancelar/remover plantão. | ROLE_MANAGER ou ROLE_ADMIN | Not Imple |
-| GET | `/agenda/setor/{setorId}` | Deveria listar escala por setor e período. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| GET | `/doctor` | Lista todos os médicos. Endpoint para managers, hospitais e admins. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | OK |
+| PUT | `/doctor/{id}` | Atualiza/vincula médico. Endpoint para managers, hospitais e admins. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | OK |
+| GET | `/plantao/{id}` | Busca plantão por ID. | ROLE_MANAGER, ROLE_DOCTOR, ROLE_HOSPITAL, ROLE_ADMIN | OK |
+| POST | `/plantao` | Cadastra plantão/escala. | ROLE_MANAGER | OK |
+| PUT | `/plantao/{id}` | Atualiza plantão/escala. | ROLE_MANAGER | OK |
+| DELETE | `/plantao/{id}` | Cancelar/remover plantão. | ROLE_MANAGER ou ROLE_ADMIN | OK |
+| GET | `/agenda/setor/{setorId}` | Lista escala por setor e período. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | OK |
 
 ### ROLE_HOSPITAL
 | Método | Endpoint | Descrição | Acesso | Status |
 |--------|----------|-----------|--------|--------|
-| GET | `/doctor` | Deveria listar médicos para Manager/Hospital/Admin, mas nao ha método no controller. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
-| PUT | `/doctor/{id}` | Deveria atualizar/vincular médico, mas nao ha método no controller. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| GET | `/doctor` | Lista todos os médicos. Endpoint para managers, hospitais e admins. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | OK |
+| PUT | `/doctor/{id}` | Atualiza/vincula médico. Endpoint para managers, hospitais e admins. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | OK |
 | POST | `/manager` | Cadastra escalista para o hospital autenticado, vinculando-o a um setor do próprio hospital. | ROLE_HOSPITAL | OK |
 | GET | `/manager` | Lista managers/escalistas pertencentes ao hospital autenticado. | ROLE_HOSPITAL | OK |
 | GET | `/manager/{id}` | Busca manager por ID, somente se pertencer ao hospital autenticado. | ROLE_HOSPITAL | OK |
-| PUT | `/manager/{id}` | Deveria atualizar manager, mas nao ha método no controller. | ROLE_HOSPITAL ou ROLE_ADMIN | Not Imple |
+| PUT | `/manager/{id}` | Atualiza manager. Endpoint para ROLE_HOSPITAL ou ROLE_ADMIN. | ROLE_HOSPITAL ou ROLE_ADMIN | OK |
 | POST | `/setor` | Cadastra setor e associa automaticamente ao hospital autenticado. | ROLE_HOSPITAL | OK |
 | GET | `/setor` | Lista setores pertencentes ao hospital autenticado. | ROLE_HOSPITAL | OK |
 | GET | `/setor/{id}` | Busca setor por ID, somente se pertencer ao hospital autenticado. | ROLE_HOSPITAL | OK |
 | PUT | `/setor/{id}` | Atualiza nome/descrição de setor, somente se pertencer ao hospital autenticado. | ROLE_HOSPITAL | OK |
-| GET | `/plantao/{id}` | Deveria buscar plantão por ID. | ROLE_MANAGER, ROLE_DOCTOR, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
-| GET | `/agenda/setor/{setorId}` | Deveria listar escala por setor e período. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| GET | `/plantao/{id}` | Busca plantão por ID. | ROLE_MANAGER, ROLE_DOCTOR, ROLE_HOSPITAL, ROLE_ADMIN | OK |
+| GET | `/agenda/setor/{setorId}` | Lista escala por setor e período. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | OK |
 
 ### ROLE_MANAGER
 | Método | Endpoint | Descrição | Acesso | Status |
 |--------|----------|-----------|--------|--------|
-| GET | `/doctor` | Deveria listar médicos para Manager/Hospital/Admin, mas nao ha método no controller. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
-| PUT | `/doctor/{id}` | Deveria atualizar/vincular médico, mas nao ha método no controller. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
-| POST | `/plantao` | Deveria cadastrar plantão/escala. | ROLE_MANAGER | Not Imple |
-| GET | `/plantao/{id}` | Deveria buscar plantão por ID. | ROLE_MANAGER, ROLE_DOCTOR, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
-| PUT | `/plantao/{id}` | Deveria atualizar plantão/escala. | ROLE_MANAGER | Not Imple |
-| DELETE | `/plantao/{id}` | Deveria cancelar/remover plantão. | ROLE_MANAGER ou ROLE_ADMIN | Not Imple |
-| GET | `/agenda/setor/{setorId}` | Deveria listar escala por setor e período. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
+| GET | `/doctor` | Lista todos os médicos. Endpoint para managers, hospitais e admins. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | OK |
+| PUT | `/doctor/{id}` | Atualiza/vincula médico. Endpoint para managers, hospitais e admins. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | OK |
+| POST | `/plantao` | Cadastra plantão/escala. | ROLE_MANAGER | OK |
+| GET | `/plantao/{id}` | Busca plantão por ID. | ROLE_MANAGER, ROLE_DOCTOR, ROLE_HOSPITAL, ROLE_ADMIN | OK |
+| PUT | `/plantao/{id}` | Atualiza plantão/escala. | ROLE_MANAGER | OK |
+| DELETE | `/plantao/{id}` | Cancelar/remover plantão. | ROLE_MANAGER ou ROLE_ADMIN | OK |
+| GET | `/agenda/setor/{setorId}` | Lista escala por setor e período. | ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN | OK |
 
 ### ROLE_DOCTOR
 | Método | Endpoint | Descrição | Acesso | Status |
 |--------|----------|-----------|--------|--------|
 | GET | `/doctor/me` | Retorna os dados do médico autenticado pelo token. | ROLE_DOCTOR | OK |
-| GET | `/plantao/{id}` | Deveria buscar plantão por ID. | ROLE_MANAGER, ROLE_DOCTOR, ROLE_HOSPITAL, ROLE_ADMIN | Not Imple |
-| GET | `/agenda/doctor/me` | Deveria listar agenda do médico autenticado por período. | ROLE_DOCTOR | Not Imple |
-| POST | `/plantao/{id}/check-in` | Deveria registrar check-in do médico responsável. | ROLE_DOCTOR | Not Imple |
-| POST | `/plantao/{id}/check-out` | Deveria registrar check-out do médico responsável. | ROLE_DOCTOR | Not Imple |
-| POST | `/plantao/{id}/troca` | Deveria disponibilizar plantão para troca/cobertura. | ROLE_DOCTOR | Not Imple |
-| POST | `/plantao/{id}/interesse` | Deveria registrar interesse de médico em cobrir plantão. | ROLE_DOCTOR | Not Imple |
+| GET | `/plantao/{id}` | Busca plantão por ID. | ROLE_MANAGER, ROLE_DOCTOR, ROLE_HOSPITAL, ROLE_ADMIN | OK |
+| GET | `/agenda/doctor/me` | Lista agenda do médico autenticado por período. | ROLE_DOCTOR | OK |
+| POST | `/plantao/{id}/check-in` | Registra check-in do médico responsável. | ROLE_DOCTOR | OK |
+| POST | `/plantao/{id}/check-out` | Registra check-out do médico responsável. | ROLE_DOCTOR | OK |
+| POST | `/plantao/{id}/troca` | Disponibiliza plantão para troca/cobertura. | ROLE_DOCTOR | OK |
+| POST | `/plantao/{id}/interesse` | Registra interesse de médico em cobrir plantão. | ROLE_DOCTOR | OK |
 
 ## Alterações Realizadas Durante o Desenvolvimento
 1. **Configuração Inicial**: Spring Boot com JPA, Security e JWT.
@@ -216,15 +226,57 @@ Legenda de status:
 - **Flyway validado**: Migrations executadas antes do Hibernate, com schema validado em vez de criado por `ddl-auto=update`
 - **Isolamento por hospital**: Setores e managers buscados por ID agora sao filtrados pelo hospital autenticado.
 
+### Implementação de Endpoints de Plantão (Shift) - Maio 2026
+- **Entidades criadas**:
+  - `PlantaoStatus.java`: Enum com status dos plantões (SCHEDULED, CHECK_IN, CHECK_OUT, CANCELLED, PENDING_INTEREST)
+  - `Plantao.java`: Entidade principal com relacionamento muitos-para-muitos para médicos interessados
+- **Repositório**: `PlantaoRepository.java` com queries customizadas para buscar por setor, médico e período
+- **Serviço**: 
+  - `PlantaoService.java` (interface)
+  - `PlantaoServiceImple.java` (implementação com validações de data, médico, setor)
+- **Controllers**:
+  - `PlantaoController.java`: Endpoints para CREATE, READ, UPDATE, DELETE de plantões, check-in/check-out, interesse e troca
+  - `AgendaController.java`: Endpoints para listar agendas por setor ou médico, com filtro opcional de período
+- **Migrações**:
+  - `V4__create-plantao-table.sql`: Criação das tabelas `tb_plantao` e `tb_plantao_interest` com relacionamento muitos-para-muitos
+  - Correção: Uso de `TIMESTAMP` em vez de `DATETIME` para compatibilidade com H2 database
+- **Serviços atualizados**:
+  - `DoctorService`: Adicionados métodos `findAll()` e `update()`
+  - `DoctorServiceImple`: Implementação dos novos métodos com validações
+  - `ManagerService`: Adicionado método `update()`
+  - `ManagerServiceImple`: Implementação de update com validação de setor
+- **Controllers atualizados**:
+  - `DoctorController`: Adicionados endpoints GET (listar), PUT (atualizar) e DELETE
+  - `ManagerController`: Adicionados endpoints PUT (atualizar) e DELETE
+- **Endpoints implementados (15 total)**:
+  - DELETE `/doctor/{id}` (ROLE_ADMIN)
+  - GET `/doctor` (ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN)
+  - PUT `/doctor/{id}` (ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN)
+  - PUT `/manager/{id}` (ROLE_HOSPITAL, ROLE_ADMIN)
+  - DELETE `/manager/{id}` (ROLE_ADMIN)
+  - POST `/plantao` (ROLE_MANAGER)
+  - GET `/plantao/{id}` (ROLE_MANAGER, ROLE_DOCTOR, ROLE_HOSPITAL, ROLE_ADMIN)
+  - PUT `/plantao/{id}` (ROLE_MANAGER)
+  - DELETE `/plantao/{id}` (ROLE_MANAGER, ROLE_ADMIN)
+  - POST `/plantao/{id}/check-in` (ROLE_DOCTOR)
+  - POST `/plantao/{id}/check-out` (ROLE_DOCTOR)
+  - POST `/plantao/{id}/interesse` (ROLE_DOCTOR)
+  - POST `/plantao/{id}/troca` (ROLE_DOCTOR)
+  - GET `/agenda/setor/{setorId}` (ROLE_MANAGER, ROLE_HOSPITAL, ROLE_ADMIN)
+  - GET `/agenda/doctor/me` (ROLE_DOCTOR)
+
 ## Próximos Passos
-- Implementar vínculo formal Doctor-Hospital-Setor.
-- Implementar endpoints de escala de plantões.
-- Adicionar sistema de interesse de médicos em cobrir furos.
-- Separar DTOs de entrada/saída para nao expor entidades diretamente.
-- Padronizar tratamento de erros com `@RestControllerAdvice`.
-- Expandir testes unitários/integração.
+- ✅ Implementar endpoints de escala de plantões (CONCLUÍDO)
+- ✅ Adicionar sistema de interesse de médicos em cobrir furos (CONCLUÍDO)
+- ✅ Implementar check-in/check-out de plantões (CONCLUÍDO)
+- Implementar validação de conflito de plantões (médico não pode estar em dois plantões simultâneos)
+- Implementar sistema de troca de plantões entre médicos
+- Separar DTOs de entrada/saída para não expor entidades diretamente
+- Padronizar tratamento de erros com `@RestControllerAdvice`
+- Expandir testes unitários/integração para os novos endpoints
 - Configurar produção (MySQL, variáveis de ambiente para JWT secret)
 - Adicionar validações adicionais (ex.: formato de CPF/CNPJ, data de nascimento)
+- Implementar auditoria e logs de ações dos usuários
 
 ## Como Executar
 1. **Pré-requisitos**: Java 21, Maven
@@ -325,6 +377,58 @@ Header: Authorization: Bearer <token>
 ### Listar setores por hospital
 ```bash
 GET /setor/hospital/1
+Header: Authorization: Bearer <token>
+```
+
+### Cadastro de Plantão (requer token de Manager)
+```json
+POST /plantao
+Header: Authorization: Bearer <token>
+{
+  "setor": {
+    "id": 1
+  },
+  "doctorAssignado": {
+    "id": 1
+  },
+  "dataInicio": "2026-05-20T08:00:00",
+  "dataFim": "2026-05-20T18:00:00"
+}
+```
+
+### Listar agenda por setor e período
+```bash
+GET /agenda/setor/1?dataInicio=2026-05-20T00:00:00&dataFim=2026-05-20T23:59:59
+Header: Authorization: Bearer <token>
+```
+
+### Listar agenda do médico autenticado
+```bash
+GET /agenda/doctor/me?dataInicio=2026-05-20T00:00:00&dataFim=2026-05-20T23:59:59
+Header: Authorization: Bearer <token>
+```
+
+### Check-in de plantão (requer token de Doctor)
+```bash
+POST /plantao/1/check-in
+Header: Authorization: Bearer <token>
+```
+
+### Check-out de plantão (requer token de Doctor)
+```bash
+POST /plantao/1/check-out
+Header: Authorization: Bearer <token>
+```
+
+### Registrar interesse em cobertura (requer token de Doctor)
+```bash
+POST /plantao/1/interesse
+Header: Authorization: Bearer <token>
+```
+
+### Disponibilizar plantão para troca (requer token de Doctor)
+```bash
+POST /plantao/1/troca
 Header: Authorization: Bearer <token>
 ```
 

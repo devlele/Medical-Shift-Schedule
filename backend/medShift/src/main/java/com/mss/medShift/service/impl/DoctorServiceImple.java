@@ -1,5 +1,6 @@
 package com.mss.medShift.service.impl;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,6 +33,11 @@ public class DoctorServiceImple implements DoctorService {
     }
 
     @Override
+    public List<Doctor> findAll() {
+        return doctorRepository.findAll();
+    }
+
+    @Override
     public Doctor create(Doctor doctorToCreate) {
         if(doctorRepository.existsByCrm(doctorToCreate.getCrm())) {
             throw new IllegalArgumentException("This CRM is already registered");
@@ -44,6 +50,26 @@ public class DoctorServiceImple implements DoctorService {
         doctorToCreate.setPassword(passwordEncoder.encode(doctorToCreate.getPassword()));
 
         return doctorRepository.save(doctorToCreate);
+    }
+
+    @Override
+    public Doctor update(Long id, Doctor doctorToUpdate) {
+        Doctor doctor = findById(id);
+
+        if (doctorToUpdate.getName() != null) {
+            doctor.setName(doctorToUpdate.getName());
+        }
+        if (doctorToUpdate.getSpecialty() != null) {
+            doctor.setSpecialty(doctorToUpdate.getSpecialty());
+        }
+        if (doctorToUpdate.getHospital() != null) {
+            doctor.setHospital(doctorToUpdate.getHospital());
+        }
+        if (doctorToUpdate.getSetor() != null) {
+            doctor.setSetor(doctorToUpdate.getSetor());
+        }
+
+        return doctorRepository.save(doctor);
     }
 
     @Override

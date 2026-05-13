@@ -81,4 +81,22 @@ public class ManagerServiceImple implements ManagerService {
         }
         throw new IllegalArgumentException("Id not founded");
     }
+
+    public Manager update(Long id, Manager managerToUpdate) {
+        Manager manager = findById(id);
+
+        if (managerToUpdate.getName() != null) {
+            manager.setName(managerToUpdate.getName());
+        }
+        if (managerToUpdate.getDepartment() != null) {
+            manager.setDepartment(managerToUpdate.getDepartment());
+        }
+        if (managerToUpdate.getSetor() != null && managerToUpdate.getSetor().getId() != null) {
+            Setor setor = setorRepository.findById(managerToUpdate.getSetor().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Setor não encontrado"));
+            manager.setSetor(setor);
+        }
+
+        return managerRepository.save(manager);
+    }
 }

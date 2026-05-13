@@ -1,6 +1,6 @@
 jsons para teste:
 
-POST: localhost:8080/doctor
+POST: localhost:8080/doctor/register
 {
   "name": "João Silva",
   "cpf": "12345678900",
@@ -8,8 +8,8 @@ POST: localhost:8080/doctor
   "birthday": "1990-01-01",
   "password": "senha123",
   "specialty": "Cardiologia",
-  "crm": "12345",
-  "role": "USER"
+  "crm": "12345/SP",
+  "role": "DOCTOR"
 }
 
 POST: localhost:8080/auth/login
@@ -32,4 +32,20 @@ POST: localhost:8080/auth/login
 {
   "email": "marcos@example.com",
   "password": "senha1234"
+}
+
+POST: localhost:8080/hospital
+{
+  "nomeFantasia": "Hospital São João",
+  "cnpj": "12345678000123",
+  "endereco": "Rua das Flores, 123, São Paulo, SP",
+  "nomeGestor": "Dr. Carlos Mendes",
+  "email": "hospital@saojoao.com",
+  "password": "senhaHospital123"
+}
+
+POST: localhost:8080/auth/login
+{
+  "email": "hospital@saojoao.com",
+  "password": "senhaHospital123"
 }

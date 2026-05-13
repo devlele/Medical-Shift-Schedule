@@ -13,6 +13,7 @@ public interface ManagerService {
     List<Manager> findByHospitalId(Long hospitalId);
     Manager create(Manager managerToCreate);
     Manager create(Manager managerToCreate, Hospital hospitalLogado);
+    Manager update(Long id, Manager managerToUpdate);
     UserDetails findByEmail(String email);
     void delete(Long id);
 }
