@@ -14,7 +14,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import ptBrLocale from "@fullcalendar/core/locales/pt-br";
 
-import Sidebar from "../../components/Sidebar/Sidebar";
+import Sidebar from "../../Components/Sidebar/Sidebar";
 import userImg from "../../assets/drhouse.png";
 
 import "./Agenda.css";

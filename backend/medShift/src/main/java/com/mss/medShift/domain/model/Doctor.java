@@ -26,6 +26,9 @@ public class Doctor extends User implements UserDetails {
     private Long id;
     private  String crm;
     private String specialty;
+    private String uf;
+    private String telefone;
+    private String fotoPerfilUrl;
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
@@ -67,6 +70,30 @@ public class Doctor extends User implements UserDetails {
 
     public void setSpecialty(String specialty) {
         this.specialty = specialty;
+    }
+
+    public String getUf() {
+        return uf;
+    }
+
+    public void setUf(String uf) {
+        this.uf = uf;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
+
+    public String getFotoPerfilUrl() {
+        return fotoPerfilUrl;
+    }
+
+    public void setFotoPerfilUrl(String fotoPerfilUrl) {
+        this.fotoPerfilUrl = fotoPerfilUrl;
     }
 
     public UserRole getRole() {

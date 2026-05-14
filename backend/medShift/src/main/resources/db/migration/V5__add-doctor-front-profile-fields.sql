@@ -1,0 +1,3 @@
+ALTER TABLE tb_doctor ADD COLUMN uf VARCHAR(2);
+ALTER TABLE tb_doctor ADD COLUMN telefone VARCHAR(20);
+ALTER TABLE tb_doctor ADD COLUMN foto_perfil_url VARCHAR(500);

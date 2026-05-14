@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.mss.medShift.controller.dto.AuthUserResponse;
 import com.mss.medShift.service.auth.TokenService;
 
 @RestController
@@ -29,12 +31,13 @@ public class AuthController {
                 loginRequest.email(), loginRequest.password());
 
         Authentication auth = authenticationManager.authenticate(usernamePassword);
+        UserDetails user = (UserDetails) auth.getPrincipal();
 
-        String token = tokenService.generateToken((UserDetails) auth.getPrincipal());
+        String token = tokenService.generateToken(user);
 
-        return ResponseEntity.ok(new LoginResponse(token));
+        return ResponseEntity.ok(new LoginResponse(token, AuthUserResponse.from(user)));
     }
 
     public record LoginRequest(String email, String password) {}
-    public record LoginResponse(String token) {}
+    public record LoginResponse(String token, AuthUserResponse user) {}
 }

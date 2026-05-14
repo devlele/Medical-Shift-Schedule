@@ -33,8 +33,28 @@ public class DoctorServiceImple implements DoctorService {
     }
 
     @Override
+    public Doctor findByIdAndHospitalId(Long id, Long hospitalId) {
+        return doctorRepository.findByIdAndHospitalId(id, hospitalId).orElseThrow(NoSuchElementException::new);
+    }
+
+    @Override
+    public Doctor findByIdAndHospitalIdAndSetorId(Long id, Long hospitalId, Long setorId) {
+        return doctorRepository.findByIdAndHospitalIdAndSetorId(id, hospitalId, setorId).orElseThrow(NoSuchElementException::new);
+    }
+
+    @Override
     public List<Doctor> findAll() {
         return doctorRepository.findAll();
+    }
+
+    @Override
+    public List<Doctor> findByHospitalId(Long hospitalId) {
+        return doctorRepository.findByHospitalId(hospitalId);
+    }
+
+    @Override
+    public List<Doctor> findByHospitalIdAndSetorId(Long hospitalId, Long setorId) {
+        return doctorRepository.findByHospitalIdAndSetorId(hospitalId, setorId);
     }
 
     @Override
@@ -44,6 +64,13 @@ public class DoctorServiceImple implements DoctorService {
         }
         if(doctorRepository.existsByEmail(doctorToCreate.getEmail())) {
             throw new IllegalArgumentException("This email is already registered");
+        }
+
+        if (doctorToCreate.getUf() == null && doctorToCreate.getCrm() != null && doctorToCreate.getCrm().contains("/")) {
+            String[] crmParts = doctorToCreate.getCrm().split("/");
+            if (crmParts.length > 1) {
+                doctorToCreate.setUf(crmParts[1].toUpperCase());
+            }
         }
 
         doctorToCreate.setRole(UserRole.DOCTOR);
@@ -61,6 +88,15 @@ public class DoctorServiceImple implements DoctorService {
         }
         if (doctorToUpdate.getSpecialty() != null) {
             doctor.setSpecialty(doctorToUpdate.getSpecialty());
+        }
+        if (doctorToUpdate.getUf() != null) {
+            doctor.setUf(doctorToUpdate.getUf());
+        }
+        if (doctorToUpdate.getTelefone() != null) {
+            doctor.setTelefone(doctorToUpdate.getTelefone());
+        }
+        if (doctorToUpdate.getFotoPerfilUrl() != null) {
+            doctor.setFotoPerfilUrl(doctorToUpdate.getFotoPerfilUrl());
         }
         if (doctorToUpdate.getHospital() != null) {
             doctor.setHospital(doctorToUpdate.getHospital());

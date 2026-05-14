@@ -48,12 +48,15 @@ public class SecurityConfiguration {
 
                         // Doctor endpoints - only DOCTOR role for their own data
                         .requestMatchers(HttpMethod.GET, "/doctor/me").hasRole("DOCTOR")
+                        .requestMatchers(HttpMethod.GET, "/doctor/me/**").hasRole("DOCTOR")
+                        .requestMatchers(HttpMethod.POST, "/doctor/me/**").hasRole("DOCTOR")
+                        .requestMatchers(HttpMethod.PUT, "/doctor/me/**").hasRole("DOCTOR")
+                        .requestMatchers(HttpMethod.GET, "/agenda/doctor/me/**").hasRole("DOCTOR")
                         
                         // Admin-only lookups documented as administrative endpoints.
                         .requestMatchers(HttpMethod.GET, "/hospital").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/hospital/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/hospital/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/doctor/{id}").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/setor/hospital/**").hasRole("ADMIN")
                         
                         // Hospital-scoped endpoints.
@@ -68,6 +71,7 @@ public class SecurityConfiguration {
 
                         // Manager endpoints - MANAGER, HOSPITAL or ADMIN role
                         .requestMatchers(HttpMethod.GET, "/doctor").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/doctor/{id}").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/doctor/**").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
                         
                         // Admin only

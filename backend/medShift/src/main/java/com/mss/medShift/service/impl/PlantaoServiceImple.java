@@ -47,6 +47,18 @@ public class PlantaoServiceImple implements PlantaoService {
     }
 
     @Override
+    public Plantao findByIdAndHospitalId(Long id, Long hospitalId) {
+        return plantaoRepository.findByIdAndSetorHospitalId(id, hospitalId)
+                .orElseThrow(() -> new NoSuchElementException("Plantao not found with id: " + id));
+    }
+
+    @Override
+    public Plantao findByIdAndHospitalIdAndSetorId(Long id, Long hospitalId, Long setorId) {
+        return plantaoRepository.findByIdAndSetorHospitalIdAndSetorId(id, hospitalId, setorId)
+                .orElseThrow(() -> new NoSuchElementException("Plantao not found with id: " + id));
+    }
+
+    @Override
     public List<Plantao> findBySetorId(Long setorId) {
         return plantaoRepository.findBySetorId(setorId);
     }
@@ -57,6 +69,16 @@ public class PlantaoServiceImple implements PlantaoService {
     }
 
     @Override
+    public List<Plantao> findByHospitalId(Long hospitalId) {
+        return plantaoRepository.findBySetorHospitalId(hospitalId);
+    }
+
+    @Override
+    public List<Plantao> findByHospitalIdAndSetorId(Long hospitalId, Long setorId) {
+        return plantaoRepository.findBySetorHospitalIdAndSetorId(hospitalId, setorId);
+    }
+
+    @Override
     public List<Plantao> findBySetorAndPeriod(Long setorId, LocalDateTime start, LocalDateTime end) {
         return plantaoRepository.findBySetorIdAndDataInicioBetween(setorId, start, end);
     }
@@ -64,6 +86,26 @@ public class PlantaoServiceImple implements PlantaoService {
     @Override
     public List<Plantao> findByDoctorAndPeriod(Long doctorId, LocalDateTime start, LocalDateTime end) {
         return plantaoRepository.findByDoctorAssignadoIdAndDataInicioBetween(doctorId, start, end);
+    }
+
+    @Override
+    public List<Plantao> findByHospitalAndPeriod(Long hospitalId, LocalDateTime start, LocalDateTime end) {
+        return plantaoRepository.findBySetorHospitalIdAndDataInicioBetween(hospitalId, start, end);
+    }
+
+    @Override
+    public List<Plantao> findByHospitalAndSetorAndPeriod(Long hospitalId, Long setorId, LocalDateTime start, LocalDateTime end) {
+        return plantaoRepository.findBySetorHospitalIdAndSetorIdAndDataInicioBetween(hospitalId, setorId, start, end);
+    }
+
+    @Override
+    public List<Plantao> findByDoctorAndHospital(Long doctorId, Long hospitalId) {
+        return plantaoRepository.findByDoctorAssignadoIdAndSetorHospitalId(doctorId, hospitalId);
+    }
+
+    @Override
+    public List<Plantao> findByDoctorAndHospitalAndPeriod(Long doctorId, Long hospitalId, LocalDateTime start, LocalDateTime end) {
+        return plantaoRepository.findByDoctorAssignadoIdAndSetorHospitalIdAndDataInicioBetween(doctorId, hospitalId, start, end);
     }
 
     @Override

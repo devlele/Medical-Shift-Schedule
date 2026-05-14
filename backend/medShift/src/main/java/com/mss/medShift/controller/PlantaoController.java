@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.mss.medShift.domain.model.Plantao;
 import com.mss.medShift.domain.model.Doctor;
+import com.mss.medShift.domain.model.Hospital;
+import com.mss.medShift.domain.model.Manager;
 import com.mss.medShift.service.PlantaoService;
 
 @RestController
@@ -46,9 +49,9 @@ public class PlantaoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Plantao> getPlantao(@PathVariable Long id) {
+    public ResponseEntity<Plantao> getPlantao(@PathVariable Long id, @AuthenticationPrincipal UserDetails user) {
         try {
-            var plantao = plantaoService.findById(id);
+            var plantao = findPlantaoForUser(id, user);
             return ResponseEntity.ok(plantao);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -113,5 +116,18 @@ public class PlantaoController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    private Plantao findPlantaoForUser(Long id, UserDetails user) {
+        if (user instanceof Hospital hospital) {
+            return plantaoService.findByIdAndHospitalId(id, hospital.getId());
+        }
+        if (user instanceof Manager manager) {
+            if (manager.getHospital() == null || manager.getSetor() == null) {
+                throw new IllegalArgumentException("Escalista sem hospital ou setor");
+            }
+            return plantaoService.findByIdAndHospitalIdAndSetorId(id, manager.getHospital().getId(), manager.getSetor().getId());
+        }
+        return plantaoService.findById(id);
     }
 }

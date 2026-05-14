@@ -1,11 +1,21 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
-import {Home, CalendarDays, ClipboardPlus, History, User} from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import {Home, CalendarDays, ClipboardPlus, History, User, LogOut} from "lucide-react";
 
 import logo from "../../assets/logo.png";
 import "./Sidebar.css"
 
 export default function Sidebar() {
+    const navigate = useNavigate();
+
+    function handleLogout() {
+        localStorage.removeItem("token");
+        localStorage.removeItem("emailUsuario");
+        localStorage.removeItem("usuario");
+        localStorage.removeItem("role");
+        navigate("/Login", { replace: true });
+    }
+
     return (
         <aside className="sidebar">
             <div className="area-logo">
@@ -40,6 +50,11 @@ export default function Sidebar() {
                 </NavLink>
 
             </nav>
+
+            <button type="button" className="item-menu botao-logout" onClick={handleLogout}>
+                <LogOut className="icone" />
+                <span>Sair</span>
+            </button>
         </aside>
 
     );
