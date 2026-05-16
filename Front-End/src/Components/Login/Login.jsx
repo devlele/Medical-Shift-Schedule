@@ -19,6 +19,7 @@ const Login = () => {
     email: false,
     senha: false,
   });
+  const [submitted, setSubmitted] = useState(false);
 
   const validarFormulario = () => {
     const novoErros = {};
@@ -40,6 +41,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitted(true);
     const novoErros = validarFormulario();
     setErroLogin("");
 
@@ -61,7 +63,7 @@ const Login = () => {
         setErroLogin(
           error.message.includes("Failed to fetch")
             ? "Nao foi possivel conectar à API. Confirme se o backend está rodando em http://localhost:8080."
-            : "Email ou senha inválidos."
+            : "Email ou senha inválidos.",
         );
       } finally {
         setEnviando(false);
@@ -109,8 +111,10 @@ const Login = () => {
 
   const handleBlur = (field) => {
     setFormularioTocado({ ...formularioTocado, [field]: true });
-    const novoErros = validarFormulario();
-    setErros(novoErros);
+    if (submitted) {
+      const novoErros = validarFormulario();
+      setErros(novoErros);
+    }
   };
 
   return (
@@ -126,7 +130,7 @@ const Login = () => {
           <form onSubmit={handleSubmit}>
             {/* EMAIL */}
             <div
-              className={`grupo-formulario ${erros.email ? "campo-com-erro" : ""}`}
+              className={`grupo-formulario ${submitted && erros.email ? "campo-com-erro" : ""}`}
             >
               <label className="label-formulario">Email</label>
 
@@ -141,7 +145,7 @@ const Login = () => {
                   onBlur={() => handleBlur("email")}
                 />
               </div>
-              {erros.email && (
+              {submitted && erros.email && (
                 <span className="mensagem-erro">
                   <AlertCircle size={14} />
                   {erros.email}
@@ -151,7 +155,7 @@ const Login = () => {
 
             {/* SENHA */}
             <div
-              className={`grupo-formulario ${erros.senha ? "campo-com-erro" : ""}`}
+              className={`grupo-formulario ${submitted && erros.senha ? "campo-com-erro" : ""}`}
             >
               <div className="linha-label">
                 <label className="label-formulario">Senha</label>
@@ -172,7 +176,7 @@ const Login = () => {
                   onBlur={() => handleBlur("senha")}
                 />
               </div>
-              {erros.senha && (
+              {submitted && erros.senha && (
                 <span className="mensagem-erro">
                   <AlertCircle size={14} />
                   {erros.senha}

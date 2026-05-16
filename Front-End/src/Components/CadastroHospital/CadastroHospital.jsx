@@ -27,6 +27,7 @@ export default function CadastroHospital() {
 
   const [erros, setErros] = useState({});
   const [formularioTocado, setFormularioTocado] = useState({});
+  const [submitted, setSubmitted] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [mensagemSucesso, setMensagemSucesso] = useState("");
   const [erroEnvio, setErroEnvio] = useState("");
@@ -86,7 +87,7 @@ export default function CadastroHospital() {
     setMensagemSucesso("");
 
     // Validação em tempo real se o campo foi tocado
-    if (formularioTocado[name]) {
+    if (formularioTocado[name] && submitted) {
       const novoErros = validarFormulario();
       setErros(novoErros);
     }
@@ -94,12 +95,15 @@ export default function CadastroHospital() {
 
   const handleBlur = (field) => {
     setFormularioTocado({ ...formularioTocado, [field]: true });
-    const novoErros = validarFormulario();
-    setErros(novoErros);
+    if (submitted) {
+      const novoErros = validarFormulario();
+      setErros(novoErros);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitted(true);
     const novoErros = validarFormulario();
     setErroEnvio("");
     setMensagemSucesso("");
@@ -117,13 +121,15 @@ export default function CadastroHospital() {
       try {
         setEnviando(true);
         await cadastrarHospital(payload);
-        setMensagemSucesso("Hospital cadastrado com sucesso. Redirecionando para login...");
+        setMensagemSucesso(
+          "Hospital cadastrado com sucesso. Redirecionando para login...",
+        );
         setTimeout(() => navigate("/Login"), 1200);
       } catch (error) {
         setErroEnvio(
           error.message.includes("Failed to fetch")
             ? "Nao foi possivel conectar à API. Confirme se o backend está rodando em http://localhost:8080."
-            : "Nao foi possivel cadastrar o hospital. Verifique se email ou CNPJ já estao cadastrados."
+            : "Nao foi possivel cadastrar o hospital. Verifique se email ou CNPJ já estao cadastrados.",
         );
       } finally {
         setEnviando(false);
@@ -168,7 +174,9 @@ export default function CadastroHospital() {
               Preencha os dados para análise da sua instituição.
             </span>
 
-            <div className={`campo ${erros.nome ? "campo-com-erro" : ""}`}>
+            <div
+              className={`campo ${submitted && erros.nome ? "campo-com-erro" : ""}`}
+            >
               <label>Nome da instituição</label>
               <input
                 type="text"
@@ -178,7 +186,7 @@ export default function CadastroHospital() {
                 onChange={handleChange}
                 onBlur={() => handleBlur("nome")}
               />
-              {erros.nome && (
+              {submitted && erros.nome && (
                 <span className="mensagem-erro">
                   <AlertCircle size={14} />
                   {erros.nome}
@@ -186,7 +194,9 @@ export default function CadastroHospital() {
               )}
             </div>
 
-            <div className={`campo ${erros.cnpj ? "campo-com-erro" : ""}`}>
+            <div
+              className={`campo ${submitted && erros.cnpj ? "campo-com-erro" : ""}`}
+            >
               <label>CNPJ</label>
               <input
                 type="text"
@@ -196,7 +206,7 @@ export default function CadastroHospital() {
                 onChange={handleChange}
                 onBlur={() => handleBlur("cnpj")}
               />
-              {erros.cnpj && (
+              {submitted && erros.cnpj && (
                 <span className="mensagem-erro">
                   <AlertCircle size={14} />
                   {erros.cnpj}
@@ -204,7 +214,9 @@ export default function CadastroHospital() {
               )}
             </div>
 
-            <div className={`campo ${erros.endereco ? "campo-com-erro" : ""}`}>
+            <div
+              className={`campo ${submitted && erros.endereco ? "campo-com-erro" : ""}`}
+            >
               <label>Endereço</label>
               <input
                 type="text"
@@ -214,7 +226,7 @@ export default function CadastroHospital() {
                 onChange={handleChange}
                 onBlur={() => handleBlur("endereco")}
               />
-              {erros.endereco && (
+              {submitted && erros.endereco && (
                 <span className="mensagem-erro">
                   <AlertCircle size={14} />
                   {erros.endereco}
@@ -223,7 +235,7 @@ export default function CadastroHospital() {
             </div>
 
             <div
-              className={`campo ${erros.responsavel ? "campo-com-erro" : ""}`}
+              className={`campo ${submitted && erros.responsavel ? "campo-com-erro" : ""}`}
             >
               <label>Responsável</label>
               <input
@@ -234,7 +246,7 @@ export default function CadastroHospital() {
                 onChange={handleChange}
                 onBlur={() => handleBlur("responsavel")}
               />
-              {erros.responsavel && (
+              {submitted && erros.responsavel && (
                 <span className="mensagem-erro">
                   <AlertCircle size={14} />
                   {erros.responsavel}
@@ -242,7 +254,9 @@ export default function CadastroHospital() {
               )}
             </div>
 
-            <div className={`campo ${erros.email ? "campo-com-erro" : ""}`}>
+            <div
+              className={`campo ${submitted && erros.email ? "campo-com-erro" : ""}`}
+            >
               <label>Email corporativo</label>
               <input
                 type="email"
@@ -252,7 +266,7 @@ export default function CadastroHospital() {
                 onChange={handleChange}
                 onBlur={() => handleBlur("email")}
               />
-              {erros.email && (
+              {submitted && erros.email && (
                 <span className="mensagem-erro">
                   <AlertCircle size={14} />
                   {erros.email}
@@ -261,7 +275,9 @@ export default function CadastroHospital() {
             </div>
 
             <div className="linha-2">
-              <div className={`campo ${erros.senha ? "campo-com-erro" : ""}`}>
+              <div
+                className={`campo ${submitted && erros.senha ? "campo-com-erro" : ""}`}
+              >
                 <label>Senha</label>
                 <input
                   type="password"
@@ -271,7 +287,7 @@ export default function CadastroHospital() {
                   onChange={handleChange}
                   onBlur={() => handleBlur("senha")}
                 />
-                {erros.senha && (
+                {submitted && erros.senha && (
                   <span className="mensagem-erro">
                     <AlertCircle size={14} />
                     {erros.senha}
@@ -280,7 +296,7 @@ export default function CadastroHospital() {
               </div>
 
               <div
-                className={`campo ${erros.confirmaSenha ? "campo-com-erro" : ""}`}
+                className={`campo ${submitted && erros.confirmaSenha ? "campo-com-erro" : ""}`}
               >
                 <label>Confirmar senha</label>
                 <input
@@ -291,7 +307,7 @@ export default function CadastroHospital() {
                   onChange={handleChange}
                   onBlur={() => handleBlur("confirmaSenha")}
                 />
-                {erros.confirmaSenha && (
+                {submitted && erros.confirmaSenha && (
                   <span className="mensagem-erro">
                     <AlertCircle size={14} />
                     {erros.confirmaSenha}
@@ -300,16 +316,14 @@ export default function CadastroHospital() {
               </div>
             </div>
 
-            {erroEnvio && <div className="alerta-formulario erro">{erroEnvio}</div>}
+            {erroEnvio && (
+              <div className="alerta-formulario erro">{erroEnvio}</div>
+            )}
             {mensagemSucesso && (
               <div className="alerta-formulario sucesso">{mensagemSucesso}</div>
             )}
 
-            <button
-              type="submit"
-              className="btn-cadastrar"
-              disabled={enviando || Object.keys(erros).length > 0}
-            >
+            <button type="submit" className="btn-cadastrar" disabled={enviando}>
               {enviando ? "Enviando..." : "Cadastrar hospital"}{" "}
               <ArrowRight size={18} />
             </button>

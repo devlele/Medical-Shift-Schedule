@@ -74,3 +74,39 @@
   font: inherit;
   margin-top: auto;
 }
+@media (max-width: 980px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    padding: 18px;
+    border-radius: 0;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .menu-lateral {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .item-menu {
+    flex: 1 1 calc(50% - 10px);
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+    padding: 14px;
+  }
+
+  .item-menu .icone {
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .item-menu {
+    flex: 1 1 100%;
+  }
+}

@@ -12,7 +12,6 @@ import {
   formatarTelefone,
 } from "../../utils/validacoes";
 import { useState } from "react";
-import { cadastrarMedico } from "../../services/api";
 
 import "./CadastroMedico.css";
 import "../../utils/validacoes.css";
@@ -33,8 +32,7 @@ function CadastroUsuario() {
 
   const [erros, setErros] = useState({});
   const [formularioTocado, setFormularioTocado] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [mensagem, setMensagem] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   const formatarCPF = (valor) => {
     valor = valor.replace(/\D/g, "");
@@ -77,6 +75,12 @@ function CadastroUsuario() {
       novoErros.dataNascimento = "Data de nascimento é obrigatória";
     }
 
+    if (!validarCampoObrigatorio(formData.telefone)) {
+      novoErros.telefone = "Telefone é obrigatório";
+    } else if (!validarTelefone(formData.telefone)) {
+      novoErros.telefone = "Telefone inválido. Formato: (XX) XXXXX-XXXX";
+    }
+
     if (!validarCampoObrigatorio(formData.especialidade)) {
       novoErros.especialidade = "Especialidade é obrigatória";
     }
@@ -110,7 +114,7 @@ function CadastroUsuario() {
     setFormData({ ...formData, [name]: novoValor });
 
     // Validação em tempo real se o campo foi tocado
-    if (formularioTocado[name]) {
+    if (formularioTocado[name] && submitted) {
       const novoErros = validarFormulario();
       setErros(novoErros);
     }
@@ -118,43 +122,20 @@ function CadastroUsuario() {
 
   const handleBlur = (field) => {
     setFormularioTocado({ ...formularioTocado, [field]: true });
-    const novoErros = validarFormulario();
-    setErros(novoErros);
+    if (submitted) {
+      const novoErros = validarFormulario();
+      setErros(novoErros);
+    }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("handleSubmit chamado");
+    setSubmitted(true);
     const novoErros = validarFormulario();
-    console.log("Erros:", novoErros);
 
     if (Object.keys(novoErros).length === 0) {
-      setLoading(true);
-      setMensagem("");
-
-      try {
-        // Map form data to API payload
-        const payload = {
-          name: formData.nome,
-          email: formData.email,
-          cpf: formData.cpf.replace(/\D/g, ""), // Remove formatting
-          birthday: formData.dataNascimento,
-          password: formData.senha,
-          specialty: formData.especialidade,
-          crm: formData.crm + "/" + formData.uf, // Combine CRM and UF
-          role: "DOCTOR"
-        };
-        console.log("Payload:", payload);
-
-        await cadastrarMedico(payload);
-        setMensagem("Cadastro realizado com sucesso! Você pode fazer login agora.");
-        // Optionally reset form or redirect
-      } catch (error) {
-        console.error("Erro no cadastro:", error);
-        setMensagem("Erro ao cadastrar: " + error.message);
-      } finally {
-        setLoading(false);
-      }
+      console.log("Formulário válido! Dados:", formData);
+      // Aqui irá a lógica de cadastro
     } else {
       setErros(novoErros);
       setFormularioTocado({
@@ -164,6 +145,7 @@ function CadastroUsuario() {
         email: true,
         cpf: true,
         dataNascimento: true,
+        telefone: true,
         especialidade: true,
         senha: true,
         confirmaSenha: true,
@@ -192,14 +174,10 @@ function CadastroUsuario() {
               Preencha os dados abaixo para criar sua conta profissional.
             </span>
 
-            {mensagem && (
-              <div className={`mensagem ${mensagem.includes("Erro") ? "erro" : "sucesso"}`}>
-                {mensagem}
-              </div>
-            )}
-
             {/* Nome */}
-            <div className={`campo ${erros.nome ? "campo-com-erro" : ""}`}>
+            <div
+              className={`campo ${submitted && erros.nome ? "campo-com-erro" : ""}`}
+            >
               <label>Nome Completo</label>
               <input
                 type="text"
@@ -209,7 +187,7 @@ function CadastroUsuario() {
                 onChange={handleChange}
                 onBlur={() => handleBlur("nome")}
               />
-              {erros.nome && (
+              {submitted && erros.nome && (
                 <span className="mensagem-erro">
                   <AlertCircle size={14} />
                   {erros.nome}
@@ -219,7 +197,9 @@ function CadastroUsuario() {
 
             {/* CRM + UF */}
             <div className="linha-2">
-              <div className={`campo ${erros.crm ? "campo-com-erro" : ""}`}>
+              <div
+                className={`campo ${submitted && erros.crm ? "campo-com-erro" : ""}`}
+              >
                 <label>CRM</label>
                 <input
                   type="text"
@@ -229,7 +209,7 @@ function CadastroUsuario() {
                   onChange={handleChange}
                   onBlur={() => handleBlur("crm")}
                 />
-                {erros.crm && (
+                {submitted && erros.crm && (
                   <span className="mensagem-erro">
                     <AlertCircle size={14} />
                     {erros.crm}
@@ -237,7 +217,9 @@ function CadastroUsuario() {
                 )}
               </div>
 
-              <div className={`campo ${erros.uf ? "campo-com-erro" : ""}`}>
+              <div
+                className={`campo ${submitted && erros.uf ? "campo-com-erro" : ""}`}
+              >
                 <label>UF</label>
                 <select
                   name="uf"
@@ -274,7 +256,7 @@ function CadastroUsuario() {
                   <option value="SE">SE</option>
                   <option value="TO">TO</option>
                 </select>
-                {erros.uf && (
+                {submitted && erros.uf && (
                   <span className="mensagem-erro">
                     <AlertCircle size={14} />
                     {erros.uf}
@@ -285,7 +267,9 @@ function CadastroUsuario() {
 
             {/* Email + CPF */}
             <div className="linha-2">
-              <div className={`campo ${erros.email ? "campo-com-erro" : ""}`}>
+              <div
+                className={`campo ${submitted && erros.email ? "campo-com-erro" : ""}`}
+              >
                 <label>E-mail Profissional</label>
                 <input
                   type="email"
@@ -295,7 +279,7 @@ function CadastroUsuario() {
                   onChange={handleChange}
                   onBlur={() => handleBlur("email")}
                 />
-                {erros.email && (
+                {submitted && erros.email && (
                   <span className="mensagem-erro">
                     <AlertCircle size={14} />
                     {erros.email}
@@ -303,7 +287,9 @@ function CadastroUsuario() {
                 )}
               </div>
 
-              <div className={`campo ${erros.cpf ? "campo-com-erro" : ""}`}>
+              <div
+                className={`campo ${submitted && erros.cpf ? "campo-com-erro" : ""}`}
+              >
                 <label>CPF</label>
                 <input
                   type="text"
@@ -313,7 +299,7 @@ function CadastroUsuario() {
                   onChange={handleChange}
                   onBlur={() => handleBlur("cpf")}
                 />
-                {erros.cpf && (
+                {submitted && erros.cpf && (
                   <span className="mensagem-erro">
                     <AlertCircle size={14} />
                     {erros.cpf}
@@ -325,7 +311,7 @@ function CadastroUsuario() {
             {/* Data + Telefone */}
             <div className="linha-2">
               <div
-                className={`campo ${erros.dataNascimento ? "campo-com-erro" : ""}`}
+                className={`campo ${submitted && erros.dataNascimento ? "campo-com-erro" : ""}`}
               >
                 <label>Data de Nascimento</label>
                 <input
@@ -335,7 +321,7 @@ function CadastroUsuario() {
                   onChange={handleChange}
                   onBlur={() => handleBlur("dataNascimento")}
                 />
-                {erros.dataNascimento && (
+                {submitted && erros.dataNascimento && (
                   <span className="mensagem-erro">
                     <AlertCircle size={14} />
                     {erros.dataNascimento}
@@ -344,7 +330,7 @@ function CadastroUsuario() {
               </div>
 
               <div
-                className={`campo ${erros.telefone ? "campo-com-erro" : ""}`}
+                className={`campo ${submitted && erros.telefone ? "campo-com-erro" : ""}`}
               >
                 <label>Telefone</label>
                 <input
@@ -355,7 +341,7 @@ function CadastroUsuario() {
                   onChange={handleChange}
                   onBlur={() => handleBlur("telefone")}
                 />
-                {erros.telefone && (
+                {submitted && erros.telefone && (
                   <span className="mensagem-erro">
                     <AlertCircle size={14} />
                     {erros.telefone}
@@ -366,7 +352,7 @@ function CadastroUsuario() {
 
             {/* Especialidade */}
             <div
-              className={`campo ${erros.especialidade ? "campo-com-erro" : ""}`}
+              className={`campo ${submitted && erros.especialidade ? "campo-com-erro" : ""}`}
             >
               <label>Especialidade</label>
               <select
@@ -390,7 +376,7 @@ function CadastroUsuario() {
                 <option value="Psiquiatria">Psiquiatria</option>
                 <option value="Endocrinologia">Endocrinologia</option>
               </select>
-              {erros.especialidade && (
+              {submitted && erros.especialidade && (
                 <span className="mensagem-erro">
                   <AlertCircle size={14} />
                   {erros.especialidade}
@@ -400,7 +386,9 @@ function CadastroUsuario() {
 
             {/* Senha */}
             <div className="linha-2">
-              <div className={`campo ${erros.senha ? "campo-com-erro" : ""}`}>
+              <div
+                className={`campo ${submitted && erros.senha ? "campo-com-erro" : ""}`}
+              >
                 <label>Senha</label>
                 <input
                   type="password"
@@ -410,7 +398,7 @@ function CadastroUsuario() {
                   onChange={handleChange}
                   onBlur={() => handleBlur("senha")}
                 />
-                {erros.senha && (
+                {submitted && erros.senha && (
                   <span className="mensagem-erro">
                     <AlertCircle size={14} />
                     {erros.senha}
@@ -419,7 +407,7 @@ function CadastroUsuario() {
               </div>
 
               <div
-                className={`campo ${erros.confirmaSenha ? "campo-com-erro" : ""}`}
+                className={`campo ${submitted && erros.confirmaSenha ? "campo-com-erro" : ""}`}
               >
                 <label>Confirmar Senha</label>
                 <input
@@ -430,7 +418,7 @@ function CadastroUsuario() {
                   onChange={handleChange}
                   onBlur={() => handleBlur("confirmaSenha")}
                 />
-                {erros.confirmaSenha && (
+                {submitted && erros.confirmaSenha && (
                   <span className="mensagem-erro">
                     <AlertCircle size={14} />
                     {erros.confirmaSenha}
@@ -439,12 +427,8 @@ function CadastroUsuario() {
               </div>
             </div>
 
-            <button
-              type="submit"
-              className="btn-cadastrar"
-              disabled={loading}
-            >
-              {loading ? "Cadastrando..." : "Cadastrar"}
+            <button type="submit" className="btn-cadastrar">
+              Cadastrar
             </button>
 
             <Link to="/Login" className="link-login">

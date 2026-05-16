@@ -34,7 +34,7 @@ export default function Sidebar() {
                     <span>Agenda</span>
                 </NavLink>
 
-                <NavLink to="/plantoes" className="item-menu">
+                <NavLink to="/PlantoesOfertados" className="item-menu">
                     <ClipboardPlus className="icone" />
                     <span>Plantões</span>
                 </NavLink>

@@ -19,6 +19,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 28px;
+    gap: 20px;
 }
 
 .topo h1 {
@@ -32,8 +33,6 @@
     color: #6d8b84;
     font-size: 17px;
 }
-
-/* DIREITA */
 
 .topo-direita {
     display: flex;
@@ -118,7 +117,7 @@
 .view-tabs button.active {
     background: white;
     color: #0f766e;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, .08);
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
 }
 
 .filters h3 {
@@ -140,7 +139,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 18px;
+    margin-bottom: 16px;
     cursor: pointer;
     color: #35524b;
     font-weight: 500;
@@ -154,7 +153,7 @@
     border: 2px solid #99d8c4;
     background: white;
     cursor: pointer;
-    transition: .2s;
+    transition: 0.2s;
 }
 
 .filters input[type="checkbox"]:checked {
@@ -169,7 +168,7 @@
     color: #7b978f;
 }
 
-/* MAIN */
+/* MAIN*/
 
 .main-panel {
     display: flex;
@@ -177,126 +176,12 @@
     gap: 28px;
 }
 
-/* CALENDÁRIO */
-
-.calendar-wrapper {
-    background: #dff1e8;
-    border-radius: 34px;
-    padding: 28px;
-}
-
-/* HEADER */
-
-.fc-toolbar {
-    margin-bottom: 28px !important;
-}
-
-.fc-toolbar-title {
-    font-size: 34px !important;
-    font-weight: 700 !important;
-    color: #223633 !important;
-}
-
-.fc-button {
-    background: transparent !important;
-    border: none !important;
-    color: #28443f !important;
-    box-shadow: none !important;
-}
-
-.fc-button:hover {
-    transform: scale(1.08);
-}
-
-.fc-icon {
-    font-size: 1.4rem !important;
-}
-
-/* CABEÇALHO DOS DIAS */
-
-.fc-col-header {
-    margin-bottom: 12px !important;
-}
-
-.fc-col-header-cell {
-    border: none !important;
-    background: transparent !important;
-}
-
-.fc-col-header-cell-cushion {
-    color: #649c8b !important;
-    text-decoration: none !important;
-    font-weight: 700;
-    font-size: 13px;
-}
-
-/* GRID */
-
-.fc-theme-standard td,
-.fc-theme-standard th {
-    border: none !important;
-}
-
-.fc-scrollgrid {
-    border: none !important;
-}
-
-.fc-scrollgrid-section table {
-    border-spacing: 10px !important;
-}
-
-/* DIA */
-
-.fc-daygrid-day,
-.fc-timegrid-col {
-    background: #f7fbf9;
-    border-radius: 24px;
-    overflow: hidden;
-}
-
-.fc-daygrid-day-frame {
-    min-height: 120px;
-    padding: 12px;
-}
-
-.fc-daygrid-day-number {
-    text-decoration: none !important;
-    font-size: 20px;
-    font-weight: 700;
-    color: #1f2d2b !important;
-}
-
-/* DIA ATUAL */
-
-.fc-day-today {
-    background: #8ed8df !important;
-}
-
-/* EVENTOS */
-
-.fc-event {
-    border: none !important;
-    border-radius: 999px !important;
-    padding: 6px 12px !important;
-    font-size: 12px !important;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.event-day {
-    background: #71b99e !important;
-}
-
-.event-night {
-    background: #59949b !important;
-}
-
-/*  CALENDÁRIO SEMANAL */
+/* CALENDÁRIO SEMANAL */
 
 .week-calendar {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 18px;
+    grid-template-columns: repeat(7, minmax(100px, 1fr));
+    gap: 16px;
 }
 
 .day-card {
@@ -305,13 +190,13 @@
     border-radius: 24px;
     padding: 24px 12px;
     cursor: pointer;
-    transition: .25s;
+    transition: 0.25s ease;
     position: relative;
     min-height: 120px;
 }
 
 .day-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
 }
 
 .day-card span {
@@ -346,7 +231,7 @@
     transform: translateX(-50%);
 }
 
-/* LISTA DE PLANTÕES */
+/* PLANTÕES */
 
 .shifts-list {
     display: flex;
@@ -355,13 +240,15 @@
 }
 
 .shift-card {
-    background: #f7fbf9;
-    border-radius: 28px;
-    padding: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
+    background: #f7fbf9 !important;
+    border-radius: 28px !important;
+    padding: 28px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 24px !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04) !important;
 }
 
 .shift-icon {
@@ -375,10 +262,6 @@
     font-weight: 700;
     gap: 8px;
     flex-shrink: 0;
-}
-
-.shift-icon span {
-    font-size: 13px;
 }
 
 .shift-icon.dia {
@@ -425,15 +308,88 @@
     background: #dff1e8;
     color: #0f766e;
     font-weight: 700;
-    padding: 14px 24px;
+    padding: 14px;
     border-radius: 14px;
     cursor: pointer;
-    transition: .2s;
+    transition: 0.2s;
 }
 
 .details-btn:hover {
     background: #0f766e;
-    color: white;
+    color: rgb(23, 121, 88);
+}
+
+/* FULLCALENDAR */
+
+.calendar-wrapper {
+    background: #dff1e8;
+    border-radius: 34px;
+    padding: 28px;
+}
+
+.fc {
+    width: 100%;
+}
+
+.fc-toolbar {
+    margin-bottom: 24px !important;
+}
+
+.fc-toolbar-title {
+    font-size: 32px !important;
+    font-weight: 700 !important;
+    color: #223633 !important;
+}
+
+.fc-button {
+    background: transparent !important;
+    border: none !important;
+    color: #28443f !important;
+    box-shadow: none !important;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th,
+.fc-scrollgrid {
+    border: none !important;
+}
+
+.fc-daygrid-day {
+    background: #f7fbf9;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.fc-daygrid-day-frame {
+    min-height: 120px;
+    padding: 10px;
+}
+
+.fc-daygrid-day-number {
+    text-decoration: none !important;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2d2b !important;
+}
+
+.fc-day-today {
+    background: #bfe8eb !important;
+}
+
+.fc-event {
+    border: none !important;
+    border-radius: 999px !important;
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    font-weight: 600;
+}
+
+.event-day {
+    background: #71b99e !important;
+}
+
+.event-night {
+    background: #59949b !important;
 }
 
 /* RESPONSIVO */
@@ -458,6 +414,21 @@
     .details-btn {
         width: 100%;
     }
+
+    .week-calendar {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+
+    .week-calendar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .day-card {
+        min-width: 120px;
+        flex-shrink: 0;
+    }
 }
 
 @media (max-width: 600px) {
@@ -468,11 +439,15 @@
     .topo {
         flex-direction: column;
         align-items: flex-start;
-        gap: 20px;
     }
 
     .topo h1 {
         font-size: 28px;
+    }
+
+    .topo-direita {
+        width: 100%;
+        justify-content: space-between;
     }
 
     .fc-toolbar {
@@ -482,5 +457,9 @@
 
     .shift-info h3 {
         font-size: 20px;
+    }
+
+    .calendar-wrapper {
+        padding: 18px;
     }
 }

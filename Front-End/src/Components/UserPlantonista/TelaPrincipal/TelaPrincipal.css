@@ -121,3 +121,39 @@
   border-radius: 12px;
   margin-top: 10px;
 }
+
+@media (max-width: 1024px) {
+  .conteudo {
+    padding: 24px;
+  }
+
+  .cards {
+    flex-direction: column;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .topo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .topo-direita {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .cards {
+    gap: 16px;
+  }
+
+  .plantao {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
