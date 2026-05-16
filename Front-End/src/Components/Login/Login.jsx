@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { Mail, Lock, AlertCircle } from "lucide-react";
 
@@ -15,6 +16,8 @@ const Login = () => {
     email: false,
     senha: false,
   });
+  const [submitted, setSubmitted] = useState(false);
+  const navigate = useNavigate();
 
   const validarFormulario = () => {
     const novoErros = {};
@@ -36,12 +39,14 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setSubmitted(true);
     const novoErros = validarFormulario();
 
     if (Object.keys(novoErros).length === 0) {
       // Validação passou
       console.log("Formulário válido! Email:", email);
-      // Aqui irá a lógica de login
+      // Aqui irá a lógica de login (chamar API etc.)
+      navigate("/TelaPrincipal");
     } else {
       setErros(novoErros);
     }
@@ -49,7 +54,7 @@ const Login = () => {
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
-    if (formularioTocado.email && erros.email) {
+    if (formularioTocado.email && submitted) {
       const novoErros = { ...erros };
       if (!e.target.value) {
         novoErros.email = "Email é obrigatório";
@@ -64,7 +69,7 @@ const Login = () => {
 
   const handleSenhaChange = (e) => {
     setSenha(e.target.value);
-    if (formularioTocado.senha && erros.senha) {
+    if (formularioTocado.senha && submitted) {
       const novoErros = { ...erros };
       if (!e.target.value) {
         novoErros.senha = "Senha é obrigatória";
@@ -79,8 +84,10 @@ const Login = () => {
 
   const handleBlur = (field) => {
     setFormularioTocado({ ...formularioTocado, [field]: true });
-    const novoErros = validarFormulario();
-    setErros(novoErros);
+    if (submitted) {
+      const novoErros = validarFormulario();
+      setErros(novoErros);
+    }
   };
 
   return (
@@ -96,7 +103,7 @@ const Login = () => {
           <form onSubmit={handleSubmit}>
             {/* EMAIL */}
             <div
-              className={`grupo-formulario ${erros.email ? "campo-com-erro" : ""}`}
+              className={`grupo-formulario ${submitted && erros.email ? "campo-com-erro" : ""}`}
             >
               <label className="label-formulario">Email</label>
 
@@ -111,7 +118,7 @@ const Login = () => {
                   onBlur={() => handleBlur("email")}
                 />
               </div>
-              {erros.email && (
+              {submitted && erros.email && (
                 <span className="mensagem-erro">
                   <AlertCircle size={14} />
                   {erros.email}
@@ -121,7 +128,7 @@ const Login = () => {
 
             {/* SENHA */}
             <div
-              className={`grupo-formulario ${erros.senha ? "campo-com-erro" : ""}`}
+              className={`grupo-formulario ${submitted && erros.senha ? "campo-com-erro" : ""}`}
             >
               <div className="linha-label">
                 <label className="label-formulario">Senha</label>
@@ -142,7 +149,7 @@ const Login = () => {
                   onBlur={() => handleBlur("senha")}
                 />
               </div>
-              {erros.senha && (
+              {submitted && erros.senha && (
                 <span className="mensagem-erro">
                   <AlertCircle size={14} />
                   {erros.senha}
@@ -159,14 +166,8 @@ const Login = () => {
             </div>
 
             {/* BOTÃO */}
-            <button
-              type="submit"
-              className="botao-principal"
-              disabled={Object.keys(erros).length > 0}
-            >
-              <Link to="/TelaPrincipal" className="link-perfil">
-                Entrar
-              </Link>
+            <button type="submit" className="botao-principal">
+              Entrar
             </button>
           </form>
 
