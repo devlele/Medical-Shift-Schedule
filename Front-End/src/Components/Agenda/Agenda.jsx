@@ -281,9 +281,7 @@ export default function Agenda() {
               </>
             )}
 
-            {/* ======================
-      VISÃO MENSAL
-  ====================== */}
+            {/* VISÃO MENSAL */}
             {view === "month" && (
               <div className="calendar-wrapper">
                 <FullCalendar

@@ -10,6 +10,8 @@ import TelaPrincipal from "./Components/TelaPrincipal/TelaPrincipal";
 import RecuperarSenha from "./Components/RecuperarSenha/RecuperarSenha";
 import Agenda from "./Components/Agenda/Agenda";
 import Historico from "./Components/Historico/Historico";
+import PlantoesOfertados from "./Components/Plantoes/PlantoesOfertados.jsx"
+import DetalhesOferta from "./Components/Plantoes/DetalhesOferta.jsx"
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
         <Route path="/RecuperarSenha" element={<RecuperarSenha />} />
         <Route path="/Agenda" element={<Agenda />} />
         <Route path="/historico" element={<Historico />} />
+        <Route path="/PlantoesOfertados" element={<PlantoesOfertados />} />
+        <Route path="/DetalhesOferta" element={<DetalhesOferta />} />
       </Routes>
     </BrowserRouter>
   );
