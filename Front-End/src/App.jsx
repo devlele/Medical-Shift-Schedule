@@ -5,13 +5,13 @@ import Home from "./Components/Home/Home";
 import CadastroMedico from "./Components/CadastroMedico/CadastroMedico";
 import CadastroHospital from "./Components/CadastroHospital/CadastroHospital";
 import CadastroTipo from "./Components/CadastroTipo/CadastroTipo";
-import Perfil from "./Components/Perfil/Perfil";
-import TelaPrincipal from "./Components/TelaPrincipal/TelaPrincipal";
+import Perfil from "./Components/UserPlantonista/Perfil/Perfil";
+import TelaPrincipal from "./Components/UserPlantonista/TelaPrincipal/TelaPrincipal";
 import RecuperarSenha from "./Components/RecuperarSenha/RecuperarSenha";
-import Agenda from "./Components/Agenda/Agenda";
-import Historico from "./Components/Historico/Historico";
-import PlantoesOfertados from "./Components/Plantoes/PlantoesOfertados.jsx"
-import DetalhesOferta from "./Components/Plantoes/DetalhesOferta.jsx"
+import Agenda from "./Components/UserPlantonista/Agenda/Agenda";
+import Historico from "./Components/UserPlantonista/Historico/Historico";
+import PlantoesOfertados from "./Components/UserPlantonista/Plantoes/PlantoesOfertados.jsx";
+import DetalhesOferta from "./Components/UserPlantonista/Plantoes/DetalhesOferta.jsx";
 
 function App() {
   return (

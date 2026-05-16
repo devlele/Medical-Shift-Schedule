@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Bell, Settings } from "lucide-react";
-import Sidebar from "../../Components/Sidebar/Sidebar";
-import userImg from "../../assets/drhouse.png";
+import Sidebar from "../../Sidebar/Sidebar";
+import userImg from "../../../assets/drhouse.png";
 import "./Historico.css";
 
 const hospitais = [
