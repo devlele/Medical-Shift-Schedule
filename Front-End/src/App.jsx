@@ -9,6 +9,7 @@ import Perfil from "./Components/UserPlantonista/Perfil/Perfil";
 import TelaPrincipal from "./Components/UserPlantonista/TelaPrincipal/TelaPrincipal";
 import RecuperarSenha from "./Components/RecuperarSenha/RecuperarSenha";
 import Agenda from "./Components/UserPlantonista/Agenda/Agenda";
+import DetalhePlantao from "./Components/UserPlantonista/Agenda/DetalhePlantao";
 import Historico from "./Components/UserPlantonista/Historico/Historico";
 import PlantoesOfertados from "./Components/UserPlantonista/Plantoes/PlantoesOfertados.jsx";
 import DetalhesOferta from "./Components/UserPlantonista/Plantoes/DetalhesOferta.jsx";
@@ -26,6 +27,7 @@ function App() {
         <Route path="/TelaPrincipal" element={<TelaPrincipal />} />
         <Route path="/RecuperarSenha" element={<RecuperarSenha />} />
         <Route path="/Agenda" element={<Agenda />} />
+        <Route path="/DetalhePlantao/:id" element={<DetalhePlantao />} />
         <Route path="/historico" element={<Historico />} />
         <Route path="/PlantoesOfertados" element={<PlantoesOfertados />} />
         <Route path="/DetalhesOferta" element={<DetalhesOferta />} />

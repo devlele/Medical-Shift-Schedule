@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bell, Settings, Clock3, MapPin, Sun, Moon } from "lucide-react";
 
 import FullCalendar from "@fullcalendar/react";
@@ -61,6 +62,7 @@ const shifts = [
 ];
 
 export default function Agenda() {
+  const navigate = useNavigate();
   const [view, setView] = useState("week");
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedHospitals, setSelectedHospitals] = useState(hospitals);
@@ -271,7 +273,14 @@ export default function Agenda() {
                           </div>
                         </div>
 
-                        <button className="details-btn">Ver Detalhes</button>
+                        <button
+                          className="details-btn"
+                          onClick={() =>
+                            navigate(`/DetalhePlantao/${shift.id}`)
+                          }
+                        >
+                          Ver Detalhes
+                        </button>
                       </div>
                     ))
                   ) : (
@@ -298,10 +307,17 @@ export default function Agenda() {
                   fixedWeekCount={false}
                   events={calendarEvents}
                   dateClick={(info) => {
-                    setSelectedDay(info.dateStr);
+                    const event = calendarEvents.find(
+                      (e) => e.start === info.dateStr,
+                    );
+                    if (event) {
+                      navigate(`/DetalhePlantao/${event.id}`);
+                    } else {
+                      setSelectedDay(info.dateStr);
+                    }
                   }}
                   eventClick={(info) => {
-                    alert(`Plantão em ${info.event.extendedProps.hospital}`);
+                    navigate(`/DetalhePlantao/${info.event.id}`);
                   }}
                 />
               </div>
