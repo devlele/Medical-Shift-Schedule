@@ -7,6 +7,7 @@ import CadastroHospital from "./Components/CadastroHospital/CadastroHospital";
 import CadastroTipo from "./Components/CadastroTipo/CadastroTipo";
 import Perfil from "./Components/UserPlantonista/Perfil/Perfil";
 import TelaPrincipal from "./Components/UserPlantonista/TelaPrincipal/TelaPrincipal";
+import ResolucaoConflito from "./Components/UserPlantonista/ResolucaoConflito/ResolucaoConflito";
 import RecuperarSenha from "./Components/RecuperarSenha/RecuperarSenha";
 import Agenda from "./Components/UserPlantonista/Agenda/Agenda";
 import DetalhePlantao from "./Components/UserPlantonista/Agenda/DetalhePlantao";
@@ -25,6 +26,7 @@ function App() {
         <Route path="/CadastroMedico" element={<CadastroMedico />} />
         <Route path="/Perfil" element={<Perfil />} />
         <Route path="/TelaPrincipal" element={<TelaPrincipal />} />
+        <Route path="/ResolucaoConflito" element={<ResolucaoConflito />} />
         <Route path="/RecuperarSenha" element={<RecuperarSenha />} />
         <Route path="/Agenda" element={<Agenda />} />
         <Route path="/DetalhePlantao/:id" element={<DetalhePlantao />} />

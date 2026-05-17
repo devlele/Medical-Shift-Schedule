@@ -125,9 +125,9 @@
 
 /* ÁREA INFERIOR */
 .area-baixo {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
+  display: flex;
   gap: 25px;
+  justify-content: center;
 }
 
 /* CARD INFO */
@@ -135,6 +135,9 @@
   background: var(--white);
   border-radius: 24px;
   padding: 30px;
+  flex: 1;
+  max-width: 920px;
+  width: 100%;
 }
 
 .card-info h3,
@@ -223,7 +226,7 @@
 /* RESPONSIVO */
 @media (max-width: 1100px) {
   .area-baixo {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 }
 

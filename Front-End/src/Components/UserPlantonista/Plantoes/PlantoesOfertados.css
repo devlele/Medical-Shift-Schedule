@@ -1,243 +1,258 @@
 .plantoes-layout {
-    display: flex;
-    min-height: 100vh;
-    background: #e8f5ef;
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 100vh;
+  background: #e8f5ef;
+  min-width: 0;
 }
 
 .plantoes-content {
-    flex: 1;
-    padding: 35px 45px;
+  flex: 1;
+  padding: 35px 45px;
+  min-width: 0;
 }
 
 /* HEADER */
 .topo {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 24px;
-    margin-bottom: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 28px;
 }
 
 .topo h1 {
-    font-size: 36px;
-    margin-bottom: 8px;
-    color: var(--medical-dark);
+  font-size: 36px;
+  margin-bottom: 8px;
+  color: var(--medical-dark);
 }
 
 .topo p {
-    color: var(--medical-muted);
-    font-size: 16px;
+  color: var(--medical-muted);
+  font-size: 16px;
 }
 
 .topo-direita {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .icone-topo {
-    width: 22px;
-    height: 22px;
-    color: #5f7f75;
-    cursor: pointer;
-    transition: 0.2s;
+  width: 22px;
+  height: 22px;
+  color: #5f7f75;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
 .icone-topo:hover {
-    color: var(--medical-dark);
-    transform: scale(1.1);
+  color: var(--medical-dark);
+  transform: scale(1.1);
 }
 
 .user {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: #ecf6f1;
-    padding: 10px 14px;
-    border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ecf6f1;
+  padding: 10px 14px;
+  border-radius: 999px;
 }
 
 .user img {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    object-fit: cover;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .user span {
-    font-weight: 600;
-    color: var(--medical-dark);
+  font-weight: 600;
+  color: var(--medical-dark);
 }
 
 /* BOTAO OFERTA */
 .offer-button-container {
-    display: flex;
-    justify-content: flex-end;
-    margin: 35px 0;
+  display: flex;
+  justify-content: flex-end;
+  margin: 35px 0;
 }
 
 .offer-btn {
-    border: none;
-    background: #1f4739;
-    color: white;
-    padding: 14px 18px;
-    border-radius: 18px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: 0.2s ease;
+  border: none;
+  background: #1f4739;
+  color: white;
+  padding: 14px 18px;
+  border-radius: 18px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.2s ease;
+  min-width: 0;
 }
 
 .offer-btn:hover {
-    transform: translateY(-2px);
+  transform: translateY(-2px);
 }
 
 /* CARDS */
 .cards-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  min-width: 0;
 }
 
 .shift-card {
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    border-radius: 30px;
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  border-radius: 30px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
 }
 
 .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
 }
 
 .card-title-section {
-    display: flex;
-    gap: 16px;
+  display: flex;
+  gap: 16px;
+  min-width: 0;
+}
+
+.card-title-section > div {
+  min-width: 0;
 }
 
 .card-title-section h3 {
-    color: #243b35;
-    font-size: 1.2rem;
-    margin-bottom: 4px;
+  color: #243b35;
+  font-size: 1.2rem;
+  margin-bottom: 4px;
 }
 
 .card-title-section span {
-    color: #66756f;
-    font-size: 0.9em;
+  color: #66756f;
+  font-size: 0.9em;
 }
 
 .badge {
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: bold;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: bold;
 }
 
 /* TAGS */
 .urgent {
-    background: #ffd7d7;
-    color: #b13434;
+  background: #ffd7d7;
+  color: #b13434;
 }
 
 .routine {
-    background: #c8f3f5;
-    color: #147d82;
+  background: #c8f3f5;
+  color: #147d82;
 }
 
 /* INFO */
 .card-info {
-    margin-top: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    padding: 14px;
-}
-
-.info-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #253f37;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 14px;
+  min-width: 0;
+  color: #253f37;
 }
 
 /* BOTÕES */
 .card-buttons {
-    margin-top: 14px;
-    display: flex;
-    gap: 16px;
+  margin-top: 14px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: flex-start;
 }
 
 .details-btn,
 .accept-btn {
-    flex: 1;
-    border: none;
-    border-radius: 16px;
-    padding: 8px ;
-    font-size: 0.9rem;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    transition: 0.2s ease;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  flex: 1 1 140px;
+  border: none;
+  border-radius: 16px;
+  padding: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+  white-space: normal;
 }
 
 /* DETALHES */
 .details-btn {
-    background: #d9ebe2;
-    color: #24443a;
+  background: #d9ebe2;
+  color: #24443a;
 }
 
 .details-btn:hover {
-    background: #c8ddd3; 
-    transform: translateY(-2px);
+  background: #c8ddd3;
+  transform: translateY(-2px);
 }
 
 /* ACEITAR */
 .accept-btn {
-    background: #24443a;
-    color: white;
+  background: #24443a;
+  color: white;
 }
 
 .accept-btn:hover {
-    background: #1b352d;
-    transform: translateY(-2px);
+  background: #1b352d;
+  transform: translateY(-2px);
 }
 
 @media (max-width: 1100px) {
-    .cards-grid {
-        grid-template-columns: 1fr;
-    }
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .plantoes-header {
-        flex-direction: column;
-        gap: 20px;
-    }
+  .plantoes-header {
+    flex-direction: column;
+    gap: 20px;
+  }
 
-    .header-right {
-        width: 100%;
-        justify-content: space-between;
-    }
-}
+  .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
 
-@media (max-width: 768px) {
-    .plantoes-content {
-        padding: 20px;
-    }
+  .card-buttons {
+    flex-direction: column;
+    gap: 14px;
+  }
 
-    .card-buttons {
-        flex-direction: column;
-    }
+  .details-btn,
+  .accept-btn {
+    width: 100%;
+  }
 
-    .offer-button-container {
-        justify-content: center;
-    }
+  .offer-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
 }

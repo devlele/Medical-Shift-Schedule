@@ -51,6 +51,7 @@
   display: flex;
   gap: var(--spacing-lg);
   margin: var(--spacing-lg) 0;
+  flex-wrap: wrap;
 }
 
 .card {
@@ -59,10 +60,33 @@
   border-radius: var(--border-radius-xl);
   width: 220px;
   box-shadow: var(--shadow-sm);
+  flex: 1 1 220px;
+  min-width: 220px;
 }
 
 .card.alerta {
   background: #f8d7d7;
+  color: #82281f; /* texto mais escuro que o fundo */
+  cursor: pointer;
+}
+
+/* Hover para ambos os cards */
+.cards .card {
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.cards .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 30px rgba(15, 49, 45, 0.08);
+}
+
+/* Garantir que elementos específicos do card alerta usem cor mais escura */
+.card.alerta .badge,
+.card.alerta p,
+.card.alerta h2 {
+  color: #82281f;
 }
 
 /* GRID */

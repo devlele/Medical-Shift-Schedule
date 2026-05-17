@@ -161,6 +161,12 @@ button:hover {
   transform: translateY(-1px);
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 button:active {
   transform: translateY(0);
 }

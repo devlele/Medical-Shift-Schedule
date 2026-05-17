@@ -4,10 +4,8 @@ import {
   Settings,
   Home,
   ClipboardPlus,
-  History,
   User,
   ImagePlus,
-  CalendarDays,
 } from "lucide-react";
 import fotoPerfil from "../../../assets/drhouse.png";
 import "./Perfil.css";
@@ -94,48 +92,7 @@ const Perfil = () => {
             </div>
           </div>
 
-          {/* HISTÓRICO */}
-          <div className="card-historico">
-            <div className="topo-historico-geral">
-              <h3>Histórico Recente</h3>
-            </div>
-
-            <div className="item-historico">
-              <div className="linha-historico">
-                <span className="tag">NOTURNO</span>
-                <span>3 set</span>
-              </div>
-              <strong>Hospital Alvorada</strong>
-              <p>UTI Cardiológica • 12h</p>
-            </div>
-
-            <div className="item-historico">
-              <div className="linha-historico">
-                <span className="tag azul">DIURNO</span>
-                <span>15 out</span>
-              </div>
-              <strong>Clínica Sanctuary</strong>
-              <p>Emergência • 6h</p>
-            </div>
-
-            <div className="item-historico">
-              <div className="linha-historico">
-                <span className="tag">NOTURNO</span>
-                <span>12 out</span>
-              </div>
-              <strong>Hospital Central</strong>
-              <p>Plantão Geral • 12h</p>
-            </div>
-
-            <div className="item-historico">
-              <div className="linha-historico">
-                <span className="tag azul">DIURNO</span>
-                <span>10 out</span>
-              </div>
-              <strong>Hospital Alvorada</strong>
-              <p>UTI Cardiológica • 12h</p>
-            </div>
-          </div>
+          {/* Histórico removido conforme solicitado */}
         </section>
       </main>
     </div>

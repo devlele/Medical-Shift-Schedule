@@ -1,0 +1,199 @@
+.resolucao-conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  padding-bottom: 20px;
+}
+
+.card-conflicto {
+  background: var(--white);
+  border-radius: 32px;
+  padding: 28px 30px;
+  max-width: 980px;
+  width: 100%;
+  box-shadow: 0 28px 50px rgba(15, 49, 45, 0.07);
+}
+
+.card-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.tag-alerta {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 164, 164, 0.22);
+  color: #b02a2a;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+.card-conflicto h2 {
+  margin: 0;
+  color: #9d1f1f;
+  font-size: 1.85rem;
+  line-height: 1.1;
+}
+
+.card-subtitulo {
+  margin-top: 16px;
+  margin-bottom: 28px;
+  color: #5a211f;
+  line-height: 1.6;
+}
+
+.quadro-branco {
+  background: var(--medical-card);
+  border-radius: 24px;
+  padding: 24px;
+}
+
+.quadro-branco h3 {
+  margin: 0 0 22px;
+  color: var(--medical-dark);
+  font-size: 1.25rem;
+}
+
+.detalhes-conflito {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.compromisso-card {
+  background: var(--white);
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: 0 18px 28px rgba(15, 49, 45, 0.06);
+}
+
+.compromisso-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.compromisso-label {
+  display: inline-flex;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(47, 128, 85, 0.12);
+  color: var(--medical-dark);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.compromisso-card strong {
+  color: var(--medical-dark);
+}
+
+.compromisso-body {
+  display: grid;
+  gap: 14px;
+}
+
+.compromisso-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.compromisso-actions .btn {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.compromisso-actions .btn:hover {
+  transform: translateY(-2px);
+}
+
+.manter-btn {
+  background: #1f7a63;
+  color: #ffffff;
+  border: none;
+}
+
+.ofertar-btn {
+  background: #eef7f2;
+  color: #1f7a63;
+  border: 1px solid #cfe2d8;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.campo label {
+  color: var(--medical-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.valor {
+  background: rgba(43, 191, 156, 0.14);
+  color: var(--medical-dark);
+  padding: 16px;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: 1px solid rgba(43, 191, 156, 0.24);
+}
+
+@media (max-width: 980px) {
+  .card-conflicto {
+    padding: 24px;
+  }
+
+  .detalhes-conflito {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .card-conflicto {
+    padding: 22px;
+  }
+
+  .card-subtitulo {
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 980px) {
+  .card-conflicto {
+    padding: 24px;
+  }
+
+  .campos {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .card-conflicto {
+    padding: 22px;
+  }
+
+  .card-subtitulo {
+    margin-bottom: 20px;
+  }
+}

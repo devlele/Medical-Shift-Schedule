@@ -1,5 +1,6 @@
 import React from "react";
 import { Bell, Settings } from "lucide-react";
+import { NavLink } from "react-router-dom";
 import Sidebar from "../../Sidebar/Sidebar";
 import userImg from "../../../assets/drhouse.png";
 import Calendario from "../../Calendario/Calendario";
@@ -54,11 +55,11 @@ export default function TelaPrincipal() {
 
         {/* CARDS */}
         <section className="cards">
-          <div className="card alerta">
+          <NavLink to="/ResolucaoConflito" className="card alerta">
             <span className="badge">CRÍTICO</span>
             <p>ALERTAS DE CONFLITO</p>
             <h2>{plantoes.filter((p) => p.title === "CONFLITO").length}</h2>
-          </div>
+          </NavLink>
 
           <div className="card">
             <p>PLANTÕES NO MÊS</p>
