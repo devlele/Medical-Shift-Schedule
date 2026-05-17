@@ -1,8 +1,9 @@
 // TELA COM OS PLANTÕES QUE ESTÃO OFERTADOS
+import React from "react";
 import fotoPerfil from "../../../assets/drhouse.png";
 import "./PlantoesOfertados.css";
 import Sidebar from "../../Sidebar/Sidebar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Bell,
   Settings,
@@ -56,6 +57,8 @@ const shifts = [
 ];
 
 export default function PlantoesOfertados() {
+  const navigate = useNavigate();
+
   return (
     <div className="plantoes-layout">
       <Sidebar />
@@ -81,7 +84,10 @@ export default function PlantoesOfertados() {
         </header>
 
         <div className="offer-button-container">
-          <button className="offer-btn">
+          <button
+            className="offer-btn"
+            onClick={() => navigate("/OferecerPlantao")}
+          >
             <ArrowLeftRight size={18} />
             Oferecer plantão
           </button>

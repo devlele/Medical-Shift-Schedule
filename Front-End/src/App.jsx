@@ -14,6 +14,7 @@ import DetalhePlantao from "./Components/UserPlantonista/Agenda/DetalhePlantao";
 import Historico from "./Components/UserPlantonista/Historico/Historico";
 import PlantoesOfertados from "./Components/UserPlantonista/Plantoes/PlantoesOfertados.jsx";
 import DetalhesOferta from "./Components/UserPlantonista/Plantoes/DetalhesOferta.jsx";
+import OferecerPlantao from "./Components/UserPlantonista/Plantoes/OferecerPlantao.jsx";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/DetalhePlantao/:id" element={<DetalhePlantao />} />
         <Route path="/historico" element={<Historico />} />
         <Route path="/PlantoesOfertados" element={<PlantoesOfertados />} />
+        <Route path="/OferecerPlantao" element={<OferecerPlantao />} />
         <Route path="/DetalhesOferta" element={<DetalhesOferta />} />
       </Routes>
     </BrowserRouter>

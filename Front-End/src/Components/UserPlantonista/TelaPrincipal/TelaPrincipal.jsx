@@ -11,18 +11,21 @@ export default function TelaPrincipal() {
   // Dados para testes:
   const plantoes = [
     {
+      id: 1,
       title: "Hospital da Luz",
       date: "2026-06-06",
       tipo: "Pediátrico • 12h",
       color: "#1f7a63",
     },
     {
+      id: 2,
       title: "Clínica Santa Helena",
       date: "2026-06-08",
       tipo: "Plantão Geral • 6h",
       color: "#2bbf9c",
     },
     {
+      id: 3,
       title: "CONFLITO",
       date: "2026-06-12",
       tipo: "Conflito de horário",
