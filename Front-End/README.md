@@ -1,4 +1,4 @@
-# Medical Shift Schedule — Front-End
+# Medical Shift Schedule - Front-End
 
 Este repositório contém a interface React do sistema Medical Shift Schedule, construída com Vite.
 
@@ -16,7 +16,57 @@ A aplicação front-end é uma camada de navegação e visualização para usuá
 - Visualização de plantões ofertados e detalhes
 - Navegação entre telas com React Router
 
-## Estrutura de telas
+## Tecnologias e Stack
+
+| Tecnologia    | Versão     | Uso                                 |
+| ------------- | ---------- | ----------------------------------- |
+| React         | 19.2.4     | Framework principal                 |
+| React Router  | 7.14.1     | Navegação entre páginas/rotas       |
+| Vite          | 8.0.13     | Build tool e dev server             |
+| FullCalendar  | 6.1.20     | Calendários mensal e diário         |
+| Lucide React  | 1.8.0      | Ícones SVG                          |
+| Framer Motion | 12.38.0    | Animações opcionais                 |
+| CSS Puro      | Sem versão | Estilização, sem Tailwind/Bootstrap |
+
+## Estrutura do Projeto
+
+```text
+Front-End/
+|-- src/
+|   |-- main.jsx              # Entry point
+|   |-- App.jsx               # Root component + routes
+|   |-- App.css               # Estilos globais
+|   |-- index.css             # Reset CSS + variáveis globais
+|   |-- Components/
+|   |   |-- Login/            # Tela de login
+|   |   |-- Home/             # Home pública
+|   |   |-- RecuperarSenha/   # Recuperação de senha
+|   |   |-- Cadastro*/        # Telas de cadastro: hospital, médico e tipo
+|   |   |-- Sidebar/          # Menu lateral reutilizado
+|   |   |-- Calendario/       # Componente calendário
+|   |   |-- Footer/           # Rodapé reutilizado
+|   |   `-- UserPlantonista/  # Seção autenticada
+|   |       |-- TelaPrincipal/       # Dashboard
+|   |       |-- Perfil/              # Perfil do usuário
+|   |       |-- Agenda/              # Calendário semanal/mensal
+|   |       |-- Historico/           # Histórico de plantões
+|   |       |-- Plantoes/            # Gestão de plantões
+|   |       |   |-- PlantoesOfertados.jsx  # Plantões disponíveis
+|   |       |   |-- OferecerPlantao.jsx    # Oferta de plantão
+|   |       |   `-- DetalhesOferta.jsx     # Detalhes da oferta
+|   |       `-- ResolucaoConflito/   # Tela de conflitos
+|   |-- services/
+|   |   `-- api.js            # Chamadas HTTP com axios/fetch
+|   |-- utils/
+|   |   |-- validacoes.js     # Validações de formulário
+|   |   `-- validarCPF.js     # Validação de CPF específica
+|   `-- assets/               # Imagens, logos e ícones
+|-- vite.config.js            # Configuração Vite
+|-- eslint.config.js          # Regras ESLint
+`-- package.json              # Dependências
+```
+
+## Estrutura de Telas
 
 Abaixo estão as telas principais e o que cada uma faz.
 
@@ -135,7 +185,17 @@ Conteúdo e função:
 - Possui botões para ver detalhes ou aceitar o plantão.
 - Serve como ponto de entrada para intercâmbio de plantões.
 
-### 12. Detalhes da Oferta de Plantão
+### 12. Oferecer Plantão
+
+Local: `src/Components/UserPlantonista/Plantoes/OferecerPlantao.jsx`
+
+Conteúdo e função:
+
+- Tela para disponibilizar um plantão para outros profissionais.
+- Permite informar dados da oferta, como data, horário, local e descrição.
+- Ajuda no fluxo de troca ou cobertura de plantões.
+
+### 13. Detalhes da Oferta de Plantão
 
 Local: `src/Components/UserPlantonista/Plantoes/DetalhesOferta.jsx`
 
@@ -150,15 +210,15 @@ Conteúdo e função:
 
 A aplicação usa `react-router-dom` para controlar as rotas. As rotas principais estão definidas em `src/App.jsx`.
 
-## Estrutura de código relevante
+## Estrutura de Código Relevante
 
-- `src/App.jsx` — configura as rotas e faz o mapeamento das telas.
-- `src/services/api.js` — ponto de integração com o backend.
-- `src/components/Sidebar/Sidebar.jsx` — navegação principal usada em telas internas.
-- `src/assets/` — imagens e recursos visuais usados em várias telas.
-- `src/utils/` — validações e helpers reutilizáveis.
+- `src/App.jsx` - configura as rotas e faz o mapeamento das telas.
+- `src/services/api.js` - ponto de integração com o backend.
+- `src/Components/Sidebar/Sidebar.jsx` - navegação principal usada em telas internas.
+- `src/assets/` - imagens e recursos visuais usados em várias telas.
+- `src/utils/` - validações e helpers reutilizáveis.
 
-## Como executar
+## Como Executar
 
 1. Instale as dependências:
 
@@ -172,9 +232,9 @@ npm install
 npm run dev
 ```
 
-3. Abra o navegador em `http://localhost:5173`
+3. Abra o navegador em `http://localhost:5173`.
 
-## Próximos passos sugeridos
+## Próximos Passos Sugeridos
 
 - Conectar os formulários ao backend real.
 - Implementar validações adicionais de CPF, e-mail e senha.
