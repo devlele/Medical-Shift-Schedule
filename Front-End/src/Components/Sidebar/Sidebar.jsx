@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+
 import {
   Home,
   CalendarDays,
@@ -9,6 +10,10 @@ import {
   LogOut,
   Menu,
   X,
+  Users,
+  FileText,
+  Shield,
+  Building2,
 } from "lucide-react";
 
 import logo from "../../assets/logo.png";
@@ -31,8 +36,45 @@ export default function Sidebar() {
     setIsOpen(false);
   }
 
+  /* =========================
+     MENU HOSPITAL
+  ========================== */
+  const menuHospital = [
+    {
+      to: "/UserHospital/TelaPrincipal",
+      label: "Home",
+      icon: Home,
+    },
+    {
+      to: "/Colaboradores",
+      label: "Colaboradores",
+      icon: Users,
+    },
+    {
+      to: "/CadastrarProfissional",
+      label: "Cadastrar Profissional",
+      icon: ClipboardPlus,
+    },
+    {
+      to: "/Setores",
+      label: "Setores",
+      icon: Building2,
+    },
+    {
+      to: "/perfil",
+      label: "Perfil",
+      icon: User,
+    },
+  ];
+
+  /* =========================
+     ESCOLHE MENU
+  ========================== */
+  let menu = menuHospital;
+
   return (
     <>
+      {/* BOTÃO MOBILE */}
       <button
         type="button"
         className="sidebar-toggle"
@@ -43,6 +85,7 @@ export default function Sidebar() {
         {isOpen ? <X size={26} /> : <Menu size={26} />}
       </button>
 
+      {/* OVERLAY */}
       <button
         type="button"
         className={`sidebar-overlay ${isOpen ? "ativo" : ""}`}
@@ -50,46 +93,33 @@ export default function Sidebar() {
         onClick={closeSidebar}
       />
 
+      {/* SIDEBAR */}
       <aside className={`sidebar ${isOpen ? "aberta" : ""}`}>
+        {/* LOGO */}
         <div className="area-logo">
           <img src={logo} alt="Logo MSS" className="logo" />
         </div>
 
+        {/* MENU */}
         <nav className="menu-lateral">
-          <NavLink
-            to="/TelaPrincipal"
-            className="item-menu"
-            onClick={closeSidebar}
-          >
-            <Home className="icone" />
-            <span>Home</span>
-          </NavLink>
+          {menu.map((item) => {
+            const Icon = item.icon;
 
-          <NavLink to="/Agenda" className="item-menu" onClick={closeSidebar}>
-            <CalendarDays className="icone" />
-            <span>Agenda</span>
-          </NavLink>
-
-          <NavLink
-            to="/PlantoesOfertados"
-            className="item-menu"
-            onClick={closeSidebar}
-          >
-            <ClipboardPlus className="icone" />
-            <span>Plantões</span>
-          </NavLink>
-
-          <NavLink to="/historico" className="item-menu" onClick={closeSidebar}>
-            <History className="icone" />
-            <span>Histórico</span>
-          </NavLink>
-
-          <NavLink to="/perfil" className="item-menu" onClick={closeSidebar}>
-            <User className="icone" />
-            <span>Perfil</span>
-          </NavLink>
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className="item-menu"
+                onClick={closeSidebar}
+              >
+                <Icon className="icone" />
+                <span>{item.label}</span>
+              </NavLink>
+            );
+          })}
         </nav>
 
+        {/* LOGOUT */}
         <button
           type="button"
           className="item-menu botao-logout"

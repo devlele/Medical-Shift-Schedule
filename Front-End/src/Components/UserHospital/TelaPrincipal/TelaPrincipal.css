@@ -1,0 +1,188 @@
+.layout-escalista {
+  min-height: 100vh;
+  background: #edf8f2;
+  padding-left: var(--sidebar-width);
+}
+
+.conteudo-escalista {
+  padding: 40px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.topo-escalista {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.topo-escalista h1 {
+  font-size: 2.2rem;
+  color: #1e3732;
+}
+
+.topo-escalista p {
+  color: #68807a;
+}
+
+.topo-direita {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icone-topo {
+  cursor: pointer;
+  color: #24443d;
+}
+
+/* ROSQUINHA HEADER */
+.avatar-default {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f5fbf7;
+  border: 2px solid #dff3e8;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #24443d;
+}
+
+.nome-hospital {
+  font-weight: 600;
+  color: #24443d;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.cards-dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 50px;
+}
+
+.card-dashboard {
+  flex: 1 1 260px;
+  background: #f8fffb;
+  border-radius: 30px;
+  padding: 28px;
+  min-height: 180px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+}
+
+.card-dashboard span {
+  color: #68807a;
+}
+
+.card-dashboard strong {
+  font-size: 2.3rem;
+  color: #1e3732;
+}
+
+.icone-card {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icone-card.azul {
+  background: #cdeff5;
+  color: #108ca6;
+}
+
+.icone-card.verde {
+  background: #d9f5e4;
+  color: #1d9b5f;
+}
+
+.icone-card.escuro {
+  background: #dbe8de;
+  color: #2f473d;
+}
+
+/* =========================
+   ESCALISTAS
+========================= */
+
+.secao-profissionais h2 {
+  font-size: 2rem;
+  color: #1e3732;
+}
+
+.cabecalho-secao {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+
+.cabecalho-secao button {
+  border: none;
+  background: transparent;
+  color: #0d8abc;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.grid-profissionais {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 26px;
+}
+
+.card-profissional {
+  background: #eef9f2;
+  border-radius: 30px;
+  padding: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* ROSQUINHA ESCALISTA */
+.avatar-escalista {
+  width: 84px;
+  height: 84px;
+  border-radius: 24px;
+  background: #f5fbf7;
+  border: 2px solid #dff3e8;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #24443d;
+}
+
+/* INFO */
+.info-profissional h3 {
+  font-size: 1.4rem;
+  color: #243b36;
+}
+
+.botao-seta {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: #fff;
+  cursor: pointer;
+}
