@@ -58,31 +58,27 @@
   background: var(--white);
   padding: var(--spacing-lg);
   border-radius: var(--border-radius-xl);
-  width: 220px;
   box-shadow: var(--shadow-sm);
-  flex: 1 1 220px;
-  min-width: 220px;
-}
 
-.card.alerta {
-  background: #f8d7d7;
-  color: #82281f; /* texto mais escuro que o fundo */
-  cursor: pointer;
-}
+  flex: 1 1 260px;
+  min-width: 260px;
 
-/* Hover para ambos os cards */
-.cards .card {
   transition:
     transform 0.18s ease,
     box-shadow 0.18s ease;
 }
 
-.cards .card:hover {
+.card:hover {
   transform: translateY(-6px);
   box-shadow: 0 20px 30px rgba(15, 49, 45, 0.08);
 }
 
-/* Garantir que elementos específicos do card alerta usem cor mais escura */
+.card.alerta {
+  background: #f8d7d7;
+  color: #82281f;
+  cursor: pointer;
+}
+
 .card.alerta .badge,
 .card.alerta p,
 .card.alerta h2 {
@@ -137,6 +133,12 @@
   border-radius: 20px;
 }
 
+.proximos-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .plantao {
   display: flex;
   gap: 10px;
@@ -146,13 +148,35 @@
   margin-top: 10px;
 }
 
+.data {
+  min-width: 60px;
+  text-align: center;
+}
+
+.data span {
+  display: block;
+  font-size: 12px;
+  color: #777;
+}
+
+.data strong {
+  font-size: 20px;
+}
+
+.info p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.info span {
+  font-size: 14px;
+  color: #666;
+}
+
+/* RESPONSIVIDADE */
 @media (max-width: 1024px) {
   .conteudo {
     padding: 24px;
-  }
-
-  .cards {
-    flex-direction: column;
   }
 
   .grid {
@@ -174,6 +198,10 @@
 
   .cards {
     gap: 16px;
+  }
+
+  .card {
+    min-width: 100%;
   }
 
   .plantao {

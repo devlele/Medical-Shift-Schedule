@@ -1,61 +1,104 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import {Home, CalendarDays, ClipboardPlus, History, User, LogOut} from "lucide-react";
+import {
+  Home,
+  CalendarDays,
+  ClipboardPlus,
+  History,
+  User,
+  LogOut,
+  Menu,
+  X,
+} from "lucide-react";
 
 import logo from "../../assets/logo.png";
-import "./Sidebar.css"
+import "./Sidebar.css";
 
 export default function Sidebar() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
-    function handleLogout() {
-        localStorage.removeItem("token");
-        localStorage.removeItem("emailUsuario");
-        localStorage.removeItem("usuario");
-        localStorage.removeItem("role");
-        navigate("/Login", { replace: true });
-    }
+  function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("emailUsuario");
+    localStorage.removeItem("usuario");
+    localStorage.removeItem("role");
 
-    return (
-        <aside className="sidebar">
-            <div className="area-logo">
-                <img src={logo} alt="Logo MSS" className="logo" />
-            </div>
+    navigate("/Login", { replace: true });
+  }
 
-            <nav className="menu-lateral">
+  function closeSidebar() {
+    setIsOpen(false);
+  }
 
-                <NavLink to="/TelaPrincipal" className="item-menu">
-                    <Home className="icone" />
-                    <span>Home</span>
-                </NavLink>
+  return (
+    <>
+      <button
+        type="button"
+        className="sidebar-toggle"
+        aria-label={isOpen ? "Fechar menu lateral" : "Abrir menu lateral"}
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((current) => !current)}
+      >
+        {isOpen ? <X size={26} /> : <Menu size={26} />}
+      </button>
 
-                <NavLink to="/Agenda" className="item-menu">
-                    <CalendarDays className="icone" />
-                    <span>Agenda</span>
-                </NavLink>
+      <button
+        type="button"
+        className={`sidebar-overlay ${isOpen ? "ativo" : ""}`}
+        aria-label="Fechar menu lateral"
+        onClick={closeSidebar}
+      />
 
-                <NavLink to="/PlantoesOfertados" className="item-menu">
-                    <ClipboardPlus className="icone" />
-                    <span>Plantões</span>
-                </NavLink>
+      <aside className={`sidebar ${isOpen ? "aberta" : ""}`}>
+        <div className="area-logo">
+          <img src={logo} alt="Logo MSS" className="logo" />
+        </div>
 
-                <NavLink to="/historico" className="item-menu">
-                    <History className="icone" />
-                    <span>Histórico</span>
-                </NavLink>
+        <nav className="menu-lateral">
+          <NavLink
+            to="/TelaPrincipal"
+            className="item-menu"
+            onClick={closeSidebar}
+          >
+            <Home className="icone" />
+            <span>Home</span>
+          </NavLink>
 
-                <NavLink to="/perfil" className="item-menu">
-                    <User className="icone" />
-                    <span>Perfil</span>
-                </NavLink>
+          <NavLink to="/Agenda" className="item-menu" onClick={closeSidebar}>
+            <CalendarDays className="icone" />
+            <span>Agenda</span>
+          </NavLink>
 
-            </nav>
+          <NavLink
+            to="/PlantoesOfertados"
+            className="item-menu"
+            onClick={closeSidebar}
+          >
+            <ClipboardPlus className="icone" />
+            <span>Plantões</span>
+          </NavLink>
 
-            <button type="button" className="item-menu botao-logout" onClick={handleLogout}>
-                <LogOut className="icone" />
-                <span>Sair</span>
-            </button>
-        </aside>
+          <NavLink to="/historico" className="item-menu" onClick={closeSidebar}>
+            <History className="icone" />
+            <span>Histórico</span>
+          </NavLink>
 
-    );
+          <NavLink to="/perfil" className="item-menu" onClick={closeSidebar}>
+            <User className="icone" />
+            <span>Perfil</span>
+          </NavLink>
+        </nav>
+
+        <button
+          type="button"
+          className="item-menu botao-logout"
+          onClick={handleLogout}
+        >
+          <LogOut className="icone" />
+          <span>Sair</span>
+        </button>
+      </aside>
+    </>
+  );
 }
