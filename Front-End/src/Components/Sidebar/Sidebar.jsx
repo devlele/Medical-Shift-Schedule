@@ -36,9 +36,7 @@ export default function Sidebar() {
     setIsOpen(false);
   }
 
-  /* =========================
-     MENU HOSPITAL
-  ========================== */
+  /* MENU HOSPITAL */
   const menuHospital = [
     {
       to: "/UserHospital/TelaPrincipal",
@@ -67,9 +65,7 @@ export default function Sidebar() {
     },
   ];
 
-  /* =========================
-     ESCOLHE MENU
-  ========================== */
+  /* ESCOLHE MENU */
   let menu = menuHospital;
 
   return (

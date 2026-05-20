@@ -8,9 +8,7 @@
   padding: 40px;
 }
 
-/* =========================
-   HEADER
-========================= */
+/* HEADER */
 
 .topo-escalista {
   display: flex;
@@ -60,9 +58,7 @@
   color: #24443d;
 }
 
-/* =========================
-   CARDS
-========================= */
+/* CARDS*/
 
 .cards-dashboard {
   display: flex;
