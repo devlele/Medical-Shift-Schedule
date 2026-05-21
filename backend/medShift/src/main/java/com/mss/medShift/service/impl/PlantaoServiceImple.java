@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.mss.medShift.domain.model.Plantao;
 import com.mss.medShift.domain.model.PlantaoStatus;
-import com.mss.medShift.domain.model.Doctor;
+import com.mss.medShift.domain.model.PlantaoTipo;
 import com.mss.medShift.domain.repository.PlantaoRepository;
 import com.mss.medShift.service.PlantaoService;
 
@@ -26,7 +26,7 @@ public class PlantaoServiceImple implements PlantaoService {
         if (plantao.getSetor() == null) {
             throw new IllegalArgumentException("Setor is required");
         }
-        if (plantao.getDoctorAssignado() == null) {
+        if (plantao.getMedicoTitular() == null && plantao.getMedicoResponsavelAtual() == null) {
             throw new IllegalArgumentException("Doctor is required");
         }
         if (plantao.getDataInicio() == null || plantao.getDataFim() == null) {
@@ -36,7 +36,19 @@ public class PlantaoServiceImple implements PlantaoService {
             throw new IllegalArgumentException("Start date must be before end date");
         }
 
-        plantao.setStatus(PlantaoStatus.SCHEDULED);
+        if (plantao.getHospital() == null && plantao.getSetor() != null) {
+            plantao.setHospital(plantao.getSetor().getHospital());
+        }
+        if (plantao.getMedicoTitular() == null) {
+            plantao.setMedicoTitular(plantao.getMedicoResponsavelAtual());
+        }
+        if (plantao.getMedicoResponsavelAtual() == null) {
+            plantao.setMedicoResponsavelAtual(plantao.getMedicoTitular());
+        }
+        if (plantao.getTipo() == null) {
+            plantao.setTipo(plantao.getRegraPlantaoFixo() == null ? PlantaoTipo.AVULSO : PlantaoTipo.FIXO);
+        }
+        plantao.setStatus(PlantaoStatus.AGENDADO);
         return plantaoRepository.save(plantao);
     }
 
@@ -48,13 +60,13 @@ public class PlantaoServiceImple implements PlantaoService {
 
     @Override
     public Plantao findByIdAndHospitalId(Long id, Long hospitalId) {
-        return plantaoRepository.findByIdAndSetorHospitalId(id, hospitalId)
+        return plantaoRepository.findByIdAndHospitalId(id, hospitalId)
                 .orElseThrow(() -> new NoSuchElementException("Plantao not found with id: " + id));
     }
 
     @Override
     public Plantao findByIdAndHospitalIdAndSetorId(Long id, Long hospitalId, Long setorId) {
-        return plantaoRepository.findByIdAndSetorHospitalIdAndSetorId(id, hospitalId, setorId)
+        return plantaoRepository.findByIdAndHospitalIdAndSetorId(id, hospitalId, setorId)
                 .orElseThrow(() -> new NoSuchElementException("Plantao not found with id: " + id));
     }
 
@@ -65,17 +77,17 @@ public class PlantaoServiceImple implements PlantaoService {
 
     @Override
     public List<Plantao> findByDoctorId(Long doctorId) {
-        return plantaoRepository.findByDoctorAssignadoId(doctorId);
+        return plantaoRepository.findByMedicoResponsavelAtualId(doctorId);
     }
 
     @Override
     public List<Plantao> findByHospitalId(Long hospitalId) {
-        return plantaoRepository.findBySetorHospitalId(hospitalId);
+        return plantaoRepository.findByHospitalId(hospitalId);
     }
 
     @Override
     public List<Plantao> findByHospitalIdAndSetorId(Long hospitalId, Long setorId) {
-        return plantaoRepository.findBySetorHospitalIdAndSetorId(hospitalId, setorId);
+        return plantaoRepository.findByHospitalIdAndSetorId(hospitalId, setorId);
     }
 
     @Override
@@ -85,27 +97,27 @@ public class PlantaoServiceImple implements PlantaoService {
 
     @Override
     public List<Plantao> findByDoctorAndPeriod(Long doctorId, LocalDateTime start, LocalDateTime end) {
-        return plantaoRepository.findByDoctorAssignadoIdAndDataInicioBetween(doctorId, start, end);
+        return plantaoRepository.findByMedicoResponsavelAtualIdAndDataInicioBetween(doctorId, start, end);
     }
 
     @Override
     public List<Plantao> findByHospitalAndPeriod(Long hospitalId, LocalDateTime start, LocalDateTime end) {
-        return plantaoRepository.findBySetorHospitalIdAndDataInicioBetween(hospitalId, start, end);
+        return plantaoRepository.findByHospitalIdAndDataInicioBetween(hospitalId, start, end);
     }
 
     @Override
     public List<Plantao> findByHospitalAndSetorAndPeriod(Long hospitalId, Long setorId, LocalDateTime start, LocalDateTime end) {
-        return plantaoRepository.findBySetorHospitalIdAndSetorIdAndDataInicioBetween(hospitalId, setorId, start, end);
+        return plantaoRepository.findByHospitalIdAndSetorIdAndDataInicioBetween(hospitalId, setorId, start, end);
     }
 
     @Override
     public List<Plantao> findByDoctorAndHospital(Long doctorId, Long hospitalId) {
-        return plantaoRepository.findByDoctorAssignadoIdAndSetorHospitalId(doctorId, hospitalId);
+        return plantaoRepository.findByMedicoResponsavelAtualIdAndHospitalId(doctorId, hospitalId);
     }
 
     @Override
     public List<Plantao> findByDoctorAndHospitalAndPeriod(Long doctorId, Long hospitalId, LocalDateTime start, LocalDateTime end) {
-        return plantaoRepository.findByDoctorAssignadoIdAndSetorHospitalIdAndDataInicioBetween(doctorId, hospitalId, start, end);
+        return plantaoRepository.findByMedicoResponsavelAtualIdAndHospitalIdAndDataInicioBetween(doctorId, hospitalId, start, end);
     }
 
     @Override
@@ -115,8 +127,23 @@ public class PlantaoServiceImple implements PlantaoService {
         if (updatedPlantao.getSetor() != null) {
             plantao.setSetor(updatedPlantao.getSetor());
         }
-        if (updatedPlantao.getDoctorAssignado() != null) {
-            plantao.setDoctorAssignado(updatedPlantao.getDoctorAssignado());
+        if (updatedPlantao.getMedicoTitular() != null) {
+            plantao.setMedicoTitular(updatedPlantao.getMedicoTitular());
+        }
+        if (updatedPlantao.getMedicoResponsavelAtual() != null) {
+            plantao.setMedicoResponsavelAtual(updatedPlantao.getMedicoResponsavelAtual());
+        }
+        if (updatedPlantao.getHospital() != null) {
+            plantao.setHospital(updatedPlantao.getHospital());
+        }
+        if (updatedPlantao.getRegraPlantaoFixo() != null) {
+            plantao.setRegraPlantaoFixo(updatedPlantao.getRegraPlantaoFixo());
+        }
+        if (updatedPlantao.getCriadoPorEscalista() != null) {
+            plantao.setCriadoPorEscalista(updatedPlantao.getCriadoPorEscalista());
+        }
+        if (updatedPlantao.getTipo() != null) {
+            plantao.setTipo(updatedPlantao.getTipo());
         }
         if (updatedPlantao.getDataInicio() != null) {
             plantao.setDataInicio(updatedPlantao.getDataInicio());
@@ -140,50 +167,4 @@ public class PlantaoServiceImple implements PlantaoService {
         throw new NoSuchElementException("Plantao not found with id: " + id);
     }
 
-    @Override
-    public Plantao checkIn(Long plantaoId, Long doctorId) {
-        Plantao plantao = findById(plantaoId);
-
-        if (!plantao.getDoctorAssignado().getId().equals(doctorId)) {
-            throw new IllegalArgumentException("Only the assigned doctor can check in");
-        }
-
-        plantao.setCheckInTime(LocalDateTime.now());
-        plantao.setStatus(PlantaoStatus.CHECK_IN);
-
-        return plantaoRepository.save(plantao);
-    }
-
-    @Override
-    public Plantao checkOut(Long plantaoId, Long doctorId) {
-        Plantao plantao = findById(plantaoId);
-
-        if (!plantao.getDoctorAssignado().getId().equals(doctorId)) {
-            throw new IllegalArgumentException("Only the assigned doctor can check out");
-        }
-
-        plantao.setCheckOutTime(LocalDateTime.now());
-        plantao.setStatus(PlantaoStatus.CHECK_OUT);
-
-        return plantaoRepository.save(plantao);
-    }
-
-    @Override
-    public Plantao registerInterest(Long plantaoId, Doctor doctor) {
-        Plantao plantao = findById(plantaoId);
-
-        if (plantao.getStatus().equals(PlantaoStatus.SCHEDULED)) {
-            plantao.setStatus(PlantaoStatus.PENDING_INTEREST);
-        }
-
-        plantao.addInterestedDoctor(doctor);
-        return plantaoRepository.save(plantao);
-    }
-
-    @Override
-    public Plantao openForExchange(Long plantaoId) {
-        Plantao plantao = findById(plantaoId);
-        plantao.setStatus(PlantaoStatus.PENDING_INTEREST);
-        return plantaoRepository.save(plantao);
-    }
 }

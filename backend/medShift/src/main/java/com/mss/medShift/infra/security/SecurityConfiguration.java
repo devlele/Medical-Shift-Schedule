@@ -66,13 +66,23 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.PUT, "/setor/{id}").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.GET, "/manager").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.GET, "/manager/{id}").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.GET, "/manager/{id}/setores").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.POST, "/manager").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.POST, "/manager/**").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.PUT, "/manager/{id}").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.DELETE, "/manager/{id}/setores/{setorId}").hasRole("HOSPITAL")
 
                         // Manager endpoints - MANAGER, HOSPITAL or ADMIN role
                         .requestMatchers(HttpMethod.GET, "/doctor").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/doctor/{id}/setores").hasAnyRole("ESCALISTA", "MANAGER")
+                        .requestMatchers(HttpMethod.POST, "/doctor/{id}/setores/{setorId}").hasAnyRole("ESCALISTA", "MANAGER")
+                        .requestMatchers(HttpMethod.DELETE, "/doctor/{id}/setores/{setorId}").hasAnyRole("ESCALISTA", "MANAGER")
                         .requestMatchers(HttpMethod.GET, "/doctor/{id}").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/doctor/**").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
+
+                        // Shift scheduling is scoped to escalistas.
+                        .requestMatchers(HttpMethod.POST, "/plantao").hasAnyRole("ESCALISTA", "MANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/plantao/{id}").hasAnyRole("ESCALISTA", "MANAGER")
                         
                         // Admin only
                         .requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")

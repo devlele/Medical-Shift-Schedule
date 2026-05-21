@@ -12,16 +12,16 @@ import com.mss.medShift.domain.model.Plantao;
 @Repository
 public interface PlantaoRepository extends JpaRepository<Plantao, Long> {
     List<Plantao> findBySetorId(Long setorId);
-    List<Plantao> findByDoctorAssignadoId(Long doctorId);
+    List<Plantao> findByMedicoResponsavelAtualId(Long doctorId);
     List<Plantao> findByDataInicioBetween(LocalDateTime start, LocalDateTime end);
     List<Plantao> findBySetorIdAndDataInicioBetween(Long setorId, LocalDateTime start, LocalDateTime end);
-    List<Plantao> findByDoctorAssignadoIdAndDataInicioBetween(Long doctorId, LocalDateTime start, LocalDateTime end);
-    List<Plantao> findBySetorHospitalId(Long hospitalId);
-    List<Plantao> findBySetorHospitalIdAndDataInicioBetween(Long hospitalId, LocalDateTime start, LocalDateTime end);
-    List<Plantao> findByDoctorAssignadoIdAndSetorHospitalId(Long doctorId, Long hospitalId);
-    List<Plantao> findByDoctorAssignadoIdAndSetorHospitalIdAndDataInicioBetween(Long doctorId, Long hospitalId, LocalDateTime start, LocalDateTime end);
-    Optional<Plantao> findByIdAndSetorHospitalId(Long id, Long hospitalId);
-    Optional<Plantao> findByIdAndSetorHospitalIdAndSetorId(Long id, Long hospitalId, Long setorId);
-    List<Plantao> findBySetorHospitalIdAndSetorId(Long hospitalId, Long setorId);
-    List<Plantao> findBySetorHospitalIdAndSetorIdAndDataInicioBetween(Long hospitalId, Long setorId, LocalDateTime start, LocalDateTime end);
+    List<Plantao> findByMedicoResponsavelAtualIdAndDataInicioBetween(Long doctorId, LocalDateTime start, LocalDateTime end);
+    List<Plantao> findByHospitalId(Long hospitalId);
+    List<Plantao> findByHospitalIdAndDataInicioBetween(Long hospitalId, LocalDateTime start, LocalDateTime end);
+    List<Plantao> findByMedicoResponsavelAtualIdAndHospitalId(Long doctorId, Long hospitalId);
+    List<Plantao> findByMedicoResponsavelAtualIdAndHospitalIdAndDataInicioBetween(Long doctorId, Long hospitalId, LocalDateTime start, LocalDateTime end);
+    Optional<Plantao> findByIdAndHospitalId(Long id, Long hospitalId);
+    Optional<Plantao> findByIdAndHospitalIdAndSetorId(Long id, Long hospitalId, Long setorId);
+    List<Plantao> findByHospitalIdAndSetorId(Long hospitalId, Long setorId);
+    List<Plantao> findByHospitalIdAndSetorIdAndDataInicioBetween(Long hospitalId, Long setorId, LocalDateTime start, LocalDateTime end);
 }

@@ -17,16 +17,20 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.mss.medShift.domain.model.Hospital;
 import com.mss.medShift.domain.model.Setor;
+import com.mss.medShift.domain.model.Usuario;
 import com.mss.medShift.service.SetorService;
+import com.mss.medShift.service.auth.AccessScopeService;
 
 @RestController
 @RequestMapping("/setor")
 public class SetorController {
 
     private final SetorService setorService;
+    private final AccessScopeService accessScopeService;
 
-    public SetorController(SetorService setorService) {
+    public SetorController(SetorService setorService, AccessScopeService accessScopeService) {
         this.setorService = setorService;
+        this.accessScopeService = accessScopeService;
     }
 
     /*@PostMapping
@@ -41,7 +45,8 @@ public class SetorController {
     }*/
 
     @PostMapping
-    public ResponseEntity<Setor> create(@RequestBody Setor setorToCreate, @AuthenticationPrincipal Hospital hospitalLogado) {  // ← pega direto do token
+    public ResponseEntity<Setor> create(@RequestBody Setor setorToCreate, @AuthenticationPrincipal Usuario usuarioLogado) {
+        Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
 
         var setorCreated = setorService.create(setorToCreate, hospitalLogado);
 
@@ -54,9 +59,9 @@ public class SetorController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Setor> getSetor(@PathVariable Long id, @AuthenticationPrincipal Hospital hospitalLogado) {
+    public ResponseEntity<Setor> getSetor(@PathVariable Long id, @AuthenticationPrincipal Usuario usuarioLogado) {
         try {
-            var setor = setorService.findById(id, hospitalLogado);
+            var setor = accessScopeService.requireSetorOfAuthenticatedHospital(usuarioLogado, id);
             return ResponseEntity.ok(setor);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -64,7 +69,8 @@ public class SetorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Setor>> getSetoresDoHospitalLogado(@AuthenticationPrincipal Hospital hospitalLogado) {
+    public ResponseEntity<List<Setor>> getSetoresDoHospitalLogado(@AuthenticationPrincipal Usuario usuarioLogado) {
+        Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
         var setores = setorService.findByHospitalId(hospitalLogado.getId());
         return ResponseEntity.ok(setores);
     }
@@ -77,8 +83,9 @@ public class SetorController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Setor> update(@PathVariable Long id, @RequestBody Setor setor,
-            @AuthenticationPrincipal Hospital hospitalLogado) {
+            @AuthenticationPrincipal Usuario usuarioLogado) {
         try {
+            Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
             var setorUpdated = setorService.update(id, setor, hospitalLogado);
             return ResponseEntity.ok(setorUpdated);
         } catch (Exception e) {

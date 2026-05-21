@@ -2,19 +2,22 @@ package com.mss.medShift.service;
 
 import java.util.List;
 
-import org.springframework.security.core.userdetails.UserDetails;
-
 import com.mss.medShift.domain.model.Doctor;
+import com.mss.medShift.domain.model.Manager;
+import com.mss.medShift.domain.model.MedicoSetor;
 
 public interface DoctorService {
     Doctor findById(Long id);
+    Doctor findByUsuarioId(Long usuarioId);
     Doctor findByIdAndHospitalId(Long id, Long hospitalId);
     Doctor findByIdAndHospitalIdAndSetorId(Long id, Long hospitalId, Long setorId);
     List<Doctor> findAll();
     List<Doctor> findByHospitalId(Long hospitalId);
     List<Doctor> findByHospitalIdAndSetorId(Long hospitalId, Long setorId);
     Doctor create(Doctor doctorToCreate);
+    List<MedicoSetor> findSetoresVinculados(Long doctorId, Manager escalistaLogado, List<Long> setorIdsPermitidos);
+    MedicoSetor vincularSetor(Long doctorId, Long setorId, Manager escalistaLogado);
+    void desvincularSetor(Long doctorId, Long setorId, Manager escalistaLogado);
     Doctor update(Long id, Doctor doctorToUpdate);
-    UserDetails findByEmail(String email);
     void delete(Long id);
 } 

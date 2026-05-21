@@ -27,7 +27,7 @@ public record PlantaoSummaryResponse(
     public static PlantaoSummaryResponse from(Plantao plantao) {
         var setor = plantao.getSetor();
         var hospital = setor != null ? setor.getHospital() : null;
-        var doctor = plantao.getDoctorAssignado();
+        var doctor = plantao.getMedicoResponsavelAtual();
         Long duracaoHoras = null;
 
         if (plantao.getDataInicio() != null && plantao.getDataFim() != null) {

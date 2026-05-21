@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,24 +18,34 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.mss.medShift.domain.model.Plantao;
-import com.mss.medShift.domain.model.Doctor;
 import com.mss.medShift.domain.model.Hospital;
 import com.mss.medShift.domain.model.Manager;
+import com.mss.medShift.domain.model.Usuario;
 import com.mss.medShift.service.PlantaoService;
+import com.mss.medShift.service.auth.AccessScopeService;
 
 @RestController
 @RequestMapping("/plantao")
 public class PlantaoController {
 
     private final PlantaoService plantaoService;
+    private final AccessScopeService accessScopeService;
 
-    public PlantaoController(PlantaoService plantaoService) {
+    public PlantaoController(PlantaoService plantaoService, AccessScopeService accessScopeService) {
         this.plantaoService = plantaoService;
+        this.accessScopeService = accessScopeService;
     }
 
     @PostMapping
-    public ResponseEntity<Plantao> create(@RequestBody Plantao plantao) {
+    public ResponseEntity<Plantao> create(@RequestBody Plantao plantao, @AuthenticationPrincipal Usuario usuarioLogado) {
         try {
+            if (plantao.getSetor() == null || plantao.getSetor().getId() == null) {
+                throw new IllegalArgumentException("Setor is required");
+            }
+            Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, plantao.getSetor().getId());
+            plantao.setCriadoPorEscalista(escalista);
+            plantao.setHospital(escalista.getHospital());
+
             var plantaoCriado = plantaoService.create(plantao);
             URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                     .path("/{id}")
@@ -49,7 +58,7 @@ public class PlantaoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Plantao> getPlantao(@PathVariable Long id, @AuthenticationPrincipal UserDetails user) {
+    public ResponseEntity<Plantao> getPlantao(@PathVariable Long id, @AuthenticationPrincipal Usuario user) {
         try {
             var plantao = findPlantaoForUser(id, user);
             return ResponseEntity.ok(plantao);
@@ -59,8 +68,20 @@ public class PlantaoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Plantao> update(@PathVariable Long id, @RequestBody Plantao plantao) {
+    public ResponseEntity<Plantao> update(@PathVariable Long id, @RequestBody Plantao plantao,
+            @AuthenticationPrincipal Usuario usuarioLogado) {
         try {
+            Plantao plantaoAtual = plantaoService.findById(id);
+            if (plantaoAtual.getSetor() == null || plantaoAtual.getSetor().getId() == null) {
+                throw new IllegalArgumentException("Plantão sem setor");
+            }
+            accessScopeService.requireEscalistaCanAccessSetor(usuarioLogado, plantaoAtual.getSetor().getId());
+            if (plantao.getSetor() != null && plantao.getSetor().getId() != null) {
+                Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, plantao.getSetor().getId());
+                plantao.setHospital(escalista.getHospital());
+                plantao.setCriadoPorEscalista(escalista);
+            }
+
             var plantaoAtualizado = plantaoService.update(id, plantao);
             return ResponseEntity.ok(plantaoAtualizado);
         } catch (Exception e) {
@@ -78,55 +99,18 @@ public class PlantaoController {
         }
     }
 
-    @PostMapping("/{id}/check-in")
-    public ResponseEntity<Plantao> checkIn(@PathVariable Long id, @AuthenticationPrincipal Doctor doctor) {
-        try {
-            var plantao = plantaoService.checkIn(id, doctor.getId());
-            return ResponseEntity.ok(plantao);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @PostMapping("/{id}/check-out")
-    public ResponseEntity<Plantao> checkOut(@PathVariable Long id, @AuthenticationPrincipal Doctor doctor) {
-        try {
-            var plantao = plantaoService.checkOut(id, doctor.getId());
-            return ResponseEntity.ok(plantao);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @PostMapping("/{id}/interesse")
-    public ResponseEntity<Plantao> registerInterest(@PathVariable Long id, @AuthenticationPrincipal Doctor doctor) {
-        try {
-            var plantao = plantaoService.registerInterest(id, doctor);
-            return ResponseEntity.ok(plantao);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @PostMapping("/{id}/troca")
-    public ResponseEntity<Plantao> openForExchange(@PathVariable Long id) {
-        try {
-            var plantao = plantaoService.openForExchange(id);
-            return ResponseEntity.ok(plantao);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    private Plantao findPlantaoForUser(Long id, UserDetails user) {
-        if (user instanceof Hospital hospital) {
+    private Plantao findPlantaoForUser(Long id, Usuario user) {
+        if (accessScopeService.isHospital(user)) {
+            Hospital hospital = accessScopeService.requireHospitalProfile(user);
             return plantaoService.findByIdAndHospitalId(id, hospital.getId());
         }
-        if (user instanceof Manager manager) {
-            if (manager.getHospital() == null || manager.getSetor() == null) {
-                throw new IllegalArgumentException("Escalista sem hospital ou setor");
+        if (accessScopeService.isEscalista(user)) {
+            Plantao plantao = plantaoService.findById(id);
+            if (plantao.getSetor() == null || plantao.getSetor().getId() == null) {
+                throw new IllegalArgumentException("Plantão sem setor");
             }
-            return plantaoService.findByIdAndHospitalIdAndSetorId(id, manager.getHospital().getId(), manager.getSetor().getId());
+            accessScopeService.requireEscalistaCanAccessSetor(user, plantao.getSetor().getId());
+            return plantao;
         }
         return plantaoService.findById(id);
     }

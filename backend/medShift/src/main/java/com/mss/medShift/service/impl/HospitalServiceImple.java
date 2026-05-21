@@ -1,23 +1,29 @@
 package com.mss.medShift.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.mss.medShift.domain.model.Hospital;
+import com.mss.medShift.domain.model.UserRole;
+import com.mss.medShift.domain.model.Usuario;
 import com.mss.medShift.domain.repository.HospitalRepository;
+import com.mss.medShift.domain.repository.UsuarioRepository;
 import com.mss.medShift.service.HospitalService;
 
 @Service
 public class HospitalServiceImple implements HospitalService {
 
     private final HospitalRepository hospitalRepository;
+    private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public HospitalServiceImple(HospitalRepository hospitalRepository, PasswordEncoder passwordEncoder) {
+    public HospitalServiceImple(HospitalRepository hospitalRepository, UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder) {
         this.hospitalRepository = hospitalRepository;
+        this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -26,10 +32,36 @@ public class HospitalServiceImple implements HospitalService {
         if (hospitalRepository.existsByCnpj(hospital.getCnpj())) {
             throw new RuntimeException("CNPJ já cadastrado");
         }
-        if (hospitalRepository.existsByEmail(hospital.getEmail())) {
+        String email = hospital.getEmail();
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Email é obrigatório");
+        }
+        if (usuarioRepository.existsByEmail(email) || hospitalRepository.existsByEmail(email)) {
             throw new RuntimeException("Email já cadastrado");
         }
-        hospital.setPassword(passwordEncoder.encode(hospital.getPassword()));
+
+        String rawPassword = hospital.getPassword();
+        if (rawPassword == null || rawPassword.isBlank()) {
+            throw new IllegalArgumentException("Senha é obrigatória");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        Usuario usuario = new Usuario(
+                hospital.getNomeGestor() != null ? hospital.getNomeGestor() : hospital.getNomeFantasia(),
+                email,
+                passwordEncoder.encode(rawPassword),
+                null,
+                null,
+                hospital.getTelefone(),
+                UserRole.HOSPITAL);
+        usuario.setCriadoEm(now);
+        usuario.setAtualizadoEm(now);
+
+        hospital.setUsuario(usuarioRepository.save(usuario));
+        hospital.setRole(UserRole.HOSPITAL);
+        hospital.setPassword(usuario.getSenhaHash());
+        hospital.setCriadoEm(now);
+        hospital.setAtualizadoEm(now);
         return hospitalRepository.save(hospital);
     }
 
@@ -37,6 +69,12 @@ public class HospitalServiceImple implements HospitalService {
     public Hospital findById(Long id) {
         return hospitalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Hospital não encontrado"));
+    }
+
+    @Override
+    public Hospital findByUsuarioId(Long usuarioId) {
+        return hospitalRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Hospital não encontrado para este usuário"));
     }
 
     @Override
@@ -58,8 +96,15 @@ public class HospitalServiceImple implements HospitalService {
             existingHospital.setNomeGestor(hospital.getNomeGestor());
         }
         if (hospital.getPassword() != null && !hospital.getPassword().isEmpty()) {
-            existingHospital.setPassword(passwordEncoder.encode(hospital.getPassword()));
+            String encodedPassword = passwordEncoder.encode(hospital.getPassword());
+            existingHospital.setPassword(encodedPassword);
+            if (existingHospital.getUsuario() != null) {
+                existingHospital.getUsuario().setSenhaHash(encodedPassword);
+                existingHospital.getUsuario().setAtualizadoEm(LocalDateTime.now());
+                usuarioRepository.save(existingHospital.getUsuario());
+            }
         }
+        existingHospital.setAtualizadoEm(LocalDateTime.now());
         
         return hospitalRepository.save(existingHospital);
     }

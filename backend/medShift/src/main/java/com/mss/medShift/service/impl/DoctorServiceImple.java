@@ -1,30 +1,44 @@
 package com.mss.medShift.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.mss.medShift.domain.repository.DoctorRepository;
+import com.mss.medShift.domain.repository.MedicoSetorRepository;
+import com.mss.medShift.domain.repository.SetorRepository;
+import com.mss.medShift.domain.repository.UsuarioRepository;
 import com.mss.medShift.domain.model.Doctor;
+import com.mss.medShift.domain.model.Manager;
+import com.mss.medShift.domain.model.MedicoSetor;
+import com.mss.medShift.domain.model.Setor;
 import com.mss.medShift.domain.model.UserRole;
+import com.mss.medShift.domain.model.Usuario;
 import com.mss.medShift.service.DoctorService;
 
 @Service
 public class DoctorServiceImple implements DoctorService {
     private final DoctorRepository doctorRepository;
+    private final MedicoSetorRepository medicoSetorRepository;
+    private final SetorRepository setorRepository;
+    private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DoctorServiceImple(DoctorRepository doctorRepository, PasswordEncoder passwordEncoder) {
+    public DoctorServiceImple(DoctorRepository doctorRepository, MedicoSetorRepository medicoSetorRepository,
+            SetorRepository setorRepository, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.doctorRepository = doctorRepository;
+        this.medicoSetorRepository = medicoSetorRepository;
+        this.setorRepository = setorRepository;
+        this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public UserDetails findByEmail(String email) {
-        return doctorRepository.findByEmail(email);
+    public Doctor findByUsuarioId(Long usuarioId) {
+        return doctorRepository.findByUsuarioId(usuarioId).orElseThrow(NoSuchElementException::new);
     }
 
     @Override
@@ -62,8 +76,15 @@ public class DoctorServiceImple implements DoctorService {
         if(doctorRepository.existsByCrm(doctorToCreate.getCrm())) {
             throw new IllegalArgumentException("This CRM is already registered");
         }
-        if(doctorRepository.existsByEmail(doctorToCreate.getEmail())) {
+        String email = doctorToCreate.getEmail();
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if(usuarioRepository.existsByEmail(email) || doctorRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("This email is already registered");
+        }
+        if (doctorToCreate.getPassword() == null || doctorToCreate.getPassword().isBlank()) {
+            throw new IllegalArgumentException("Password is required");
         }
 
         if (doctorToCreate.getUf() == null && doctorToCreate.getCrm() != null && doctorToCreate.getCrm().contains("/")) {
@@ -73,10 +94,93 @@ public class DoctorServiceImple implements DoctorService {
             }
         }
 
-        doctorToCreate.setRole(UserRole.DOCTOR);
-        doctorToCreate.setPassword(passwordEncoder.encode(doctorToCreate.getPassword()));
+        LocalDateTime now = LocalDateTime.now();
+        Usuario usuario = new Usuario(
+                doctorToCreate.getName(),
+                email,
+                passwordEncoder.encode(doctorToCreate.getPassword()),
+                doctorToCreate.getCpf(),
+                doctorToCreate.getBirthday(),
+                doctorToCreate.getTelefone(),
+                UserRole.MEDICO);
+        usuario.setCriadoEm(now);
+        usuario.setAtualizadoEm(now);
+
+        doctorToCreate.setUsuario(usuarioRepository.save(usuario));
+        doctorToCreate.setRole(UserRole.MEDICO);
+        doctorToCreate.setPassword(usuario.getSenhaHash());
+        doctorToCreate.setCriadoEm(now);
+        doctorToCreate.setAtualizadoEm(now);
 
         return doctorRepository.save(doctorToCreate);
+    }
+
+    @Override
+    public List<MedicoSetor> findSetoresVinculados(Long doctorId, Manager escalistaLogado, List<Long> setorIdsPermitidos) {
+        Doctor doctor = findById(doctorId);
+        List<MedicoSetor> vinculos = medicoSetorRepository.findByMedicoIdAndAtivoTrue(doctor.getId()).stream()
+                .filter(vinculo -> vinculo.getSetor() != null
+                        && vinculo.getSetor().getId() != null
+                        && setorIdsPermitidos.contains(vinculo.getSetor().getId()))
+                .toList();
+
+        if (!vinculos.isEmpty()) {
+            return vinculos;
+        }
+        if (doctor.getSetor() != null && doctor.getSetor().getId() != null
+                && setorIdsPermitidos.contains(doctor.getSetor().getId())) {
+            return List.of(createOrReactivateVinculo(doctor, doctor.getSetor(), escalistaLogado, LocalDateTime.now()));
+        }
+        return List.of();
+    }
+
+    @Override
+    public MedicoSetor vincularSetor(Long doctorId, Long setorId, Manager escalistaLogado) {
+        Doctor doctor = findById(doctorId);
+        Setor setor = findSetorDoHospital(setorId, escalistaLogado);
+
+        if (doctor.getHospital() != null && !doctor.getHospital().getId().equals(escalistaLogado.getHospital().getId())) {
+            throw new IllegalArgumentException("Médico pertence a outro hospital");
+        }
+        if (doctor.getSetor() != null
+                && doctor.getSetor().getHospital() != null
+                && !doctor.getSetor().getHospital().getId().equals(escalistaLogado.getHospital().getId())) {
+            throw new IllegalArgumentException("Médico pertence a setor de outro hospital");
+        }
+
+        if (doctor.getHospital() == null) {
+            doctor.setHospital(escalistaLogado.getHospital());
+        }
+        if (doctor.getSetor() == null) {
+            doctor.setSetor(setor);
+        }
+        doctor.setAtualizadoEm(LocalDateTime.now());
+        doctorRepository.save(doctor);
+
+        return createOrReactivateVinculo(doctor, setor, escalistaLogado, LocalDateTime.now());
+    }
+
+    @Override
+    public void desvincularSetor(Long doctorId, Long setorId, Manager escalistaLogado) {
+        Doctor doctor = findById(doctorId);
+        Setor setor = findSetorDoHospital(setorId, escalistaLogado);
+
+        medicoSetorRepository.findByMedicoIdAndSetorIdAndAtivoTrue(doctor.getId(), setor.getId())
+                .ifPresentOrElse(vinculo -> {
+                    vinculo.setAtivo(false);
+                    vinculo.setDesvinculadoEm(LocalDateTime.now());
+                    medicoSetorRepository.save(vinculo);
+                }, () -> {
+                    if (!isLegacySetor(doctor, setor)) {
+                        throw new IllegalArgumentException("Vínculo entre médico e setor não encontrado");
+                    }
+                });
+
+        if (isLegacySetor(doctor, setor)) {
+            doctor.setSetor(resolveNextSetor(doctor.getId(), setor.getId()));
+            doctor.setAtualizadoEm(LocalDateTime.now());
+            doctorRepository.save(doctor);
+        }
     }
 
     @Override
@@ -85,6 +189,9 @@ public class DoctorServiceImple implements DoctorService {
 
         if (doctorToUpdate.getName() != null) {
             doctor.setName(doctorToUpdate.getName());
+            if (doctor.getUsuario() != null) {
+                doctor.getUsuario().setNome(doctorToUpdate.getName());
+            }
         }
         if (doctorToUpdate.getSpecialty() != null) {
             doctor.setSpecialty(doctorToUpdate.getSpecialty());
@@ -94,6 +201,9 @@ public class DoctorServiceImple implements DoctorService {
         }
         if (doctorToUpdate.getTelefone() != null) {
             doctor.setTelefone(doctorToUpdate.getTelefone());
+            if (doctor.getUsuario() != null) {
+                doctor.getUsuario().setTelefone(doctorToUpdate.getTelefone());
+            }
         }
         if (doctorToUpdate.getFotoPerfilUrl() != null) {
             doctor.setFotoPerfilUrl(doctorToUpdate.getFotoPerfilUrl());
@@ -103,6 +213,11 @@ public class DoctorServiceImple implements DoctorService {
         }
         if (doctorToUpdate.getSetor() != null) {
             doctor.setSetor(doctorToUpdate.getSetor());
+        }
+        doctor.setAtualizadoEm(LocalDateTime.now());
+        if (doctor.getUsuario() != null) {
+            doctor.getUsuario().setAtualizadoEm(LocalDateTime.now());
+            usuarioRepository.save(doctor.getUsuario());
         }
 
         return doctorRepository.save(doctor);
@@ -115,5 +230,43 @@ public class DoctorServiceImple implements DoctorService {
             return;
         }
         throw new NoSuchElementException("Id not founded");
+    }
+
+    private MedicoSetor createOrReactivateVinculo(Doctor doctor, Setor setor, Manager escalistaLogado, LocalDateTime now) {
+        MedicoSetor vinculo = medicoSetorRepository
+                .findByMedicoIdAndSetorId(doctor.getId(), setor.getId())
+                .orElseGet(MedicoSetor::new);
+
+        vinculo.setMedico(doctor);
+        vinculo.setSetor(setor);
+        vinculo.setVinculadoPorEscalista(escalistaLogado);
+        vinculo.setAtivo(true);
+        if (vinculo.getVinculadoEm() == null) {
+            vinculo.setVinculadoEm(now);
+        }
+        vinculo.setDesvinculadoEm(null);
+
+        return medicoSetorRepository.save(vinculo);
+    }
+
+    private Setor findSetorDoHospital(Long setorId, Manager escalistaLogado) {
+        if (escalistaLogado.getHospital() == null) {
+            throw new IllegalArgumentException("Escalista sem hospital");
+        }
+        return setorRepository.findByIdAndHospitalId(setorId, escalistaLogado.getHospital().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Setor não encontrado para o hospital do escalista"));
+    }
+
+    private boolean isLegacySetor(Doctor doctor, Setor setor) {
+        return doctor.getSetor() != null && doctor.getSetor().getId() != null
+                && doctor.getSetor().getId().equals(setor.getId());
+    }
+
+    private Setor resolveNextSetor(Long doctorId, Long setorRemovidoId) {
+        return medicoSetorRepository.findByMedicoIdAndAtivoTrue(doctorId).stream()
+                .map(MedicoSetor::getSetor)
+                .filter(setor -> setor != null && setor.getId() != null && !setor.getId().equals(setorRemovidoId))
+                .findFirst()
+                .orElse(null);
     }
 }
