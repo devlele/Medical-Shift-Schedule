@@ -1,6 +1,7 @@
 package com.mss.medShift.service.impl;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.time.LocalDateTime;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -163,7 +164,7 @@ public class ManagerServiceImple implements ManagerService {
             managerRepository.deleteById(id);
             return;
         }
-        throw new IllegalArgumentException("Id not founded");
+        throw new NoSuchElementException("Escalista não encontrado");
     }
 
     public Manager update(Long id, Manager managerToUpdate) {

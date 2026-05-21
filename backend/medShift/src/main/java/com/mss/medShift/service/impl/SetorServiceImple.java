@@ -1,6 +1,7 @@
 package com.mss.medShift.service.impl;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 
@@ -27,13 +28,13 @@ public class SetorServiceImple implements SetorService {
     @Override
     public Setor findById(Long id) {
         return setorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Setor não encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Setor não encontrado"));
     }
 
     @Override
     public Setor findById(Long id, Hospital hospitalLogado) {
         return setorRepository.findByIdAndHospitalId(id, hospitalLogado.getId())
-                .orElseThrow(() -> new RuntimeException("Setor não encontrado para o hospital logado"));
+                .orElseThrow(() -> new NoSuchElementException("Setor não encontrado para o hospital logado"));
     }
 
     @Override

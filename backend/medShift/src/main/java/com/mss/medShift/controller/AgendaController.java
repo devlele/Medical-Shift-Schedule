@@ -34,17 +34,21 @@ public class AgendaController {
         this.accessScopeService = accessScopeService;
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<List<PlantaoSummaryResponse>> getMinhaAgenda(
+            @AuthenticationPrincipal Usuario user,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataFim) {
+        return ResponseEntity.ok(toSummary(findAgendaForUser(user, dataInicio, dataFim)));
+    }
+
     @GetMapping("/setor/{setorId}")
     public ResponseEntity<List<PlantaoSummaryResponse>> getAgendaBySetor(
             @AuthenticationPrincipal Usuario user,
             @PathVariable Long setorId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataInicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataFim) {
-        try {
-            return ResponseEntity.ok(toSummary(findAgendaBySetorForUser(user, setorId, dataInicio, dataFim)));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(toSummary(findAgendaBySetorForUser(user, setorId, dataInicio, dataFim)));
     }
 
     @GetMapping("/doctor/me")
@@ -52,18 +56,7 @@ public class AgendaController {
             @AuthenticationPrincipal Usuario usuarioLogado,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataInicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataFim) {
-        try {
-            Doctor doctor = accessScopeService.requireMedicoProfile(usuarioLogado);
-            List<Plantao> agenda;
-            if (dataInicio != null && dataFim != null) {
-                agenda = plantaoService.findByDoctorAndPeriod(doctor.getId(), dataInicio, dataFim);
-            } else {
-                agenda = plantaoService.findByDoctorId(doctor.getId());
-            }
-            return ResponseEntity.ok(toSummary(agenda));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(toSummary(findDoctorAgenda(usuarioLogado, dataInicio, dataFim)));
     }
 
     @GetMapping("/hospital/{hospitalId}")
@@ -72,11 +65,7 @@ public class AgendaController {
             @PathVariable Long hospitalId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataInicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataFim) {
-        try {
-            return ResponseEntity.ok(toSummary(findAgendaByHospitalForUser(user, hospitalId, dataInicio, dataFim)));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(toSummary(findAgendaByHospitalForUser(user, hospitalId, dataInicio, dataFim)));
     }
 
     @GetMapping("/doctor/me/hospital/{hospitalId}")
@@ -85,18 +74,14 @@ public class AgendaController {
             @PathVariable Long hospitalId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataInicio,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataFim) {
-        try {
-            Doctor doctor = accessScopeService.requireMedicoProfile(usuarioLogado);
-            List<Plantao> agenda;
-            if (dataInicio != null && dataFim != null) {
-                agenda = plantaoService.findByDoctorAndHospitalAndPeriod(doctor.getId(), hospitalId, dataInicio, dataFim);
-            } else {
-                agenda = plantaoService.findByDoctorAndHospital(doctor.getId(), hospitalId);
-            }
-            return ResponseEntity.ok(toSummary(agenda));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+        Doctor doctor = accessScopeService.requireMedicoProfile(usuarioLogado);
+        List<Plantao> agenda;
+        if (dataInicio != null && dataFim != null) {
+            agenda = plantaoService.findByDoctorAndHospitalAndPeriod(doctor.getId(), hospitalId, dataInicio, dataFim);
+        } else {
+            agenda = plantaoService.findByDoctorAndHospital(doctor.getId(), hospitalId);
         }
+        return ResponseEntity.ok(toSummary(agenda));
     }
 
     private List<PlantaoSummaryResponse> toSummary(List<Plantao> plantoes) {
@@ -104,6 +89,36 @@ public class AgendaController {
                 .sorted(Comparator.comparing(Plantao::getDataInicio, Comparator.nullsLast(Comparator.naturalOrder())))
                 .map(PlantaoSummaryResponse::from)
                 .toList();
+    }
+
+    private List<Plantao> findAgendaForUser(Usuario user, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        if (accessScopeService.isMedico(user)) {
+            return findDoctorAgenda(user, dataInicio, dataFim);
+        }
+        if (accessScopeService.isHospital(user)) {
+            Hospital hospital = accessScopeService.requireHospitalProfile(user);
+            return findByHospital(hospital.getId(), dataInicio, dataFim);
+        }
+        if (accessScopeService.isEscalista(user)) {
+            Manager manager = accessScopeService.requireEscalistaProfile(user);
+            if (manager.getHospital() == null || manager.getHospital().getId() == null) {
+                return List.of();
+            }
+            return findByHospitalAndSetores(
+                    manager.getHospital().getId(),
+                    accessScopeService.resolveEscalistaSetorIds(user),
+                    dataInicio,
+                    dataFim);
+        }
+        return List.of();
+    }
+
+    private List<Plantao> findDoctorAgenda(Usuario user, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        Doctor doctor = accessScopeService.requireMedicoProfile(user);
+        if (dataInicio != null && dataFim != null) {
+            return plantaoService.findByDoctorAndPeriod(doctor.getId(), dataInicio, dataFim);
+        }
+        return plantaoService.findByDoctorId(doctor.getId());
     }
 
     private List<Plantao> findAgendaByHospitalForUser(Usuario user, Long hospitalId, LocalDateTime dataInicio, LocalDateTime dataFim) {
@@ -128,7 +143,7 @@ public class AgendaController {
         }
         if (accessScopeService.isEscalista(user)) {
             Manager manager = accessScopeService.requireEscalistaInSetor(user, setorId);
-            return findByHospitalAndSetor(manager.getHospital().getId(), manager.getSetor().getId(), dataInicio, dataFim);
+            return findByHospitalAndSetor(manager.getHospital().getId(), setorId, dataInicio, dataFim);
         }
         return findBySetor(setorId, dataInicio, dataFim);
     }

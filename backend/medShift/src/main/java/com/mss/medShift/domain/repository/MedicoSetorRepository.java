@@ -12,6 +12,7 @@ import com.mss.medShift.domain.model.MedicoSetor;
 public interface MedicoSetorRepository extends JpaRepository<MedicoSetor, Long> {
     List<MedicoSetor> findByMedicoIdAndAtivoTrue(Long medicoId);
     List<MedicoSetor> findBySetorIdAndAtivoTrue(Long setorId);
+    List<MedicoSetor> findBySetorIdInAndAtivoTrue(List<Long> setorIds);
     Optional<MedicoSetor> findByMedicoIdAndSetorId(Long medicoId, Long setorId);
     Optional<MedicoSetor> findByMedicoIdAndSetorIdAndAtivoTrue(Long medicoId, Long setorId);
 }

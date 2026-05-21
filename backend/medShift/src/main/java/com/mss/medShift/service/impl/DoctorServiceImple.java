@@ -1,6 +1,7 @@
 package com.mss.medShift.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -69,6 +70,48 @@ public class DoctorServiceImple implements DoctorService {
     @Override
     public List<Doctor> findByHospitalIdAndSetorId(Long hospitalId, Long setorId) {
         return doctorRepository.findByHospitalIdAndSetorId(hospitalId, setorId);
+    }
+
+    @Override
+    public List<Doctor> findBySetorIds(List<Long> setorIds) {
+        if (setorIds == null || setorIds.isEmpty()) {
+            return List.of();
+        }
+
+        var doctorsById = new LinkedHashMap<Long, Doctor>();
+
+        medicoSetorRepository.findBySetorIdInAndAtivoTrue(setorIds).stream()
+                .map(MedicoSetor::getMedico)
+                .filter(doctor -> doctor != null && doctor.getId() != null)
+                .forEach(doctor -> doctorsById.putIfAbsent(doctor.getId(), doctor));
+
+        doctorRepository.findAll().stream()
+                .filter(doctor -> doctor.getId() != null)
+                .filter(doctor -> doctor.getSetor() != null
+                        && doctor.getSetor().getId() != null
+                        && setorIds.contains(doctor.getSetor().getId()))
+                .forEach(doctor -> doctorsById.putIfAbsent(doctor.getId(), doctor));
+
+        return List.copyOf(doctorsById.values());
+    }
+
+    @Override
+    public List<Doctor> findLinkCandidates(Manager escalistaLogado, Long setorId, String termo) {
+        if (escalistaLogado.getHospital() == null || escalistaLogado.getHospital().getId() == null) {
+            throw new IllegalArgumentException("Escalista sem hospital");
+        }
+
+        Long hospitalId = escalistaLogado.getHospital().getId();
+        String termoNormalizado = termo != null ? termo.trim().toLowerCase() : "";
+
+        return doctorRepository.findAll().stream()
+                .filter(doctor -> doctor.getHospital() == null
+                        || doctor.getHospital().getId() == null
+                        || hospitalId.equals(doctor.getHospital().getId()))
+                .filter(doctor -> setorId == null
+                        || medicoSetorRepository.findByMedicoIdAndSetorIdAndAtivoTrue(doctor.getId(), setorId).isEmpty())
+                .filter(doctor -> matchesTermo(doctor, termoNormalizado))
+                .toList();
     }
 
     @Override
@@ -268,5 +311,19 @@ public class DoctorServiceImple implements DoctorService {
                 .filter(setor -> setor != null && setor.getId() != null && !setor.getId().equals(setorRemovidoId))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private boolean matchesTermo(Doctor doctor, String termo) {
+        if (termo == null || termo.isBlank()) {
+            return true;
+        }
+        return containsIgnoreCase(doctor.getName(), termo)
+                || containsIgnoreCase(doctor.getEmail(), termo)
+                || containsIgnoreCase(doctor.getCpf(), termo)
+                || containsIgnoreCase(doctor.getCrm(), termo);
+    }
+
+    private boolean containsIgnoreCase(String value, String termo) {
+        return value != null && value.toLowerCase().contains(termo);
     }
 }

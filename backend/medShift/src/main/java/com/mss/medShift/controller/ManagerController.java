@@ -19,6 +19,7 @@ import com.mss.medShift.domain.model.Hospital;
 import com.mss.medShift.domain.model.Manager;
 import com.mss.medShift.domain.model.Usuario;
 import com.mss.medShift.controller.dto.EscalistaSetorResponse;
+import com.mss.medShift.controller.dto.ManagerResponse;
 import com.mss.medShift.service.ManagerService;
 import com.mss.medShift.service.auth.AccessScopeService;
 
@@ -34,26 +35,24 @@ public class ManagerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Manager> getManager(@PathVariable Long id,
+    public ResponseEntity<ManagerResponse> getManager(@PathVariable Long id,
             @AuthenticationPrincipal Usuario usuarioLogado) {
-       try {
-            Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
-            var manager = managerService.findById(id, hospitalLogado);
-            return ResponseEntity.ok(manager);
-       } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-       }
+        Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
+        var manager = managerService.findById(id, hospitalLogado);
+        return ResponseEntity.ok(ManagerResponse.from(manager));
     }
 
     @GetMapping
-    public ResponseEntity<List<Manager>> getManagersDoHospitalLogado(@AuthenticationPrincipal Usuario usuarioLogado) {
+    public ResponseEntity<List<ManagerResponse>> getManagersDoHospitalLogado(@AuthenticationPrincipal Usuario usuarioLogado) {
         Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
         var managers = managerService.findByHospitalId(hospitalLogado.getId());
-        return ResponseEntity.ok(managers);
+        return ResponseEntity.ok(managers.stream()
+                .map(ManagerResponse::from)
+                .toList());
     }
 
     @PostMapping
-    public ResponseEntity<Manager> create(@RequestBody Manager managerToCreate,
+    public ResponseEntity<ManagerResponse> create(@RequestBody Manager managerToCreate,
             @AuthenticationPrincipal Usuario usuarioLogado) {
         Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
         var managerCreated = managerService.create(managerToCreate, hospitalLogado);
@@ -62,72 +61,65 @@ public class ManagerController {
                         .buildAndExpand(managerCreated.getId())
                         .toUri();
 
-        return ResponseEntity.created(location).body(managerCreated);
+        return ResponseEntity.created(location).body(ManagerResponse.from(managerCreated));
+    }
+
+    @GetMapping("/me/setores")
+    public ResponseEntity<List<EscalistaSetorResponse>> getMeusSetores(
+            @AuthenticationPrincipal Usuario usuarioLogado) {
+        Manager escalistaLogado = accessScopeService.requireEscalistaProfile(usuarioLogado);
+        if (escalistaLogado.getHospital() == null) {
+            return ResponseEntity.ok(List.of());
+        }
+        var vinculos = managerService.findSetoresVinculados(escalistaLogado.getId(), escalistaLogado.getHospital()).stream()
+                .map(EscalistaSetorResponse::from)
+                .toList();
+        return ResponseEntity.ok(vinculos);
     }
 
     @GetMapping("/{id}/setores")
     public ResponseEntity<List<EscalistaSetorResponse>> getSetoresVinculados(@PathVariable Long id,
             @AuthenticationPrincipal Usuario usuarioLogado) {
-        try {
-            Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
-            var vinculos = managerService.findSetoresVinculados(id, hospitalLogado).stream()
-                    .map(EscalistaSetorResponse::from)
-                    .toList();
-            return ResponseEntity.ok(vinculos);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
+        var vinculos = managerService.findSetoresVinculados(id, hospitalLogado).stream()
+                .map(EscalistaSetorResponse::from)
+                .toList();
+        return ResponseEntity.ok(vinculos);
     }
 
     @PostMapping("/{id}/setores/{setorId}")
     public ResponseEntity<EscalistaSetorResponse> vincularSetor(@PathVariable Long id,
             @PathVariable Long setorId,
             @AuthenticationPrincipal Usuario usuarioLogado) {
-        try {
-            Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
-            var vinculo = managerService.vincularSetor(id, setorId, hospitalLogado, usuarioLogado);
-            return ResponseEntity.ok(EscalistaSetorResponse.from(vinculo));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
+        var vinculo = managerService.vincularSetor(id, setorId, hospitalLogado, usuarioLogado);
+        return ResponseEntity.ok(EscalistaSetorResponse.from(vinculo));
     }
 
     @DeleteMapping("/{id}/setores/{setorId}")
     public ResponseEntity<Void> desvincularSetor(@PathVariable Long id,
             @PathVariable Long setorId,
             @AuthenticationPrincipal Usuario usuarioLogado) {
-        try {
-            Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
-            managerService.desvincularSetor(id, setorId, hospitalLogado);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
+        managerService.desvincularSetor(id, setorId, hospitalLogado);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Manager> update(@PathVariable Long id, @RequestBody Manager manager,
+    public ResponseEntity<ManagerResponse> update(@PathVariable Long id, @RequestBody Manager manager,
             @AuthenticationPrincipal Usuario usuarioLogado) {
-        try {
-            Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
-            managerService.findById(id, hospitalLogado);
-            if (manager.getSetor() != null && manager.getSetor().getId() != null) {
-                manager.setSetor(accessScopeService.requireSetorOfAuthenticatedHospital(usuarioLogado, manager.getSetor().getId()));
-            }
-            var managerAtualizado = managerService.update(id, manager);
-            return ResponseEntity.ok(managerAtualizado);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+        Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
+        managerService.findById(id, hospitalLogado);
+        if (manager.getSetor() != null && manager.getSetor().getId() != null) {
+            manager.setSetor(accessScopeService.requireSetorOfAuthenticatedHospital(usuarioLogado, manager.getSetor().getId()));
         }
+        var managerAtualizado = managerService.update(id, manager);
+        return ResponseEntity.ok(ManagerResponse.from(managerAtualizado));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        try {
-            managerService.delete(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        managerService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

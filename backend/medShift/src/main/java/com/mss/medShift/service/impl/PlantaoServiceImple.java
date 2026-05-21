@@ -1,5 +1,6 @@
 package com.mss.medShift.service.impl;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -11,12 +12,14 @@ import com.mss.medShift.domain.model.Manager;
 import com.mss.medShift.domain.model.Plantao;
 import com.mss.medShift.domain.model.PlantaoStatus;
 import com.mss.medShift.domain.model.PlantaoTipo;
+import com.mss.medShift.domain.model.PlantaoTurno;
 import com.mss.medShift.domain.model.Setor;
 import com.mss.medShift.domain.repository.DoctorRepository;
 import com.mss.medShift.domain.repository.MedicoSetorRepository;
 import com.mss.medShift.domain.repository.PlantaoRepository;
 import com.mss.medShift.domain.repository.SetorRepository;
 import com.mss.medShift.service.PlantaoService;
+import com.mss.medShift.service.exception.ConflictException;
 
 @Service
 public class PlantaoServiceImple implements PlantaoService {
@@ -50,14 +53,18 @@ public class PlantaoServiceImple implements PlantaoService {
         return createAvulso(
                 plantao.getSetor().getId(),
                 medicoId,
+                null,
+                plantao.getTurno(),
                 plantao.getDataInicio(),
                 plantao.getDataFim(),
                 plantao.getCriadoPorEscalista());
     }
 
     @Override
-    public Plantao createAvulso(Long setorId, Long medicoId, LocalDateTime dataInicio, LocalDateTime dataFim, Manager escalista) {
-        validateCreateAvulsoRequest(setorId, medicoId, dataInicio, dataFim, escalista);
+    public Plantao createAvulso(Long setorId, Long medicoId, LocalDate data, PlantaoTurno turno,
+            LocalDateTime dataInicio, LocalDateTime dataFim, Manager escalista) {
+        PlantaoPeriodo periodo = resolvePeriodo(data, turno, dataInicio, dataFim);
+        validateCreateAvulsoRequest(setorId, medicoId, periodo.dataInicio(), periodo.dataFim(), escalista);
 
         Setor setor = setorRepository.findByIdAndHospitalId(setorId, escalista.getHospital().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Setor não encontrado para o hospital do escalista"));
@@ -71,8 +78,8 @@ public class PlantaoServiceImple implements PlantaoService {
             throw new IllegalArgumentException("Médico não possui vínculo ativo com o setor informado");
         }
 
-        if (hasConflitoHorario(medico.getId(), dataInicio, dataFim)) {
-            throw new IllegalArgumentException("Médico já possui plantão conflitante no período informado");
+        if (hasConflitoHorario(medico.getId(), periodo.dataInicio(), periodo.dataFim())) {
+            throw new ConflictException("Médico já possui plantão conflitante no período informado");
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -83,9 +90,10 @@ public class PlantaoServiceImple implements PlantaoService {
         plantao.setMedicoResponsavelAtual(medico);
         plantao.setCriadoPorEscalista(escalista);
         plantao.setTipo(PlantaoTipo.AVULSO);
+        plantao.setTurno(resolveTurno(turno, periodo.dataInicio(), periodo.dataFim()));
         plantao.setStatus(PlantaoStatus.AGENDADO);
-        plantao.setDataInicio(dataInicio);
-        plantao.setDataFim(dataFim);
+        plantao.setDataInicio(periodo.dataInicio());
+        plantao.setDataFim(periodo.dataFim());
         plantao.setCriadoEm(now);
         plantao.setAtualizadoEm(now);
 
@@ -185,6 +193,9 @@ public class PlantaoServiceImple implements PlantaoService {
         if (updatedPlantao.getTipo() != null) {
             plantao.setTipo(updatedPlantao.getTipo());
         }
+        if (updatedPlantao.getTurno() != null) {
+            plantao.setTurno(updatedPlantao.getTurno());
+        }
         if (updatedPlantao.getDataInicio() != null) {
             plantao.setDataInicio(updatedPlantao.getDataInicio());
         }
@@ -194,6 +205,11 @@ public class PlantaoServiceImple implements PlantaoService {
         if (updatedPlantao.getStatus() != null) {
             plantao.setStatus(updatedPlantao.getStatus());
         }
+        if (updatedPlantao.getTurno() == null
+                && (updatedPlantao.getDataInicio() != null || updatedPlantao.getDataFim() != null)) {
+            plantao.setTurno(PlantaoTurno.fromPeriodo(plantao.getDataInicio(), plantao.getDataFim()));
+        }
+        plantao.setAtualizadoEm(LocalDateTime.now());
 
         return plantaoRepository.save(plantao);
     }
@@ -229,6 +245,24 @@ public class PlantaoServiceImple implements PlantaoService {
         }
     }
 
+    private PlantaoPeriodo resolvePeriodo(LocalDate data, PlantaoTurno turno, LocalDateTime dataInicio,
+            LocalDateTime dataFim) {
+        if (turno == PlantaoTurno.DIURNO || turno == PlantaoTurno.NOTURNO) {
+            if (data == null) {
+                throw new IllegalArgumentException("Data é obrigatória para plantão diurno ou noturno");
+            }
+            return new PlantaoPeriodo(turno.dataInicio(data), turno.dataFim(data));
+        }
+        return new PlantaoPeriodo(dataInicio, dataFim);
+    }
+
+    private PlantaoTurno resolveTurno(PlantaoTurno turno, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        if (turno != null) {
+            return turno;
+        }
+        return PlantaoTurno.fromPeriodo(dataInicio, dataFim);
+    }
+
     private Long resolveMedicoId(Plantao plantao) {
         if (plantao.getMedicoTitular() != null && plantao.getMedicoTitular().getId() != null) {
             return plantao.getMedicoTitular().getId();
@@ -245,5 +279,8 @@ public class PlantaoServiceImple implements PlantaoService {
                 PlantaoStatus.CANCELADO,
                 dataFim,
                 dataInicio);
+    }
+
+    private record PlantaoPeriodo(LocalDateTime dataInicio, LocalDateTime dataFim) {
     }
 }

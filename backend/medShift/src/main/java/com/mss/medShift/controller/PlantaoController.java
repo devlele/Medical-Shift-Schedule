@@ -38,86 +38,68 @@ public class PlantaoController {
     @PostMapping("/avulso")
     public ResponseEntity<PlantaoSummaryResponse> createAvulso(@RequestBody PlantaoAvulsoRequest request,
             @AuthenticationPrincipal Usuario usuarioLogado) {
-        try {
-            Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, request.setorId());
-            var plantaoCriado = plantaoService.createAvulso(
-                    request.setorId(),
-                    request.medicoId(),
-                    request.dataInicio(),
-                    request.dataFim(),
-                    escalista);
+        Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, request.setorId());
+        var plantaoCriado = plantaoService.createAvulso(
+                request.setorId(),
+                request.medicoId(),
+                request.data(),
+                request.turno(),
+                request.dataInicio(),
+                request.dataFim(),
+                escalista);
 
-            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(plantaoCriado.getId())
-                    .toUri();
-            return ResponseEntity.created(location).body(PlantaoSummaryResponse.from(plantaoCriado));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(plantaoCriado.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(PlantaoSummaryResponse.from(plantaoCriado));
     }
 
     @PostMapping
-    public ResponseEntity<Plantao> create(@RequestBody Plantao plantao, @AuthenticationPrincipal Usuario usuarioLogado) {
-        try {
-            if (plantao.getSetor() == null || plantao.getSetor().getId() == null) {
-                throw new IllegalArgumentException("Setor is required");
-            }
-            Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, plantao.getSetor().getId());
-            plantao.setCriadoPorEscalista(escalista);
-            plantao.setHospital(escalista.getHospital());
-
-            var plantaoCriado = plantaoService.create(plantao);
-            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(plantaoCriado.getId())
-                    .toUri();
-            return ResponseEntity.created(location).body(plantaoCriado);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<PlantaoSummaryResponse> create(@RequestBody Plantao plantao, @AuthenticationPrincipal Usuario usuarioLogado) {
+        if (plantao.getSetor() == null || plantao.getSetor().getId() == null) {
+            throw new IllegalArgumentException("Setor is required");
         }
+        Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, plantao.getSetor().getId());
+        plantao.setCriadoPorEscalista(escalista);
+        plantao.setHospital(escalista.getHospital());
+
+        var plantaoCriado = plantaoService.create(plantao);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(plantaoCriado.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(PlantaoSummaryResponse.from(plantaoCriado));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Plantao> getPlantao(@PathVariable Long id, @AuthenticationPrincipal Usuario user) {
-        try {
-            var plantao = findPlantaoForUser(id, user);
-            return ResponseEntity.ok(plantao);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<PlantaoSummaryResponse> getPlantao(@PathVariable Long id, @AuthenticationPrincipal Usuario user) {
+        var plantao = findPlantaoForUser(id, user);
+        return ResponseEntity.ok(PlantaoSummaryResponse.from(plantao));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Plantao> update(@PathVariable Long id, @RequestBody Plantao plantao,
+    public ResponseEntity<PlantaoSummaryResponse> update(@PathVariable Long id, @RequestBody Plantao plantao,
             @AuthenticationPrincipal Usuario usuarioLogado) {
-        try {
-            Plantao plantaoAtual = plantaoService.findById(id);
-            if (plantaoAtual.getSetor() == null || plantaoAtual.getSetor().getId() == null) {
-                throw new IllegalArgumentException("Plantão sem setor");
-            }
-            accessScopeService.requireEscalistaCanAccessSetor(usuarioLogado, plantaoAtual.getSetor().getId());
-            if (plantao.getSetor() != null && plantao.getSetor().getId() != null) {
-                Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, plantao.getSetor().getId());
-                plantao.setHospital(escalista.getHospital());
-                plantao.setCriadoPorEscalista(escalista);
-            }
-
-            var plantaoAtualizado = plantaoService.update(id, plantao);
-            return ResponseEntity.ok(plantaoAtualizado);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+        Plantao plantaoAtual = plantaoService.findById(id);
+        if (plantaoAtual.getSetor() == null || plantaoAtual.getSetor().getId() == null) {
+            throw new IllegalArgumentException("Plantão sem setor");
         }
+        accessScopeService.requireEscalistaCanAccessSetor(usuarioLogado, plantaoAtual.getSetor().getId());
+        if (plantao.getSetor() != null && plantao.getSetor().getId() != null) {
+            Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, plantao.getSetor().getId());
+            plantao.setHospital(escalista.getHospital());
+            plantao.setCriadoPorEscalista(escalista);
+        }
+
+        var plantaoAtualizado = plantaoService.update(id, plantao);
+        return ResponseEntity.ok(PlantaoSummaryResponse.from(plantaoAtualizado));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        try {
-            plantaoService.delete(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        plantaoService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     private Plantao findPlantaoForUser(Long id, Usuario user) {

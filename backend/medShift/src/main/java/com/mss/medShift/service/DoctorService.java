@@ -14,6 +14,8 @@ public interface DoctorService {
     List<Doctor> findAll();
     List<Doctor> findByHospitalId(Long hospitalId);
     List<Doctor> findByHospitalIdAndSetorId(Long hospitalId, Long setorId);
+    List<Doctor> findBySetorIds(List<Long> setorIds);
+    List<Doctor> findLinkCandidates(Manager escalistaLogado, Long setorId, String termo);
     Doctor create(Doctor doctorToCreate);
     List<MedicoSetor> findSetoresVinculados(Long doctorId, Manager escalistaLogado, List<Long> setorIdsPermitidos);
     MedicoSetor vincularSetor(Long doctorId, Long setorId, Manager escalistaLogado);

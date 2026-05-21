@@ -1,0 +1,39 @@
+**Veredito:** o backend comporta o **MVP principal**, mas **não comporta 100% as telas do Figma do jeito que estão**. Dá para integrar muita coisa agora, mas algumas telas precisam ser simplificadas no front ou exigem novos endpoints/campos.
+
+**Funciona Bem Hoje**
+- Login único: `POST /auth/login`.
+- Cadastro público de hospital: `POST /hospital`.
+- Cadastro público de médico: `POST /doctor/register`.
+- Hospital cria setores e escalistas.
+- Hospital vincula escalistas a setores.
+- Escalista busca médicos candidatos e vincula ao setor.
+- Escalista cria plantão avulso com turno diurno/noturno.
+- Médico vê agenda.
+- Médico oferta plantão para cobertura.
+- Médico do mesmo setor vê e assume cobertura.
+- Solicitante recebe notificação.
+
+**Parcialmente Compatível**
+- Painel hospitalar: o backend tem dados separados, mas não entrega diretamente cards como “colaboradores”, “escalistas disponíveis” e “setores ativos” em um único endpoint.
+- Gestão de setores: falta retornar `quantidadeMedicos`, `coordenador/responsavelTecnico` e equipe do setor numa resposta pronta.
+- Editar equipe do setor: o backend vincula/desvincula escalistas e médicos, mas falta um endpoint mais direto tipo `GET /setor/{id}/equipe`.
+- Lista de profissionais: existe listagem, mas filtros/paginação do Figma ainda não estão completos no backend.
+- Histórico de plantões: pode ser derivado de `GET /agenda/me` com filtros, mas não existe endpoint específico de histórico paginado com status visual completo.
+- Plantões ofertados: o fluxo existe, mas faltam campos ricos do Figma como urgência, descrição, bloco/andar/mapa/local detalhado.
+
+**Não Compatível Ainda**
+- Recuperação de senha.
+- Cadastro de hospital como “solicitação em análise pelo administrador”. Hoje o hospital é criado diretamente.
+- Plantão fixo/recorrente, como “toda semana” ou “todo mês”.
+- Plantão com número de vagas/múltiplos médicos.
+- Tela de resolução de conflitos com opções “manter” e “repassar”. Hoje o backend tenta impedir conflito, não gerenciar conflito visualmente depois.
+- Supervisão/aprovação de delegações pelo escalista. O backend atual cobre pedido de cobertura entre médicos, não um fluxo de aprovação pelo escalista.
+- Upload/logo institucional completo para hospital.
+
+Minha leitura de engenheiro: para MVP, o backend está bem encaminhado. Para o Figma completo, eu priorizaria antes da integração final:
+
+1. Criar `GET /setor/{id}/equipe` com setor, escalistas, médicos, contagens e responsável técnico.
+2. Ajustar dashboard do hospital/escalista para entregar os cards das telas.
+3. Decidir se “Cadastrar Profissional” cria médico pelo hospital/escalista ou se o médico continua se cadastrando publicamente.
+4. Esconder no front, por enquanto, recuperação de senha, recorrência, vagas e resolução de conflitos.
+5. Depois implementar plantão recorrente e capacidade por plantão, se isso entrar no escopo real do produto.

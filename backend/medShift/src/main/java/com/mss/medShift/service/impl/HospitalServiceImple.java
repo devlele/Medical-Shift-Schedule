@@ -2,6 +2,7 @@ package com.mss.medShift.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import com.mss.medShift.domain.model.Usuario;
 import com.mss.medShift.domain.repository.HospitalRepository;
 import com.mss.medShift.domain.repository.UsuarioRepository;
 import com.mss.medShift.service.HospitalService;
+import com.mss.medShift.service.exception.ConflictException;
 
 @Service
 public class HospitalServiceImple implements HospitalService {
@@ -30,14 +32,14 @@ public class HospitalServiceImple implements HospitalService {
     @Override
     public Hospital create(Hospital hospital) {
         if (hospitalRepository.existsByCnpj(hospital.getCnpj())) {
-            throw new RuntimeException("CNPJ já cadastrado");
+            throw new ConflictException("CNPJ já cadastrado");
         }
         String email = hospital.getEmail();
         if (email == null || email.isBlank()) {
             throw new IllegalArgumentException("Email é obrigatório");
         }
         if (usuarioRepository.existsByEmail(email) || hospitalRepository.existsByEmail(email)) {
-            throw new RuntimeException("Email já cadastrado");
+            throw new ConflictException("Email já cadastrado");
         }
 
         String rawPassword = hospital.getPassword();
@@ -68,13 +70,13 @@ public class HospitalServiceImple implements HospitalService {
     @Override
     public Hospital findById(Long id) {
         return hospitalRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Hospital não encontrado"));
+                .orElseThrow(() -> new NoSuchElementException("Hospital não encontrado"));
     }
 
     @Override
     public Hospital findByUsuarioId(Long usuarioId) {
         return hospitalRepository.findByUsuarioId(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Hospital não encontrado para este usuário"));
+                .orElseThrow(() -> new NoSuchElementException("Hospital não encontrado para este usuário"));
     }
 
     @Override
@@ -118,12 +120,12 @@ public class HospitalServiceImple implements HospitalService {
     @Override
     public Hospital findByCnpj(String cnpj) {
         return hospitalRepository.findByCnpj(cnpj)
-                .orElseThrow(() -> new RuntimeException("Hospital não encontrado com este CNPJ"));
+                .orElseThrow(() -> new NoSuchElementException("Hospital não encontrado com este CNPJ"));
     }
 
     @Override
     public Hospital findByEmail(String email) {
         return hospitalRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Hospital não encontrado com este email"));
+                .orElseThrow(() -> new NoSuchElementException("Hospital não encontrado com este email"));
     }
 }

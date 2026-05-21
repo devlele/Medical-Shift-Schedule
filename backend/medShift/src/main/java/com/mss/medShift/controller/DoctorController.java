@@ -27,7 +27,9 @@ import com.mss.medShift.domain.model.Hospital;
 import com.mss.medShift.domain.model.Manager;
 import com.mss.medShift.domain.model.Plantao;
 import com.mss.medShift.domain.model.Usuario;
+import com.mss.medShift.controller.dto.DoctorLookupResponse;
 import com.mss.medShift.controller.dto.DoctorProfileResponse;
+import com.mss.medShift.controller.dto.DoctorResponse;
 import com.mss.medShift.controller.dto.MedicoSetorResponse;
 import com.mss.medShift.controller.dto.PlantaoSummaryResponse;
 import com.mss.medShift.service.DoctorService;
@@ -49,29 +51,37 @@ public class DoctorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Doctor>> getAllDoctors(@AuthenticationPrincipal Usuario user) {
-        try {
-            var doctors = findDoctorsForUser(user);
-            return ResponseEntity.ok(doctors);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<List<DoctorResponse>> getAllDoctors(@AuthenticationPrincipal Usuario user) {
+        var doctors = findDoctorsForUser(user);
+        return ResponseEntity.ok(doctors.stream()
+                .map(DoctorResponse::from)
+                .toList());
+    }
+
+    @GetMapping("/link-candidates")
+    public ResponseEntity<List<DoctorLookupResponse>> getLinkCandidates(
+            @AuthenticationPrincipal Usuario usuarioLogado,
+            @RequestParam(required = false) Long setorId,
+            @RequestParam(required = false) String termo) {
+        Manager escalista = setorId != null
+                ? accessScopeService.requireEscalistaInSetor(usuarioLogado, setorId)
+                : accessScopeService.requireEscalistaProfile(usuarioLogado);
+        var candidates = doctorService.findLinkCandidates(escalista, setorId, termo).stream()
+                .map(DoctorLookupResponse::from)
+                .toList();
+        return ResponseEntity.ok(candidates);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Doctor> getDoctor(@PathVariable Long id, @AuthenticationPrincipal Usuario user) {
-       try {
-            var doctor = findDoctorForUser(id, user);
-            return ResponseEntity.ok(doctor);
-       } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-       }
+    public ResponseEntity<DoctorResponse> getDoctor(@PathVariable Long id, @AuthenticationPrincipal Usuario user) {
+        var doctor = findDoctorForUser(id, user);
+        return ResponseEntity.ok(DoctorResponse.from(doctor));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Doctor> getMyProfile(@AuthenticationPrincipal Usuario usuarioLogado) {
+    public ResponseEntity<DoctorResponse> getMyProfile(@AuthenticationPrincipal Usuario usuarioLogado) {
         Doctor doctorLogado = accessScopeService.requireMedicoProfile(usuarioLogado);
-        return ResponseEntity.ok(doctorLogado);
+        return ResponseEntity.ok(DoctorResponse.from(doctorLogado));
     }
 
     @GetMapping("/me/profile")
@@ -90,19 +100,15 @@ public class DoctorController {
     public ResponseEntity<DoctorProfileResponse> updateMyCompleteProfile(
             @AuthenticationPrincipal Usuario usuarioLogado,
             @RequestBody Doctor doctor) {
-        try {
-            Doctor doctorLogado = accessScopeService.requireMedicoProfile(usuarioLogado);
-            var doctorAtualizado = doctorService.update(doctorLogado.getId(), doctor);
-            List<PlantaoSummaryResponse> historico = plantaoService.findByDoctorId(doctorAtualizado.getId()).stream()
-                    .sorted(Comparator.comparing(Plantao::getDataInicio, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
-                    .limit(5)
-                    .map(PlantaoSummaryResponse::from)
-                    .toList();
+        Doctor doctorLogado = accessScopeService.requireMedicoProfile(usuarioLogado);
+        var doctorAtualizado = doctorService.update(doctorLogado.getId(), doctor);
+        List<PlantaoSummaryResponse> historico = plantaoService.findByDoctorId(doctorAtualizado.getId()).stream()
+                .sorted(Comparator.comparing(Plantao::getDataInicio, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .limit(5)
+                .map(PlantaoSummaryResponse::from)
+                .toList();
 
-            return ResponseEntity.ok(DoctorProfileResponse.from(doctorAtualizado, historico));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(DoctorProfileResponse.from(doctorAtualizado, historico));
     }
 
     @PostMapping("/me/profile-photo")
@@ -135,7 +141,7 @@ public class DoctorController {
 
             return ResponseEntity.ok(DoctorProfileResponse.from(doctorAtualizado, historico));
         } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
+            throw new IllegalArgumentException("Falha ao salvar foto de perfil");
         }
     }
 
@@ -152,75 +158,55 @@ public class DoctorController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Doctor> create(@RequestBody Doctor doctorToCreate) {
+    public ResponseEntity<DoctorResponse> create(@RequestBody Doctor doctorToCreate) {
         var doctorCreated = doctorService.create(doctorToCreate);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                         .path("/{id}")
                         .buildAndExpand(doctorToCreate.getId())
                         .toUri();
 
-        return ResponseEntity.created(location).body(doctorCreated);
+        return ResponseEntity.created(location).body(DoctorResponse.from(doctorCreated));
     }
 
     @GetMapping("/{id}/setores")
     public ResponseEntity<List<MedicoSetorResponse>> getSetoresVinculados(@PathVariable Long id,
             @AuthenticationPrincipal Usuario usuarioLogado) {
-        try {
-            Manager escalistaLogado = accessScopeService.requireEscalistaProfile(usuarioLogado);
-            var setorIdsPermitidos = accessScopeService.resolveEscalistaSetorIds(usuarioLogado);
-            var vinculos = doctorService.findSetoresVinculados(id, escalistaLogado, setorIdsPermitidos).stream()
-                    .map(MedicoSetorResponse::from)
-                    .toList();
-            return ResponseEntity.ok(vinculos);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        Manager escalistaLogado = accessScopeService.requireEscalistaProfile(usuarioLogado);
+        var setorIdsPermitidos = accessScopeService.resolveEscalistaSetorIds(usuarioLogado);
+        var vinculos = doctorService.findSetoresVinculados(id, escalistaLogado, setorIdsPermitidos).stream()
+                .map(MedicoSetorResponse::from)
+                .toList();
+        return ResponseEntity.ok(vinculos);
     }
 
     @PostMapping("/{id}/setores/{setorId}")
     public ResponseEntity<MedicoSetorResponse> vincularSetor(@PathVariable Long id,
             @PathVariable Long setorId,
             @AuthenticationPrincipal Usuario usuarioLogado) {
-        try {
-            Manager escalistaLogado = accessScopeService.requireEscalistaInSetor(usuarioLogado, setorId);
-            var vinculo = doctorService.vincularSetor(id, setorId, escalistaLogado);
-            return ResponseEntity.ok(MedicoSetorResponse.from(vinculo));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        Manager escalistaLogado = accessScopeService.requireEscalistaInSetor(usuarioLogado, setorId);
+        var vinculo = doctorService.vincularSetor(id, setorId, escalistaLogado);
+        return ResponseEntity.ok(MedicoSetorResponse.from(vinculo));
     }
 
     @DeleteMapping("/{id}/setores/{setorId}")
     public ResponseEntity<Void> desvincularSetor(@PathVariable Long id,
             @PathVariable Long setorId,
             @AuthenticationPrincipal Usuario usuarioLogado) {
-        try {
-            Manager escalistaLogado = accessScopeService.requireEscalistaInSetor(usuarioLogado, setorId);
-            doctorService.desvincularSetor(id, setorId, escalistaLogado);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        Manager escalistaLogado = accessScopeService.requireEscalistaInSetor(usuarioLogado, setorId);
+        doctorService.desvincularSetor(id, setorId, escalistaLogado);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Doctor> update(@PathVariable Long id, @RequestBody Doctor doctor) {
-        try {
-            var doctorAtualizado = doctorService.update(id, doctor);
-            return ResponseEntity.ok(doctorAtualizado);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<DoctorResponse> update(@PathVariable Long id, @RequestBody Doctor doctor) {
+        var doctorAtualizado = doctorService.update(id, doctor);
+        return ResponseEntity.ok(DoctorResponse.from(doctorAtualizado));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        try {
-            doctorService.delete(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        doctorService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     private List<Doctor> findDoctorsForUser(Usuario user) {
@@ -233,9 +219,7 @@ public class DoctorController {
             if (manager.getHospital() == null) {
                 return List.of();
             }
-            return accessScopeService.resolveEscalistaSetorIds(user).stream()
-                    .flatMap(setorId -> doctorService.findByHospitalIdAndSetorId(manager.getHospital().getId(), setorId).stream())
-                    .toList();
+            return doctorService.findBySetorIds(accessScopeService.resolveEscalistaSetorIds(user));
         }
         return doctorService.findAll();
     }

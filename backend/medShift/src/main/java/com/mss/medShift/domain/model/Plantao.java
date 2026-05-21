@@ -44,6 +44,9 @@ public class Plantao {
     @Enumerated(EnumType.STRING)
     private PlantaoTipo tipo;
 
+    @Enumerated(EnumType.STRING)
+    private PlantaoTurno turno;
+
     private LocalDateTime dataInicio;
     private LocalDateTime dataFim;
 
@@ -73,6 +76,7 @@ public class Plantao {
         this.dataFim = dataFim;
         this.status = PlantaoStatus.AGENDADO;
         this.tipo = PlantaoTipo.AVULSO;
+        this.turno = PlantaoTurno.fromPeriodo(dataInicio, dataFim);
     }
 
     public Long getId() {
@@ -143,6 +147,14 @@ public class Plantao {
 
     public void setTipo(PlantaoTipo tipo) {
         this.tipo = tipo;
+    }
+
+    public PlantaoTurno getTurno() {
+        return turno;
+    }
+
+    public void setTurno(PlantaoTurno turno) {
+        this.turno = turno;
     }
 
     public LocalDateTime getDataInicio() {

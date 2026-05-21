@@ -1,0 +1,1 @@
+ALTER TABLE tb_plantao ADD COLUMN turno VARCHAR(50);

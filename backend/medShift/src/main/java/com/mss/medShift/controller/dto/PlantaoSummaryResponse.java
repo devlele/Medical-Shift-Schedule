@@ -6,10 +6,12 @@ import java.time.LocalDateTime;
 
 import com.mss.medShift.domain.model.Plantao;
 import com.mss.medShift.domain.model.PlantaoStatus;
+import com.mss.medShift.domain.model.PlantaoTurno;
 
 public record PlantaoSummaryResponse(
         Long id,
         String type,
+        PlantaoTurno turno,
         String setor,
         Long setorId,
         String hospital,
@@ -29,6 +31,7 @@ public record PlantaoSummaryResponse(
         var hospital = setor != null ? setor.getHospital() : null;
         var doctor = plantao.getMedicoResponsavelAtual();
         Long duracaoHoras = null;
+        PlantaoTurno turno = resolveTurno(plantao);
 
         if (plantao.getDataInicio() != null && plantao.getDataFim() != null) {
             duracaoHoras = Duration.between(plantao.getDataInicio(), plantao.getDataFim()).toHours();
@@ -36,7 +39,8 @@ public record PlantaoSummaryResponse(
 
         return new PlantaoSummaryResponse(
                 plantao.getId(),
-                resolveType(plantao.getDataInicio()),
+                resolveType(turno),
+                turno,
                 setor != null ? setor.getNome() : null,
                 setor != null ? setor.getId() : null,
                 hospital != null ? hospital.getNomeFantasia() : null,
@@ -52,12 +56,22 @@ public record PlantaoSummaryResponse(
                 plantao.getStatus());
     }
 
-    private static String resolveType(LocalDateTime dataInicio) {
-        if (dataInicio == null) {
+    private static PlantaoTurno resolveTurno(Plantao plantao) {
+        if (plantao.getTurno() != null) {
+            return plantao.getTurno();
+        }
+        return PlantaoTurno.fromPeriodo(plantao.getDataInicio(), plantao.getDataFim());
+    }
+
+    private static String resolveType(PlantaoTurno turno) {
+        if (turno == null) {
             return null;
         }
-        int hour = dataInicio.getHour();
-        return hour >= 6 && hour < 18 ? "dia" : "noite";
+        return switch (turno) {
+            case DIURNO -> "dia";
+            case NOTURNO -> "noite";
+            case PERSONALIZADO -> "personalizado";
+        };
     }
 
     private static String formatTime(LocalDateTime dataInicio, LocalDateTime dataFim, Long duracaoHoras) {
