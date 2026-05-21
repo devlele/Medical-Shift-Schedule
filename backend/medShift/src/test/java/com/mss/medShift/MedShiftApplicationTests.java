@@ -230,6 +230,53 @@ class MedShiftApplicationTests {
                 .doesNotContain(setorId);
     }
 
+    @Test
+    @Order(8)
+    void escalistaCriaPlantaoAvulsoApenasParaMedicoDoSetorSemConflito() {
+        var hospitalEmail = "hospital-plantao-avulso@example.com";
+        var hospitalPassword = "senha123";
+
+        createHospital(hospitalEmail, hospitalPassword);
+        var hospitalToken = loginAndGetToken(hospitalEmail, hospitalPassword);
+
+        var setorId = createSetor(hospitalToken, "Pronto Atendimento", "Setor de Pronto Atendimento");
+        createManager(hospitalToken, setorId, "Marcela Escalista", "09876543215",
+                "marcela.manager@example.com", "senha456", "Escalas");
+        var escalistaToken = loginAndGetToken("marcela.manager@example.com", "senha456");
+
+        var doctorId = createDoctor("doctor-plantao-avulso@example.com", "senha123", "Renata Costa",
+                "12345678902", "1992-03-04", "Pronto Atendimento", "67890");
+        var doctorSemVinculoId = createDoctor("doctor-sem-vinculo@example.com", "senha123", "Rafael Lima",
+                "12345678903", "1993-04-05", "Pronto Atendimento", "67891");
+
+        vincularDoctorSetor(escalistaToken, doctorId, setorId);
+
+        var plantaoCriado = createPlantaoAvulso(
+                escalistaToken,
+                setorId,
+                doctorId,
+                "2026-05-15T07:00:00",
+                "2026-05-15T19:00:00");
+
+        assertThat(plantaoCriado).containsEntry("status", "AGENDADO");
+        assertThat(plantaoCriado).containsEntry("setorId", setorId.intValue());
+        assertThat(plantaoCriado).containsEntry("doctorId", doctorId.intValue());
+
+        createPlantaoAvulsoExpectBadRequest(
+                escalistaToken,
+                setorId,
+                doctorId,
+                "2026-05-15T13:00:00",
+                "2026-05-15T20:00:00");
+
+        createPlantaoAvulsoExpectBadRequest(
+                escalistaToken,
+                setorId,
+                doctorSemVinculoId,
+                "2026-05-16T07:00:00",
+                "2026-05-16T19:00:00");
+    }
+
     private Long createHospital(String email, String password) {
         String cnpjSuffix = String.format("%04d", Math.abs(email.hashCode()) % 10000);
         var hospitalRequest = Map.of(
@@ -386,6 +433,52 @@ class MedShiftApplicationTests {
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    private Map<String, Object> createPlantaoAvulso(String token, Long setorId, Long doctorId,
+            String dataInicio, String dataFim) {
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        var request = Map.of(
+                "setorId", setorId,
+                "medicoId", doctorId,
+                "dataInicio", dataInicio,
+                "dataFim", dataFim
+        );
+
+        ResponseEntity<Map> response = restTemplate.exchange(
+                "/plantao/avulso",
+                HttpMethod.POST,
+                new HttpEntity<>(request, headers),
+                Map.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isNotNull();
+        return response.getBody();
+    }
+
+    private void createPlantaoAvulsoExpectBadRequest(String token, Long setorId, Long doctorId,
+            String dataInicio, String dataFim) {
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        var request = Map.of(
+                "setorId", setorId,
+                "medicoId", doctorId,
+                "dataInicio", dataInicio,
+                "dataFim", dataFim
+        );
+
+        ResponseEntity<Map> response = restTemplate.exchange(
+                "/plantao/avulso",
+                HttpMethod.POST,
+                new HttpEntity<>(request, headers),
+                Map.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     private Long createDoctor(String email, String password, String name, String cpf, String birthday, String specialty, String crm) {

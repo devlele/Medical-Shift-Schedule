@@ -6,49 +6,89 @@ import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 
+import com.mss.medShift.domain.model.Doctor;
+import com.mss.medShift.domain.model.Manager;
 import com.mss.medShift.domain.model.Plantao;
 import com.mss.medShift.domain.model.PlantaoStatus;
 import com.mss.medShift.domain.model.PlantaoTipo;
+import com.mss.medShift.domain.model.Setor;
+import com.mss.medShift.domain.repository.DoctorRepository;
+import com.mss.medShift.domain.repository.MedicoSetorRepository;
 import com.mss.medShift.domain.repository.PlantaoRepository;
+import com.mss.medShift.domain.repository.SetorRepository;
 import com.mss.medShift.service.PlantaoService;
 
 @Service
 public class PlantaoServiceImple implements PlantaoService {
 
     private final PlantaoRepository plantaoRepository;
+    private final SetorRepository setorRepository;
+    private final DoctorRepository doctorRepository;
+    private final MedicoSetorRepository medicoSetorRepository;
 
-    public PlantaoServiceImple(PlantaoRepository plantaoRepository) {
+    public PlantaoServiceImple(PlantaoRepository plantaoRepository, SetorRepository setorRepository,
+            DoctorRepository doctorRepository, MedicoSetorRepository medicoSetorRepository) {
         this.plantaoRepository = plantaoRepository;
+        this.setorRepository = setorRepository;
+        this.doctorRepository = doctorRepository;
+        this.medicoSetorRepository = medicoSetorRepository;
     }
 
     @Override
     public Plantao create(Plantao plantao) {
-        if (plantao.getSetor() == null) {
+        if (plantao.getSetor() == null || plantao.getSetor().getId() == null) {
             throw new IllegalArgumentException("Setor is required");
         }
         if (plantao.getMedicoTitular() == null && plantao.getMedicoResponsavelAtual() == null) {
             throw new IllegalArgumentException("Doctor is required");
         }
-        if (plantao.getDataInicio() == null || plantao.getDataFim() == null) {
-            throw new IllegalArgumentException("Start and end dates are required");
-        }
-        if (!plantao.getDataInicio().isBefore(plantao.getDataFim())) {
-            throw new IllegalArgumentException("Start date must be before end date");
+        if (plantao.getCriadoPorEscalista() == null) {
+            throw new IllegalArgumentException("Escalista criador is required");
         }
 
-        if (plantao.getHospital() == null && plantao.getSetor() != null) {
-            plantao.setHospital(plantao.getSetor().getHospital());
+        Long medicoId = resolveMedicoId(plantao);
+        return createAvulso(
+                plantao.getSetor().getId(),
+                medicoId,
+                plantao.getDataInicio(),
+                plantao.getDataFim(),
+                plantao.getCriadoPorEscalista());
+    }
+
+    @Override
+    public Plantao createAvulso(Long setorId, Long medicoId, LocalDateTime dataInicio, LocalDateTime dataFim, Manager escalista) {
+        validateCreateAvulsoRequest(setorId, medicoId, dataInicio, dataFim, escalista);
+
+        Setor setor = setorRepository.findByIdAndHospitalId(setorId, escalista.getHospital().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Setor não encontrado para o hospital do escalista"));
+        Doctor medico = doctorRepository.findById(medicoId)
+                .orElseThrow(() -> new IllegalArgumentException("Médico não encontrado"));
+
+        boolean medicoAtuaNoSetor = medicoSetorRepository
+                .findByMedicoIdAndSetorIdAndAtivoTrue(medico.getId(), setor.getId())
+                .isPresent();
+        if (!medicoAtuaNoSetor) {
+            throw new IllegalArgumentException("Médico não possui vínculo ativo com o setor informado");
         }
-        if (plantao.getMedicoTitular() == null) {
-            plantao.setMedicoTitular(plantao.getMedicoResponsavelAtual());
+
+        if (hasConflitoHorario(medico.getId(), dataInicio, dataFim)) {
+            throw new IllegalArgumentException("Médico já possui plantão conflitante no período informado");
         }
-        if (plantao.getMedicoResponsavelAtual() == null) {
-            plantao.setMedicoResponsavelAtual(plantao.getMedicoTitular());
-        }
-        if (plantao.getTipo() == null) {
-            plantao.setTipo(plantao.getRegraPlantaoFixo() == null ? PlantaoTipo.AVULSO : PlantaoTipo.FIXO);
-        }
+
+        LocalDateTime now = LocalDateTime.now();
+        Plantao plantao = new Plantao();
+        plantao.setHospital(setor.getHospital());
+        plantao.setSetor(setor);
+        plantao.setMedicoTitular(medico);
+        plantao.setMedicoResponsavelAtual(medico);
+        plantao.setCriadoPorEscalista(escalista);
+        plantao.setTipo(PlantaoTipo.AVULSO);
         plantao.setStatus(PlantaoStatus.AGENDADO);
+        plantao.setDataInicio(dataInicio);
+        plantao.setDataFim(dataFim);
+        plantao.setCriadoEm(now);
+        plantao.setAtualizadoEm(now);
+
         return plantaoRepository.save(plantao);
     }
 
@@ -167,4 +207,43 @@ public class PlantaoServiceImple implements PlantaoService {
         throw new NoSuchElementException("Plantao not found with id: " + id);
     }
 
+    private void validateCreateAvulsoRequest(Long setorId, Long medicoId, LocalDateTime dataInicio,
+            LocalDateTime dataFim, Manager escalista) {
+        if (escalista == null) {
+            throw new IllegalArgumentException("Usuário logado não possui perfil de escalista");
+        }
+        if (escalista.getHospital() == null || escalista.getHospital().getId() == null) {
+            throw new IllegalArgumentException("Escalista sem hospital");
+        }
+        if (setorId == null) {
+            throw new IllegalArgumentException("Setor is required");
+        }
+        if (medicoId == null) {
+            throw new IllegalArgumentException("Doctor is required");
+        }
+        if (dataInicio == null || dataFim == null) {
+            throw new IllegalArgumentException("Start and end dates are required");
+        }
+        if (!dataInicio.isBefore(dataFim)) {
+            throw new IllegalArgumentException("Start date must be before end date");
+        }
+    }
+
+    private Long resolveMedicoId(Plantao plantao) {
+        if (plantao.getMedicoTitular() != null && plantao.getMedicoTitular().getId() != null) {
+            return plantao.getMedicoTitular().getId();
+        }
+        if (plantao.getMedicoResponsavelAtual() != null && plantao.getMedicoResponsavelAtual().getId() != null) {
+            return plantao.getMedicoResponsavelAtual().getId();
+        }
+        throw new IllegalArgumentException("Doctor is required");
+    }
+
+    private boolean hasConflitoHorario(Long medicoId, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        return plantaoRepository.existsByMedicoResponsavelAtualIdAndStatusNotAndDataInicioLessThanAndDataFimGreaterThan(
+                medicoId,
+                PlantaoStatus.CANCELADO,
+                dataFim,
+                dataInicio);
+    }
 }

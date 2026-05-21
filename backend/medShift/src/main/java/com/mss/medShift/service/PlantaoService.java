@@ -3,10 +3,12 @@ package com.mss.medShift.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.mss.medShift.domain.model.Manager;
 import com.mss.medShift.domain.model.Plantao;
 
 public interface PlantaoService {
     Plantao create(Plantao plantao);
+    Plantao createAvulso(Long setorId, Long medicoId, LocalDateTime dataInicio, LocalDateTime dataFim, Manager escalista);
     Plantao findById(Long id);
     Plantao findByIdAndHospitalId(Long id, Long hospitalId);
     Plantao findByIdAndHospitalIdAndSetorId(Long id, Long hospitalId, Long setorId);

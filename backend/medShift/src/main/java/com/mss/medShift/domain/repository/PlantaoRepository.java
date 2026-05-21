@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.mss.medShift.domain.model.Plantao;
+import com.mss.medShift.domain.model.PlantaoStatus;
 
 @Repository
 public interface PlantaoRepository extends JpaRepository<Plantao, Long> {
@@ -24,4 +25,9 @@ public interface PlantaoRepository extends JpaRepository<Plantao, Long> {
     Optional<Plantao> findByIdAndHospitalIdAndSetorId(Long id, Long hospitalId, Long setorId);
     List<Plantao> findByHospitalIdAndSetorId(Long hospitalId, Long setorId);
     List<Plantao> findByHospitalIdAndSetorIdAndDataInicioBetween(Long hospitalId, Long setorId, LocalDateTime start, LocalDateTime end);
+    boolean existsByMedicoResponsavelAtualIdAndStatusNotAndDataInicioLessThanAndDataFimGreaterThan(
+            Long medicoId,
+            PlantaoStatus status,
+            LocalDateTime dataFim,
+            LocalDateTime dataInicio);
 }

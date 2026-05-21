@@ -1,8 +1,6 @@
 package com.mss.medShift.controller;
 
 import java.net.URI;
-import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -21,6 +18,8 @@ import com.mss.medShift.domain.model.Plantao;
 import com.mss.medShift.domain.model.Hospital;
 import com.mss.medShift.domain.model.Manager;
 import com.mss.medShift.domain.model.Usuario;
+import com.mss.medShift.controller.dto.PlantaoAvulsoRequest;
+import com.mss.medShift.controller.dto.PlantaoSummaryResponse;
 import com.mss.medShift.service.PlantaoService;
 import com.mss.medShift.service.auth.AccessScopeService;
 
@@ -34,6 +33,28 @@ public class PlantaoController {
     public PlantaoController(PlantaoService plantaoService, AccessScopeService accessScopeService) {
         this.plantaoService = plantaoService;
         this.accessScopeService = accessScopeService;
+    }
+
+    @PostMapping("/avulso")
+    public ResponseEntity<PlantaoSummaryResponse> createAvulso(@RequestBody PlantaoAvulsoRequest request,
+            @AuthenticationPrincipal Usuario usuarioLogado) {
+        try {
+            Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, request.setorId());
+            var plantaoCriado = plantaoService.createAvulso(
+                    request.setorId(),
+                    request.medicoId(),
+                    request.dataInicio(),
+                    request.dataFim(),
+                    escalista);
+
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(plantaoCriado.getId())
+                    .toUri();
+            return ResponseEntity.created(location).body(PlantaoSummaryResponse.from(plantaoCriado));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping
