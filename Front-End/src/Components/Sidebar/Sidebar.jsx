@@ -30,7 +30,7 @@ export default function Sidebar() {
 
   // pega o role salvo no login - MUDAR AQUI TIRAR DPS O || "ROLE"
   const role =
-    localStorage.getItem("role")?.toLowerCase()?.trim() || "hospital"; // MUDAR AQUI PARA ALTERAR A SIDEBAR (plantonista - hospital - escalista)
+    localStorage.getItem("role")?.toLowerCase()?.trim() || "escalista"; // MUDAR AQUI PARA ALTERAR A SIDEBAR (plantonista - hospital - escalista)
 
   function handleLogout() {
     localStorage.removeItem("token");
@@ -106,12 +106,12 @@ export default function Sidebar() {
   /*  ESCALISTA */
   const menuEscalista = [
     {
-      to: "/home",
+      to: "/UserEscalista/TelaPrincipal",
       label: "Home",
       icon: Home,
     },
     {
-      to: "/criar-plantao",
+      to: "/UserEscalista/CriarPlantao",
       label: "Criar Plantão",
       icon: BriefcaseMedical,
     },

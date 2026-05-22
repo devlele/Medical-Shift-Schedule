@@ -75,7 +75,7 @@
 
 /* HOVER */
 .item-menu:hover {
-  background: var(--medical-card);
+  background: var(--medical-light);
 }
 
 .item-menu:active {
@@ -83,13 +83,13 @@
 }
 
 /* ATIVO (React Router) */
-.item-menu.active {
-  background: var(--medical-card);
+.item-menu.ativo {
+  background: var(--medical-light);
   font-weight: 600;
 }
 
 /* ICONE ATIVO */
-.item-menu.active .icone {
+.item-menu.ativo .icone {
   color: var(--medical-dark);
 }
 

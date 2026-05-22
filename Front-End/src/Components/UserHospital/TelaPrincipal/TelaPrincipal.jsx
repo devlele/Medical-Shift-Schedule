@@ -73,12 +73,12 @@ export default function TelaPrincipal() {
   }, [escalistas, medicos, setores]);
 
   return (
-    <div className="layout-escalista">
+    <div className="layout-hospital">
       <Sidebar />
 
-      <main className="conteudo-escalista">
+      <main className="conteudo-hospital">
         {/* HEADER */}
-        <header className="topo-escalista">
+        <header className="topo-hospital">
           <div>
             <h1>Painel Hospitalar</h1>
             <p>Bem-vindo de volta, {nomeUsuario}.</p>

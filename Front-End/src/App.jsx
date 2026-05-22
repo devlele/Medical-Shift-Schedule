@@ -18,6 +18,8 @@ import OferecerPlantao from "./Components/UserPlantonista/Plantoes/OferecerPlant
 import TelaPrincipalHospital from "./Components/UserHospital/TelaPrincipal/TelaPrincipal";
 import Setores from "./Components/UserHospital/Setores/Setores.jsx";
 import CadastrarProfissional from "./Components/UserHospital/CadastrarProfissional/CadastrarProfissional.jsx";
+import TelaPrincipalEscalista from "./Components/UserEscalista/TelaPrincipal/TelaPrincipal.jsx";
+import CriarPlantao from "./Components/UserEscalista/CriarPlantao/CriarPlantao.jsx";
 
 function App() {
   return (
@@ -30,44 +32,27 @@ function App() {
         <Route path="/CadastroHospital" element={<CadastroHospital />} />
         <Route path="/CadastroMedico" element={<CadastroMedico />} />
         <Route path="/RecuperarSenha" element={<RecuperarSenha />} />
-        //PLNTONISTA
+
+        //PLNTONISTA:
         <Route path="/UserPlantonista/Perfil" element={<Perfil />} />
-        <Route
-          path="/UserPlantonista/TelaPrincipal"
-          element={<TelaPrincipal />}
-        />
-        <Route
-          path="/UserPlantonista/ResolucaoConflito"
-          element={<ResolucaoConflito />}
-        />
+        <Route path="/UserPlantonista/TelaPrincipal" element={<TelaPrincipal />} />
+        <Route path="/UserPlantonista/ResolucaoConflito" element={<ResolucaoConflito />} />
         <Route path="/UserPlantonista/Agenda" element={<Agenda />} />
-        <Route
-          path="/UserPlantonista/DetalhePlantao/:id"
-          element={<DetalhePlantao />}
-        />
+        <Route path="/UserPlantonista/DetalhePlantao/:id" element={<DetalhePlantao />} />
         <Route path="/UserPlantonista/Historico" element={<Historico />} />
-        <Route
-          path="/UserPlantonista/PlantoesOfertados"
-          element={<PlantoesOfertados />}
-        />
-        <Route
-          path="/UserPlantonista/OferecerPlantao"
-          element={<OferecerPlantao />}
-        />
-        <Route
-          path="/UserPlantonista/DetalhesOferta"
-          element={<DetalhesOferta />}
-        />
-        //HOSPITAL
-        <Route
-          path="/UserHospital/TelaPrincipal"
-          element={<TelaPrincipalHospital />}
-        />
-        <Route
-          path="/UserHospital/CadastrarProfissional"
-          element={<CadastrarProfissional />}
-        />
+        <Route path="/UserPlantonista/PlantoesOfertados" element={<PlantoesOfertados />} />
+        <Route path="/UserPlantonista/OferecerPlantao" element={<OferecerPlantao />} />
+        <Route path="/UserPlantonista/DetalhesOferta" element={<DetalhesOferta />} />
+
+        //HOSPITAL:
+        <Route path="/UserHospital/TelaPrincipal" element={<TelaPrincipalHospital />} />
+        <Route path="/UserHospital/CadastrarProfissional" element={<CadastrarProfissional />} />
         <Route path="/UserHospital/Setores" element={<Setores />} />
+
+        //ESCALISTA:
+        <Route path="/UserEscalista/TelaPrincipal" element={<TelaPrincipalEscalista />} />
+        <Route path="/UserEscalista/CriarPlantao" element={<CriarPlantao />} />
+
       </Routes>
     </BrowserRouter>
   );
