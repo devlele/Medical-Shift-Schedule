@@ -53,10 +53,9 @@
     border-radius: var(--border-radius-xl);
 }
 
-.user img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+.user span {
+    font-weight: 600;
+    color: #27463b;
 }
 
 /* TOP CARDS */
@@ -191,6 +190,20 @@
     cursor: pointer;
     color: #264238;
     margin-top: 12px;
+}
+
+.estado-escalista {
+    background: #f7f7f7;
+    border-radius: 20px;
+    padding: 22px;
+    color: #68807a;
+    font-weight: 600;
+}
+
+.estado-escalista.erro {
+    margin-bottom: 24px;
+    background: #fff5f5;
+    color: #b42318;
 }
 
 /* RESPONSIVO */

@@ -59,6 +59,29 @@ export const getDoctors = async () => {
     return request("/doctor");
 };
 
+export const getMedicosCandidatos = async (setorId, termo = "") => {
+    const params = new URLSearchParams();
+
+    if (setorId) {
+        params.set("setorId", setorId);
+    }
+
+    if (termo.trim()) {
+        params.set("termo", termo.trim());
+    }
+
+    const query = params.toString();
+    return request(`/doctor/link-candidates${query ? `?${query}` : ""}`);
+};
+
+export const getMeusSetoresEscalista = async () => {
+    return request("/manager/me/setores");
+};
+
+export const getMinhaAgenda = async () => {
+    return request("/agenda/me");
+};
+
 export const criarSetor = async (data) => {
     return request("/setor", {
         method: "POST",
@@ -74,6 +97,32 @@ export const criarEscalista = async (data) => {
     return request("/manager", {
         method: "POST",
         body: JSON.stringify(data),
+    });
+};
+
+export const criarPlantaoAvulso = async (data) => {
+    return request("/plantao/avulso", {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
+};
+
+export const criarPlantaoFixo = async (data) => {
+    return request("/plantao/fixo", {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
+};
+
+export const vincularMedicoSetor = async (medicoId, setorId) => {
+    return request(`/doctor/${medicoId}/setores/${setorId}`, {
+        method: "POST",
+    });
+};
+
+export const desvincularMedicoSetor = async (medicoId, setorId) => {
+    return request(`/doctor/${medicoId}/setores/${setorId}`, {
+        method: "DELETE",
     });
 };
 

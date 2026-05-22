@@ -1,62 +1,72 @@
+import { useEffect, useMemo, useState } from "react";
 import Sidebar from "../../Sidebar/Sidebar";
 import "./TelaPrincipal.css";
-import userImg from "../../../assets/draGrey.png";
 import {
     Settings,
     Bell,
-    Zap,
-    User,
+    UserRound,
 } from "lucide-react";
 
+import {
+    getDoctors,
+    getMeusSetoresEscalista,
+    getMinhaAgenda,
+} from "../../UserHospital/Setores/setorServices.js";
+
 export default function TelaPrincipal() {
-    const setores = [
-        {
-            nome: "Cardiologia",
-            subtitulo: "UNIDADE CORONÁRIA (UCO)",
-            coordenador: "Dr. André Santos",
-            staff: "24 Médicos",
-            botao: "Ver Detalhes",
-        },
-        {
-            nome: "Pronto Socorro",
-            subtitulo: "EMERGÊNCIA ADULTO",
-            coordenador: "Dra. Beatriz Lima",
-            staff: "48 Médicos",
-            botao: "Resolver Pendência",
-        },
-        {
-            nome: "Pediatria",
-            subtitulo: "ALA INFANTIL SUL",
-            coordenador: "Dr. Ricardo Melo",
-            staff: "18 Médicos",
-            botao: "Ver Detalhes",
-        },
-        {
-            nome: "UTI Adulto",
-            subtitulo: "UNIDADE DE TERAPIA INTENSIVA",
-            coordenador: "Dr. Carlos Eduardo",
-            staff: "32 Médicos",
-            botao: "Ver Detalhes",
-        },
-        {
-            nome: "Neurologia",
-            subtitulo: "CENTRO DE NEUROCIÊNCIAS",
-            coordenador: "Dra. Helena Martins",
-            staff: "12 Médicos",
-            botao: "Ver Detalhes",
-        },
-    ];
+    const usuario = obterUsuarioLogado();
+    const nomeUsuario = usuario?.name || "Escalista";
+    const [setores, setSetores] = useState([]);
+    const [medicos, setMedicos] = useState([]);
+    const [plantoes, setPlantoes] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [erro, setErro] = useState("");
+
+    useEffect(() => {
+        carregarDados();
+    }, []);
+
+    const proximosPlantoes = useMemo(() => {
+        return [...plantoes]
+            .filter((plantao) => plantao.dataInicio)
+            .sort((a, b) => new Date(a.dataInicio) - new Date(b.dataInicio))
+            .slice(0, 6);
+    }, [plantoes]);
+
+    async function carregarDados() {
+        try {
+            setLoading(true);
+            setErro("");
+
+            const [setoresData, medicosData, agendaData] = await Promise.all([
+                getMeusSetoresEscalista(),
+                getDoctors(),
+                getMinhaAgenda(),
+            ]);
+
+            setSetores(Array.isArray(setoresData) ? setoresData.filter((setor) => setor.ativo !== false) : []);
+            setMedicos(Array.isArray(medicosData) ? medicosData.filter((medico) => medico.ativo !== false) : []);
+            setPlantoes(Array.isArray(agendaData) ? agendaData : []);
+        } catch (error) {
+            console.error(error);
+            setErro(error.message || "Não foi possível carregar os dados do painel.");
+            setSetores([]);
+            setMedicos([]);
+            setPlantoes([]);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <div className="layout-escalista">
             <Sidebar />
 
             <main className="gestao-container">
-                {/* HEADER */}
                 <header className="topo-escalista">
                     <div>
                         <h1>Painel de Controle</h1>
-                        <p>Bem-vindo de volta, Dr(a). Grey</p>
+                        <p>Bem-vindo de volta, {nomeUsuario}.</p>
                     </div>
 
                     <div className="topo-direita">
@@ -64,69 +74,109 @@ export default function TelaPrincipal() {
                         <Settings className="icone-topo" />
 
                         <div className="user">
-                            <img src={userImg} alt="user" />
-                            <span>Dr(a). Grey</span>
+                            <UserRound size={18} />
+                            <span>{nomeUsuario}</span>
                         </div>
                     </div>
                 </header>
 
-                {/* Cards superiores */}
+                {erro && <div className="estado-escalista erro">{erro}</div>}
+
                 <div className="top-cards">
                     <div className="card colaboradores">
                         <span className="label">
-                            COLABORADORES
+                            MÉDICOS VINCULADOS
                         </span>
 
                         <div className="number-row">
-                            <h2>142</h2>
-                            <span>Médicos Ativos</span>
+                            <h2>{loading ? "..." : medicos.length}</h2>
+                            <span>Profissionais ativos</span>
                         </div>
                     </div>
 
                     <div className="card live-card">
-                        <h2>08 Setores</h2>
+                        <h2>{loading ? "..." : `${setores.length} Setor${setores.length === 1 ? "" : "es"}`}</h2>
 
                         <p>
-                            Operando em regime de contingência
-                            e alta demanda operacional no
-                            momento.
+                            {setores[0]?.setorNome || "Nenhum setor vinculado"}
                         </p>
                     </div>
                 </div>
 
-                {/* Lista de setores */}
                 <div className="setores-grid">
-                    {setores.map((setor, index) => (
-                        <div className="setor-card" key={index}>
-                            <h3>{setor.nome}</h3>
+                    {loading ? (
+                        <div className="estado-escalista">Carregando dados...</div>
+                    ) : setores.length === 0 ? (
+                        <div className="estado-escalista">Nenhum setor vinculado ao escalista.</div>
+                    ) : (
+                        setores.map((setor) => (
+                            <div className="setor-card" key={setor.id}>
+                                <h3>{setor.setorNome}</h3>
+
+                                <span className="subtitulo">
+                                    SETOR RESPONSÁVEL
+                                </span>
+
+                                <div className="divider" />
+
+                                <div className="info">
+                                    <p>Médicos:</p>
+                                    <strong>{medicos.length}</strong>
+                                </div>
+
+                                <div className="info">
+                                    <p>Plantões:</p>
+                                    <strong>{plantoes.length}</strong>
+                                </div>
+                            </div>
+                        ))
+                    )}
+
+                    {!loading && proximosPlantoes.map((plantao) => (
+                        <div className="setor-card" key={plantao.id}>
+                            <h3>{plantao.doctor || "Médico não informado"}</h3>
 
                             <span className="subtitulo">
-                                {setor.subtitulo}
+                                {plantao.setor || "PLANTÃO"}
                             </span>
 
                             <div className="divider" />
 
                             <div className="info">
-                                <p>Coordenador:</p>
-                                <strong>
-                                    {setor.coordenador}
-                                </strong>
+                                <p>Data:</p>
+                                <strong>{formatarData(plantao.dataInicio)}</strong>
                             </div>
 
                             <div className="info">
-                                <p>Staff total:</p>
-                                <strong>
-                                    {setor.staff}
-                                </strong>
+                                <p>Horário:</p>
+                                <strong>{plantao.time || "-"}</strong>
                             </div>
-
-                            <button className="details-btn">
-                                {setor.botao}
-                            </button>
                         </div>
                     ))}
                 </div>
             </main>
         </div>
     );
+}
+
+function obterUsuarioLogado() {
+    const usuarioSalvo = localStorage.getItem("usuario");
+
+    if (!usuarioSalvo) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(usuarioSalvo);
+    } catch {
+        return { name: usuarioSalvo };
+    }
+}
+
+function formatarData(data) {
+    if (!data) {
+        return "-";
+    }
+
+    return new Intl.DateTimeFormat("pt-BR").format(new Date(data));
 }

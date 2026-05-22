@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import {
@@ -12,13 +12,8 @@ import {
   X,
   Users,
   Building2,
-  Shield,
-  FileText,
   BriefcaseMedical,
   UserPlus,
-  UsersRound,
-  ArrowLeftRight,
-  CircleUser,
 } from "lucide-react";
 
 import logo from "../../assets/logo.png";
@@ -28,9 +23,9 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  // pega o role salvo no login - MUDAR AQUI TIRAR DPS O || "ROLE"
+  // pega o role salvo no login
   const role =
-    localStorage.getItem("role")?.toLowerCase()?.trim() || "escalista"; // MUDAR AQUI PARA ALTERAR A SIDEBAR (plantonista - hospital - escalista)
+    localStorage.getItem("role")?.toLowerCase()?.trim() || "";
 
   function handleLogout() {
     localStorage.removeItem("token");
@@ -111,34 +106,14 @@ export default function Sidebar() {
       icon: Home,
     },
     {
-      to: "/UserEscalista/CriarPlantao",
-      label: "Criar Plantão",
-      icon: BriefcaseMedical,
-    },
-    {
-      to: "/cadastrar-profissional",
-      label: "Cadastrar Profissional",
+      to: "/UserEscalista/Medicos",
+      label: "Médicos",
       icon: UserPlus,
     },
     {
-      to: "/setores",
-      label: "Setores",
-      icon: Building2,
-    },
-    {
-      to: "/plantonistas",
-      label: "Plantonistas",
-      icon: UsersRound,
-    },
-    {
-      to: "/delegacao",
-      label: "Delegação",
-      icon: ArrowLeftRight,
-    },
-    {
-      to: "/perfil",
-      label: "Perfil",
-      icon: CircleUser,
+      to: "/UserEscalista/CriarPlantao",
+      label: "Criar Plantão",
+      icon: BriefcaseMedical,
     },
   ];
 
@@ -146,7 +121,10 @@ export default function Sidebar() {
   const menus = {
     hospital: menuHospital,
     plantonista: menuPlantonista,
+    medico: menuPlantonista,
+    doctor: menuPlantonista,
     escalista: menuEscalista,
+    manager: menuEscalista,
   };
 
   const menu = menus[role] || [];

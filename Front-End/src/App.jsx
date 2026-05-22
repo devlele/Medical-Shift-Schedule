@@ -20,6 +20,7 @@ import Setores from "./Components/UserHospital/Setores/Setores.jsx";
 import CadastrarProfissional from "./Components/UserHospital/CadastrarProfissional/CadastrarProfissional.jsx";
 import TelaPrincipalEscalista from "./Components/UserEscalista/TelaPrincipal/TelaPrincipal.jsx";
 import CriarPlantao from "./Components/UserEscalista/CriarPlantao/CriarPlantao.jsx";
+import MedicosSetor from "./Components/UserEscalista/MedicosSetor/MedicosSetor.jsx";
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
 
         //ESCALISTA:
         <Route path="/UserEscalista/TelaPrincipal" element={<TelaPrincipalEscalista />} />
+        <Route path="/UserEscalista/Medicos" element={<MedicosSetor />} />
         <Route path="/UserEscalista/CriarPlantao" element={<CriarPlantao />} />
 
       </Routes>

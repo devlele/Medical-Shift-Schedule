@@ -66,12 +66,24 @@ const Login = () => {
           localStorage.setItem("role", role);
         }
 
-        if (role === "HOSPITAL") {
+        const normalizedRole = role?.toUpperCase();
+
+        if (normalizedRole === "HOSPITAL") {
           navigate("/UserHospital/TelaPrincipal");
           return;
         }
 
-        navigate("/TelaPrincipal");
+        if (normalizedRole === "ESCALISTA" || normalizedRole === "MANAGER") {
+          navigate("/UserEscalista/TelaPrincipal");
+          return;
+        }
+
+        if (normalizedRole === "MEDICO" || normalizedRole === "DOCTOR") {
+          navigate("/UserPlantonista/TelaPrincipal");
+          return;
+        }
+
+        navigate("/Login");
       } catch (error) {
         setErroLogin(
           error.message.includes("Failed to fetch")
