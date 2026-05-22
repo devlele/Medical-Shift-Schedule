@@ -106,12 +106,27 @@
   min-width: 0;
 }
 
-.card-info span {
-    font-size: 24px; 
-    font-weight: 400;
-    color: #0f172a;
-    padding-left: 20px;
-    align-items: center;
+.section-heading {
+  margin-top: 8px;
+}
+
+.section-heading h2 {
+  color: #1f4739;
+  font-size: 1.25rem;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.info-row span {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: #0f172a;
+  padding-left: 0;
 }
 
 .shift-card {
@@ -228,6 +243,12 @@
 .accept-btn:hover {
   background: #1b352d;
   transform: translateY(-2px);
+}
+
+.accept-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
 }
 
 @media (max-width: 1100px) {

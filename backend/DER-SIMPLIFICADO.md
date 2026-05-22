@@ -121,7 +121,7 @@ erDiagram
     HOSPITAL ||--o{ SETOR : possui
     HOSPITAL ||--o{ ESCALISTA : cadastra
 
-    SETOR ||--o{ ESCALISTA : responsavel_por
+    SETOR ||--o| ESCALISTA : responsavel_por
     MEDICO ||--o{ MEDICO_SETOR : possui_vinculo
     SETOR ||--o{ MEDICO_SETOR : recebe_medico
 
@@ -160,19 +160,19 @@ No DER completo, essa decisao permite centralizar login, senha e permissoes em u
 
 Representa a instituicao hospitalar cadastrada no sistema.
 
-O hospital possui setores e cadastra escalistas. Cada escalista fica responsavel por um unico setor do hospital.
+O hospital possui setores e cadastra escalistas. Cada escalista fica responsavel por um unico setor do hospital, e cada setor pode ter no maximo um escalista responsavel.
 
 ### Setor
 
 Representa uma area ou unidade operacional do hospital, como UTI, emergencia, pediatria ou centro cirurgico.
 
-O setor e uma entidade central porque limita a atuacao dos escalistas, dos medicos e a visibilidade dos pedidos de cobertura.
+O setor e uma entidade central porque limita a atuacao dos escalistas, dos medicos e a visibilidade dos pedidos de cobertura. No modelo atual, um setor pode ter no maximo um escalista responsavel.
 
 ### Escalista
 
 Representa o profissional responsavel por montar e administrar escalas.
 
-O escalista atua em um unico setor. Dentro desse setor, ele pode vincular medicos e criar plantoes.
+O escalista atua em um unico setor. Dentro desse setor, ele pode vincular medicos e criar plantoes. Como a relacao com setor e 1:1 funcional, outro escalista nao pode ser responsavel pelo mesmo setor.
 
 ### Medico
 
@@ -259,7 +259,7 @@ Uma forma clara de explicar este DER e seguir esta ordem:
 
 1. O sistema possui usuarios autenticados com diferentes papeis.
 2. O hospital cadastra setores e escalistas.
-3. Cada escalista responde por um unico setor.
+3. Cada escalista responde por um unico setor, e cada setor tem no maximo um escalista responsavel.
 4. O medico e vinculado aos setores por meio de `MEDICO_SETOR`.
 5. O medico possui especialidades por meio de `MEDICO_ESPECIALIDADE`.
 6. O escalista cria plantoes para os medicos.

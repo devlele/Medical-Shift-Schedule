@@ -67,6 +67,11 @@
     cursor: pointer;
 }
 
+.aceitar-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
 /* TOP SECTION */
 
 .top-section {

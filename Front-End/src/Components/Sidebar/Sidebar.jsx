@@ -10,12 +10,12 @@ import {
   LogOut,
   Menu,
   X,
-  Users,
   Building2,
   BriefcaseMedical,
   UserPlus,
 } from "lucide-react";
 
+import { clearAuthSession, getStoredRole } from "../../utils/authStorage";
 import logo from "../../assets/logo.png";
 import "./Sidebar.css";
 
@@ -23,15 +23,10 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  // pega o role salvo no login
-  const role =
-    localStorage.getItem("role")?.toLowerCase()?.trim() || "";
+  const role = getStoredRole();
 
   function handleLogout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("emailUsuario");
-    localStorage.removeItem("usuario");
-    localStorage.removeItem("role");
+    clearAuthSession();
 
     navigate("/Login", { replace: true });
   }
@@ -48,11 +43,6 @@ export default function Sidebar() {
       icon: Home,
     },
     {
-      to: "/UserHospital/Colaboradores",
-      label: "Colaboradores",
-      icon: Users,
-    },
-    {
       to: "/UserHospital/CadastrarProfissional",
       label: "Cadastrar Profissional",
       icon: ClipboardPlus,
@@ -61,11 +51,6 @@ export default function Sidebar() {
       to: "/UserHospital/Setores",
       label: "Setores",
       icon: Building2,
-    },
-    {
-      to: "/UserHospital/Perfil",
-      label: "Perfil",
-      icon: User,
     },
   ];
 

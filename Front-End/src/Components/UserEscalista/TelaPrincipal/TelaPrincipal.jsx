@@ -12,6 +12,7 @@ import {
     getMeusSetoresEscalista,
     getMinhaAgenda,
 } from "../../UserHospital/Setores/setorServices.js";
+import { getStoredUser } from "../../../utils/authStorage";
 
 export default function TelaPrincipal() {
     const usuario = obterUsuarioLogado();
@@ -160,17 +161,7 @@ export default function TelaPrincipal() {
 }
 
 function obterUsuarioLogado() {
-    const usuarioSalvo = localStorage.getItem("usuario");
-
-    if (!usuarioSalvo) {
-        return null;
-    }
-
-    try {
-        return JSON.parse(usuarioSalvo);
-    } catch {
-        return { name: usuarioSalvo };
-    }
+    return getStoredUser();
 }
 
 function formatarData(data) {

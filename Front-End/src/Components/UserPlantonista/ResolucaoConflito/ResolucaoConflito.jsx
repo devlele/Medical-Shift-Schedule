@@ -1,25 +1,84 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Bell, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../../Sidebar/Sidebar";
 import "./ResolucaoConflito.css";
+import { getMinhaAgendaMedico } from "../../../services/doctorServices";
+import {
+  formatDateLong,
+  formatPlantaoTime,
+  getPlantaoDate,
+} from "../../../utils/plantaoFormatters";
 
 export default function ResolucaoConflito() {
-  const compromissos = [
-    {
-      title: "Plantão UTI",
-      subtitle: "25 Outubro, Domingo",
-      horario: "07:00 — 12:00",
-      setor: "UTI Cardiológica",
-      hospital: "Hospital Alvorada",
-    },
-    {
-      title: "Treinamento Obrigatório",
-      subtitle: "25 Outubro, Domingo",
-      horario: "10:30 — 14:30",
-      setor: "Emergência",
-      hospital: "Auditório Central",
-    },
-  ];
+  const navigate = useNavigate();
+  const [conflitos, setConflitos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState("");
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarConflitos() {
+      try {
+        setLoading(true);
+        setErro("");
+
+        const agenda = await getMinhaAgendaMedico();
+        const plantoes = Array.isArray(agenda) ? agenda : [];
+        const encontrados = [];
+
+        for (let i = 0; i < plantoes.length; i += 1) {
+          for (let j = i + 1; j < plantoes.length; j += 1) {
+            if (temSobreposicao(plantoes[i], plantoes[j])) {
+              encontrados.push([plantoes[i], plantoes[j]]);
+            }
+          }
+        }
+
+        if (ativo) {
+          setConflitos(encontrados);
+        }
+      } catch (error) {
+        if (ativo) {
+          setErro(error.message || "Nao foi possivel carregar conflitos.");
+        }
+      } finally {
+        if (ativo) {
+          setLoading(false);
+        }
+      }
+    }
+
+    carregarConflitos();
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  function temSobreposicao(first, second) {
+    if (!first.dataInicio || !first.dataFim || !second.dataInicio || !second.dataFim) {
+      return false;
+    }
+
+    const firstStart = new Date(first.dataInicio);
+    const firstEnd = new Date(first.dataFim);
+    const secondStart = new Date(second.dataInicio);
+    const secondEnd = new Date(second.dataFim);
+
+    return firstStart < secondEnd && secondStart < firstEnd;
+  }
+
+  function toCompromisso(plantao) {
+    return {
+      title: plantao.setor || "Plantão",
+      subtitle: formatDateLong(getPlantaoDate(plantao)),
+      horario: formatPlantaoTime(plantao),
+      setor: plantao.setor || "Setor nao informado",
+      hospital: plantao.hospital || "Hospital nao informado",
+    };
+  }
 
   return (
     <div className="layout">
@@ -53,49 +112,69 @@ export default function ResolucaoConflito() {
             </p>
 
             <div className="quadro-branco">
-              <div className="detalhes-conflito">
-                {compromissos.map((item, index) => (
-                  <div className="compromisso-card" key={index}>
-                    <div className="compromisso-header">
-                      <span className="compromisso-label">
-                        Compromisso {index + 1}
-                      </span>
-                      <strong>{item.subtitle}</strong>
-                    </div>
+              {loading ? (
+                <p>Carregando conflitos...</p>
+              ) : erro ? (
+                <p>{erro}</p>
+              ) : conflitos.length > 0 ? (
+                conflitos.map((conflito, conflitoIndex) => (
+                  <div className="detalhes-conflito" key={conflitoIndex}>
+                    {conflito.map((plantao, index) => {
+                      const item = toCompromisso(plantao);
 
-                    <div className="compromisso-body">
-                      <div className="campo">
-                        <label>Nome</label>
-                        <div className="valor">{item.title}</div>
-                      </div>
+                      return (
+                        <div className="compromisso-card" key={plantao.id}>
+                          <div className="compromisso-header">
+                            <span className="compromisso-label">
+                              Compromisso {index + 1}
+                            </span>
+                            <strong>{item.subtitle}</strong>
+                          </div>
 
-                      <div className="campo">
-                        <label>Horário</label>
-                        <div className="valor">{item.horario}</div>
-                      </div>
+                          <div className="compromisso-body">
+                            <div className="campo">
+                              <label>Nome</label>
+                              <div className="valor">{item.title}</div>
+                            </div>
 
-                      <div className="campo">
-                        <label>Setor</label>
-                        <div className="valor">{item.setor}</div>
-                      </div>
+                            <div className="campo">
+                              <label>Horário</label>
+                              <div className="valor">{item.horario}</div>
+                            </div>
 
-                      <div className="campo">
-                        <label>Hospital</label>
-                        <div className="valor">{item.hospital}</div>
-                      </div>
-                    </div>
+                            <div className="campo">
+                              <label>Setor</label>
+                              <div className="valor">{item.setor}</div>
+                            </div>
 
-                    <div className="compromisso-actions">
-                      <button type="button" className="btn manter-btn">
-                        Manter
-                      </button>
-                      <button type="button" className="btn ofertar-btn">
-                        Ofertar
-                      </button>
-                    </div>
+                            <div className="campo">
+                              <label>Hospital</label>
+                              <div className="valor">{item.hospital}</div>
+                            </div>
+                          </div>
+
+                          <div className="compromisso-actions">
+                            <button type="button" className="btn manter-btn">
+                              Manter
+                            </button>
+                            <button
+                              type="button"
+                              className="btn ofertar-btn"
+                              onClick={() =>
+                                navigate("/UserPlantonista/OferecerPlantao")
+                              }
+                            >
+                              Ofertar
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <p>Nenhum conflito de horário detectado.</p>
+              )}
             </div>
           </div>
         </section>

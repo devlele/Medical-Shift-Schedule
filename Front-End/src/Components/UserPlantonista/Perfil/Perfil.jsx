@@ -1,17 +1,64 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Bell,
   Settings,
-  Home,
-  ClipboardPlus,
-  User,
   ImagePlus,
 } from "lucide-react";
 import fotoPerfil from "../../../assets/drhouse.png";
 import "./Perfil.css";
 import Sidebar from "../../Sidebar/Sidebar";
+import { getMeuPerfilMedico } from "../../../services/doctorServices";
+import { getUsuarioLogado } from "../../../utils/plantaoFormatters";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const Perfil = () => {
+  const usuario = getUsuarioLogado();
+  const [perfil, setPerfil] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState("");
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarPerfil() {
+      try {
+        setLoading(true);
+        setErro("");
+        const data = await getMeuPerfilMedico();
+
+        if (ativo) {
+          setPerfil(data);
+        }
+      } catch (error) {
+        if (ativo) {
+          setErro(error.message || "Nao foi possivel carregar o perfil.");
+        }
+      } finally {
+        if (ativo) {
+          setLoading(false);
+        }
+      }
+    }
+
+    carregarPerfil();
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  const nome = perfil?.name || usuario?.name || "Medico";
+  const especialidade = perfil?.specialty || "Especialidade nao informada";
+  const crm = perfil?.crm || "Nao informado";
+  const uf = perfil?.uf || perfil?.ufCrm || "UF";
+  const email = perfil?.email || usuario?.email || "Email nao informado";
+  const foto = perfil?.fotoPerfilUrl
+    ? perfil.fotoPerfilUrl.startsWith("http")
+      ? perfil.fotoPerfilUrl
+      : `${API_URL}${perfil.fotoPerfilUrl}`
+    : fotoPerfil;
+
   return (
     <div className="pagina-perfil">
       {/* MENU LATERAL */}
@@ -34,27 +81,31 @@ const Perfil = () => {
 
             <div className="usuario-topo">
               <img
-                src={fotoPerfil}
+                src={foto}
                 alt="Usuário"
                 className="foto-usuario-topo"
               />
-              <span>Dr. House</span>
+              <span>{nome}</span>
             </div>
           </div>
         </header>
 
+        {erro && <div className="alerta-login erro">{erro}</div>}
+
         {/* CARD PERFIL */}
         <section className="card-perfil">
           <div className="lado-foto">
-            <img src={fotoPerfil} alt="Perfil" className="foto-perfil" />
+            <img src={foto} alt="Perfil" className="foto-perfil" />
             <button className="botao-foto">
               <ImagePlus className="icone" />
             </button>
           </div>
 
           <div className="dados-perfil">
-            <h2>Dr. House</h2>
-            <p>Cardiologia • CRM 123456-SP</p>
+            <h2>{loading ? "Carregando..." : nome}</h2>
+            <p>
+              {especialidade} • CRM {crm}-{uf}
+            </p>
           </div>
         </section>
 
@@ -66,28 +117,28 @@ const Perfil = () => {
 
             <div className="grupo-campo">
               <label>NOME COMPLETO</label>
-              <div className="campo-fixo">Dr. Anderson Silva</div>
+              <div className="campo-fixo">{nome}</div>
             </div>
 
             <div className="grupo-campo">
               <label>ESPECIALIDADE</label>
-              <div className="campo-fixo">Cardiologia Clínica</div>
+              <div className="campo-fixo">{especialidade}</div>
             </div>
 
             <div className="grupo-campo">
               <label>E-MAIL PROFISSIONAL</label>
-              <div className="campo-fixo">anderson.silva@clinical.com</div>
+              <div className="campo-fixo">{email}</div>
             </div>
 
             <div className="linha-dupla">
               <div className="grupo-campo">
                 <label>CRM</label>
-                <div className="campo-fixo">123456</div>
+                <div className="campo-fixo">{crm}</div>
               </div>
 
               <div className="grupo-campo">
                 <label>UF</label>
-                <div className="campo-fixo">SP</div>
+                <div className="campo-fixo">{uf}</div>
               </div>
             </div>
           </div>

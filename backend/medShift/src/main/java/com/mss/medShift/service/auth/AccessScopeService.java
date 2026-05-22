@@ -11,7 +11,6 @@ import com.mss.medShift.domain.model.Manager;
 import com.mss.medShift.domain.model.Setor;
 import com.mss.medShift.domain.model.UserRole;
 import com.mss.medShift.domain.model.Usuario;
-import com.mss.medShift.domain.repository.EscalistaSetorRepository;
 import com.mss.medShift.domain.repository.MedicoSetorRepository;
 import com.mss.medShift.service.DoctorService;
 import com.mss.medShift.service.HospitalService;
@@ -25,17 +24,15 @@ public class AccessScopeService {
     private final HospitalService hospitalService;
     private final ManagerService managerService;
     private final SetorService setorService;
-    private final EscalistaSetorRepository escalistaSetorRepository;
     private final MedicoSetorRepository medicoSetorRepository;
 
     public AccessScopeService(DoctorService doctorService, HospitalService hospitalService,
             ManagerService managerService, SetorService setorService,
-            EscalistaSetorRepository escalistaSetorRepository, MedicoSetorRepository medicoSetorRepository) {
+            MedicoSetorRepository medicoSetorRepository) {
         this.doctorService = doctorService;
         this.hospitalService = hospitalService;
         this.managerService = managerService;
         this.setorService = setorService;
-        this.escalistaSetorRepository = escalistaSetorRepository;
         this.medicoSetorRepository = medicoSetorRepository;
     }
 
@@ -119,17 +116,6 @@ public class AccessScopeService {
         if (escalista.getSetor() != null && escalista.getSetor().getId() != null) {
             return List.of(escalista.getSetor().getId());
         }
-
-        List<Long> setorIds = escalistaSetorRepository.findByEscalistaIdAndAtivoTrue(escalista.getId()).stream()
-                .map(vinculo -> vinculo.getSetor() != null ? vinculo.getSetor().getId() : null)
-                .filter(id -> id != null)
-                .distinct()
-                .limit(1)
-                .toList();
-
-        if (!setorIds.isEmpty()) {
-            return setorIds;
-        }
         throw new AccessDeniedException("Escalista sem setor vinculado");
     }
 
@@ -196,10 +182,7 @@ public class AccessScopeService {
         if (escalista.getSetor() != null && escalista.getSetor().getId() != null) {
             return setorId.equals(escalista.getSetor().getId());
         }
-        boolean linked = escalistaSetorRepository
-                .findByEscalistaIdAndSetorIdAndAtivoTrue(escalista.getId(), setorId)
-                .isPresent();
-        return linked;
+        return false;
     }
 
     private boolean setorBelongsToHospital(Long setorId, Long hospitalId) {

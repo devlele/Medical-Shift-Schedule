@@ -6,11 +6,15 @@ import java.time.LocalDateTime;
 
 import com.mss.medShift.domain.model.Plantao;
 import com.mss.medShift.domain.model.PlantaoStatus;
+import com.mss.medShift.domain.model.PlantaoTipo;
 import com.mss.medShift.domain.model.PlantaoTurno;
+import com.mss.medShift.domain.model.TipoRecorrenciaPlantao;
 
 public record PlantaoSummaryResponse(
         Long id,
         String type,
+        PlantaoTipo tipoPlantao,
+        TipoRecorrenciaPlantao tipoRecorrencia,
         PlantaoTurno turno,
         String setor,
         Long setorId,
@@ -40,6 +44,8 @@ public record PlantaoSummaryResponse(
         return new PlantaoSummaryResponse(
                 plantao.getId(),
                 resolveType(turno),
+                plantao.getTipo(),
+                plantao.getRegraPlantaoFixo() != null ? plantao.getRegraPlantaoFixo().getTipoRecorrencia() : null,
                 turno,
                 setor != null ? setor.getNome() : null,
                 setor != null ? setor.getId() : null,

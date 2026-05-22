@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Login from "./Components/Login/Login";
 import Home from "./Components/Home/Home";
+import ProtectedRoute from "./Components/Auth/ProtectedRoute.jsx";
 import CadastroMedico from "./Components/CadastroMedico/CadastroMedico";
 import CadastroHospital from "./Components/CadastroHospital/CadastroHospital";
 import CadastroTipo from "./Components/CadastroTipo/CadastroTipo";
@@ -35,25 +36,130 @@ function App() {
         <Route path="/RecuperarSenha" element={<RecuperarSenha />} />
 
         //PLNTONISTA:
-        <Route path="/UserPlantonista/Perfil" element={<Perfil />} />
-        <Route path="/UserPlantonista/TelaPrincipal" element={<TelaPrincipal />} />
-        <Route path="/UserPlantonista/ResolucaoConflito" element={<ResolucaoConflito />} />
-        <Route path="/UserPlantonista/Agenda" element={<Agenda />} />
-        <Route path="/UserPlantonista/DetalhePlantao/:id" element={<DetalhePlantao />} />
-        <Route path="/UserPlantonista/Historico" element={<Historico />} />
-        <Route path="/UserPlantonista/PlantoesOfertados" element={<PlantoesOfertados />} />
-        <Route path="/UserPlantonista/OferecerPlantao" element={<OferecerPlantao />} />
-        <Route path="/UserPlantonista/DetalhesOferta" element={<DetalhesOferta />} />
+        <Route
+          path="/UserPlantonista/Perfil"
+          element={
+            <ProtectedRoute allowedRoles={["medico"]}>
+              <Perfil />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserPlantonista/TelaPrincipal"
+          element={
+            <ProtectedRoute allowedRoles={["medico"]}>
+              <TelaPrincipal />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserPlantonista/ResolucaoConflito"
+          element={
+            <ProtectedRoute allowedRoles={["medico"]}>
+              <ResolucaoConflito />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserPlantonista/Agenda"
+          element={
+            <ProtectedRoute allowedRoles={["medico"]}>
+              <Agenda />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserPlantonista/DetalhePlantao/:id"
+          element={
+            <ProtectedRoute allowedRoles={["medico"]}>
+              <DetalhePlantao />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserPlantonista/Historico"
+          element={
+            <ProtectedRoute allowedRoles={["medico"]}>
+              <Historico />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserPlantonista/PlantoesOfertados"
+          element={
+            <ProtectedRoute allowedRoles={["medico"]}>
+              <PlantoesOfertados />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserPlantonista/OferecerPlantao"
+          element={
+            <ProtectedRoute allowedRoles={["medico"]}>
+              <OferecerPlantao />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserPlantonista/DetalhesOferta"
+          element={
+            <ProtectedRoute allowedRoles={["medico"]}>
+              <DetalhesOferta />
+            </ProtectedRoute>
+          }
+        />
 
         //HOSPITAL:
-        <Route path="/UserHospital/TelaPrincipal" element={<TelaPrincipalHospital />} />
-        <Route path="/UserHospital/CadastrarProfissional" element={<CadastrarProfissional />} />
-        <Route path="/UserHospital/Setores" element={<Setores />} />
+        <Route
+          path="/UserHospital/TelaPrincipal"
+          element={
+            <ProtectedRoute allowedRoles={["hospital"]}>
+              <TelaPrincipalHospital />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserHospital/CadastrarProfissional"
+          element={
+            <ProtectedRoute allowedRoles={["hospital"]}>
+              <CadastrarProfissional />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserHospital/Setores"
+          element={
+            <ProtectedRoute allowedRoles={["hospital"]}>
+              <Setores />
+            </ProtectedRoute>
+          }
+        />
 
         //ESCALISTA:
-        <Route path="/UserEscalista/TelaPrincipal" element={<TelaPrincipalEscalista />} />
-        <Route path="/UserEscalista/Medicos" element={<MedicosSetor />} />
-        <Route path="/UserEscalista/CriarPlantao" element={<CriarPlantao />} />
+        <Route
+          path="/UserEscalista/TelaPrincipal"
+          element={
+            <ProtectedRoute allowedRoles={["escalista"]}>
+              <TelaPrincipalEscalista />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserEscalista/Medicos"
+          element={
+            <ProtectedRoute allowedRoles={["escalista"]}>
+              <MedicosSetor />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserEscalista/CriarPlantao"
+          element={
+            <ProtectedRoute allowedRoles={["escalista"]}>
+              <CriarPlantao />
+            </ProtectedRoute>
+          }
+        />
 
       </Routes>
     </BrowserRouter>

@@ -9,20 +9,43 @@ import "./Calendario.css";
 
 export default function Calendario({ eventos }) {
   const navigate = useNavigate();
-  // Função para verificar se há eventos em um dia
-  const hasEventOnDate = (date) => {
-    return eventos.some((event) => event.date === date);
+  const eventosNormalizados = eventos
+    .map((evento, index) => ({
+      id: evento.id ?? index + 1,
+      title: evento.title || evento.hospital || evento.setor || "Plantão",
+      date: evento.date || evento.dataInicio?.slice(0, 10),
+      color: evento.color || "#1f7a63",
+      kind: evento.kind || evento.dotType || "plantao",
+      targetPath: evento.targetPath,
+    }))
+    .filter((evento) => evento.date);
+
+  const getDotTypesOnDate = (date) => {
+    const order = ["plantao", "cobertura", "pedido-proprio"];
+    const types = new Set(
+      eventosNormalizados
+        .filter((event) => event.date === date)
+        .map((event) => event.kind),
+    );
+
+    return order.filter((type) => types.has(type));
   };
 
   // Função para renderizar o conteúdo do dia
   const renderDayCell = (arg) => {
     const dateStr = arg.date.toISOString().split("T")[0];
-    const hasEvent = hasEventOnDate(dateStr);
+    const dotTypes = getDotTypesOnDate(dateStr);
 
     return (
       <div className="day-content">
         <span className="day-number">{arg.dayNumberText}</span>
-        {hasEvent && <div className="bolinha"></div>}
+        {dotTypes.length > 0 && (
+          <div className="calendar-dots">
+            {dotTypes.map((type) => (
+              <span className={`calendar-dot calendar-dot-${type}`} key={type} />
+            ))}
+          </div>
+        )}
       </div>
     );
   };
@@ -39,22 +62,33 @@ export default function Calendario({ eventos }) {
           center: "",
           right: "prev,next",
         }}
-        events={eventos.map((e, idx) => ({
+        events={eventosNormalizados.map((e, idx) => ({
           id: e.id ?? idx + 1,
           title: e.title,
           start: e.date,
           color: e.color,
+          extendedProps: {
+            targetPath: e.targetPath,
+          },
         }))}
         dayCellContent={renderDayCell}
         dateClick={(info) => {
-          const found = eventos.find((ev) => ev.date === info.dateStr);
+          const found = eventosNormalizados.find(
+            (ev) => ev.date === info.dateStr,
+          );
           if (found && found.id) {
-            navigate(`/DetalhePlantao/${found.id}`);
+            navigate(
+              found.targetPath || `/UserPlantonista/DetalhePlantao/${found.id}`,
+            );
           }
         }}
         eventClick={(info) => {
-          if (info.event && info.event.id)
-            navigate(`/DetalhePlantao/${info.event.id}`);
+          if (info.event && info.event.id) {
+            navigate(
+              info.event.extendedProps.targetPath ||
+                `/UserPlantonista/DetalhePlantao/${info.event.id}`,
+            );
+          }
         }}
       />
     </div>

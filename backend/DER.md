@@ -6,6 +6,7 @@ Este documento e a fonte unica proposta para o DER do MedShift. Ele consolida as
 - o hospital acessa o sistema com suas credenciais;
 - o hospital cadastra setores e escalistas;
 - cada escalista fica responsavel por um unico setor do hospital;
+- cada setor pode ter no maximo um escalista responsavel;
 - escalistas vinculam medicos ao seu setor e atribuem plantoes;
 - plantoes podem ser avulsos ou fixos/recorrentes;
 - o medico pode abrir um pedido para outro medico assumir seu plantao;
@@ -143,6 +144,7 @@ erDiagram
         bigint medico_responsavel_atual_id FK
         bigint criado_por_escalista_id FK
         string tipo
+        string turno
         datetime data_inicio
         datetime data_fim
         string status
@@ -189,7 +191,7 @@ erDiagram
     HOSPITAL ||--o{ PLANTAO : possui
     HOSPITAL ||--o{ PEDIDO_COBERTURA : restringe
 
-    SETOR ||--o{ ESCALISTA : responsavel_por
+    SETOR ||--o| ESCALISTA : responsavel_por
     SETOR ||--o{ ESCALISTA_SETOR : registra_historico
     ESCALISTA ||--o{ ESCALISTA_SETOR : historico_setor
     USUARIO ||--o{ ESCALISTA_SETOR : vincula
@@ -312,6 +314,7 @@ Representa uma unidade operacional do hospital, como UTI, emergencia ou pediatri
 Restricao recomendada:
 
 - `hospital_id + nome` deve ser unico para evitar setores duplicados no mesmo hospital.
+- um setor deve ter no maximo um escalista responsavel.
 
 ### ESCALISTA
 
@@ -331,6 +334,7 @@ Restricao recomendada:
 - o usuario associado deve ter `role = ESCALISTA`.
 - o setor informado deve pertencer ao mesmo hospital do escalista.
 - o escalista deve possuir exatamente um setor responsavel enquanto estiver ativo.
+- `setor_id` deve ser unico entre escalistas, garantindo que um setor nao tenha dois responsaveis.
 
 ### ESCALISTA_SETOR
 
@@ -350,6 +354,7 @@ Regras:
 
 - o setor deve pertencer ao mesmo hospital do escalista;
 - um escalista so pode ter um vinculo ativo por vez;
+- um setor so pode ter um vinculo ativo correspondente ao seu escalista responsavel;
 - o vinculo ativo deve corresponder ao `ESCALISTA.setor_id`;
 - quando o escalista troca de setor, os vinculos ativos anteriores devem ser encerrados.
 
@@ -533,7 +538,7 @@ Regra:
 - `USUARIO 1:N HOSPITAL` como admin que cadastra hospitais.
 - `HOSPITAL 1:N SETOR`.
 - `HOSPITAL 1:N ESCALISTA`.
-- `SETOR 1:N ESCALISTA`; cada escalista responde por um unico setor.
+- `SETOR 1:0..1 ESCALISTA`; cada escalista responde por um unico setor, e cada setor pode ter no maximo um escalista responsavel.
 - `ESCALISTA_SETOR` registra historico/compatibilidade dos vinculos do escalista.
 - `MEDICO N:N SETOR` via `MEDICO_SETOR`.
 - `MEDICO N:N ESPECIALIDADE` via `MEDICO_ESPECIALIDADE`.
@@ -579,6 +584,7 @@ WHERE pc.status = 'ABERTO'
 - `setor.hospital_id + setor.nome` unico.
 - `escalista.usuario_id + escalista.hospital_id` unico.
 - `escalista.setor_id` obrigatorio para escalistas ativos.
+- `escalista.setor_id` unico para impedir dois escalistas no mesmo setor.
 - `escalista_setor.escalista_id` deve possuir no maximo um vinculo ativo.
 - `medico.crm + medico.uf_crm` unico.
 - `medico.usuario_id` unico.

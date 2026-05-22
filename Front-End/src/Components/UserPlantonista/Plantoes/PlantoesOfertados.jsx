@@ -1,9 +1,9 @@
 // TELA COM OS PLANTÕES QUE ESTÃO OFERTADOS
-import React from "react";
+import React, { useEffect, useState } from "react";
 import fotoPerfil from "../../../assets/drhouse.png";
 import "./PlantoesOfertados.css";
 import Sidebar from "../../Sidebar/Sidebar";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Bell,
   Settings,
@@ -12,52 +12,165 @@ import {
   UserRound,
   ArrowLeftRight,
 } from "lucide-react";
-
-const shifts = [
-  {
-    id: 1,
-    title: "Pronto Socorro Adulto",
-    hospital: "Hospital Santa Maria",
-    date: "Terça-feira, 24 de Outubro",
-    time: "19:00 - 07:00 (12h - Noturno)",
-    doctor: "Dr. Ricardo S.",
-    type: "URGENTE",
-    typeClass: "urgent",
-  },
-  {
-    id: 2,
-    title: "UTI Cardiológica",
-    hospital: "Hospital Santa Maria",
-    date: "Quarta-feira, 25 de Outubro",
-    time: "07:00 - 19:00 (12h - Diurno)",
-    doctor: "Dra. Mariana L.",
-    type: "ROTINA",
-    typeClass: "routine",
-  },
-  {
-    id: 3,
-    title: "Ambulatório Clínico",
-    hospital: "Hospital Santa Maria",
-    date: "Sexta-feira, 27 de Outubro",
-    time: "08:00 - 14:00 (06h - Diurno)",
-    doctor: "Dr. Arthur P.",
-    type: "ROTINA",
-    typeClass: "routine",
-  },
-  {
-    id: 4,
-    title: "UTI Cardiológica",
-    hospital: "Hospital Santa Maria",
-    date: "Quarta-feira, 25 de Outubro",
-    time: "07:00 - 19:00 (12h - Diurno)",
-    doctor: "Dra. Mariana L.",
-    type: "ROTINA",
-    typeClass: "routine",
-  },
-];
+import {
+  assumirCobertura,
+  cancelarPedidoCobertura,
+  getCoberturasDisponiveis,
+  getMeusPedidosCobertura,
+} from "../../../services/doctorServices";
+import {
+  formatDateLong,
+  getUsuarioLogado,
+  normalizePedidoCobertura,
+} from "../../../utils/plantaoFormatters";
 
 export default function PlantoesOfertados() {
   const navigate = useNavigate();
+  const usuario = getUsuarioLogado();
+  const [disponiveis, setDisponiveis] = useState([]);
+  const [meusPedidos, setMeusPedidos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null);
+  const [erro, setErro] = useState("");
+
+  async function carregarCoberturas() {
+    try {
+      setLoading(true);
+      setErro("");
+
+      const [disponiveisData, meusPedidosData] = await Promise.all([
+        getCoberturasDisponiveis(),
+        getMeusPedidosCobertura(),
+      ]);
+
+      setDisponiveis(
+        (Array.isArray(disponiveisData) ? disponiveisData : []).map(
+          normalizePedidoCobertura,
+        ),
+      );
+      setMeusPedidos(
+        (Array.isArray(meusPedidosData) ? meusPedidosData : []).map(
+          normalizePedidoCobertura,
+        ),
+      );
+    } catch (error) {
+      setErro(error.message || "Nao foi possivel carregar as ofertas.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    carregarCoberturas();
+  }, []);
+
+  async function handleAssumir(pedidoId) {
+    try {
+      setActionLoading(`assumir-${pedidoId}`);
+      setErro("");
+      await assumirCobertura(pedidoId);
+      await carregarCoberturas();
+    } catch (error) {
+      setErro(error.message || "Nao foi possivel assumir o plantao.");
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleCancelar(pedidoId) {
+    try {
+      setActionLoading(`cancelar-${pedidoId}`);
+      setErro("");
+      await cancelarPedidoCobertura(pedidoId);
+      await carregarCoberturas();
+    } catch (error) {
+      setErro(error.message || "Nao foi possivel cancelar o pedido.");
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  function abrirDetalhes(pedido, modo) {
+    navigate("/UserPlantonista/DetalhesOferta", {
+      state: { pedido: pedido.raw, modo },
+    });
+  }
+
+  function renderCard(pedido, modo) {
+    const isDisponivel = modo === "disponivel";
+    const isAberto = pedido.status === "ABERTO";
+
+    return (
+      <div className="shift-card" key={`${modo}-${pedido.id}`}>
+        <div className="card-header">
+          <div className="card-title-section">
+            <div>
+              <h3>{pedido.setor}</h3>
+              <span>{pedido.hospital}</span>
+            </div>
+          </div>
+
+          <span className={`badge ${isDisponivel ? "urgent" : "routine"}`}>
+            {pedido.status}
+          </span>
+        </div>
+
+        <div className="card-info">
+          <div className="info-row">
+            <CalendarDays size={18} />
+            <span>{formatDateLong(pedido.plantao.date)}</span>
+          </div>
+
+          <div className="info-row">
+            <Clock3 size={18} />
+            <span>{pedido.plantao.time}</span>
+          </div>
+
+          <div className="info-row">
+            <UserRound size={18} />
+            <span>
+              {isDisponivel
+                ? `Ofertado por: ${pedido.medicoSolicitante}`
+                : pedido.medicoCobridor
+                  ? `Coberto por: ${pedido.medicoCobridor}`
+                  : "Aguardando cobertura"}
+            </span>
+          </div>
+        </div>
+
+        <div className="card-buttons">
+          <button
+            className="details-btn"
+            onClick={() => abrirDetalhes(pedido, modo)}
+          >
+            Ver Detalhes
+          </button>
+
+          {isDisponivel ? (
+            <button
+              className="accept-btn"
+              disabled={actionLoading === `assumir-${pedido.id}`}
+              onClick={() => handleAssumir(pedido.id)}
+            >
+              {actionLoading === `assumir-${pedido.id}`
+                ? "Assumindo..."
+                : "Aceitar Plantão"}
+            </button>
+          ) : (
+            <button
+              className="accept-btn"
+              disabled={!isAberto || actionLoading === `cancelar-${pedido.id}`}
+              onClick={() => handleCancelar(pedido.id)}
+            >
+              {actionLoading === `cancelar-${pedido.id}`
+                ? "Cancelando..."
+                : "Cancelar Pedido"}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="plantoes-layout">
@@ -77,8 +190,8 @@ export default function PlantoesOfertados() {
             <Bell className="icone-topo" />
             <Settings className="icone-topo" />
             <div className="user">
-              <img src={fotoPerfil} alt="Dr. House" />
-              <span>Dr. House</span>
+              <img src={fotoPerfil} alt={usuario?.name || "Medico"} />
+              <span>{usuario?.name || "Medico"}</span>
             </div>
           </div>
         </header>
@@ -86,55 +199,39 @@ export default function PlantoesOfertados() {
         <div className="offer-button-container">
           <button
             className="offer-btn"
-            onClick={() => navigate("/OferecerPlantao")}
+            onClick={() => navigate("/UserPlantonista/OferecerPlantao")}
           >
             <ArrowLeftRight size={18} />
             Oferecer plantão
           </button>
         </div>
 
+        {erro && <div className="alerta-login erro">{erro}</div>}
+
         <section className="cards-grid">
-          {shifts.map((shift) => (
-            <div className="shift-card" key={shift.id}>
-              <div className="card-header">
-                <div className="card-title-section">
-                  <div>
-                    <h3>{shift.title}</h3>
-                    <span>{shift.hospital}</span>
-                  </div>
-                </div>
+          <div className="section-heading">
+            <h2>Disponíveis para assumir</h2>
+          </div>
 
-                <span className={`badge ${shift.typeClass}`}>{shift.type}</span>
-              </div>
+          {loading ? (
+            <p>Carregando ofertas...</p>
+          ) : disponiveis.length > 0 ? (
+            disponiveis.map((pedido) => renderCard(pedido, "disponivel"))
+          ) : (
+            <p>Nenhum plantão disponível para cobertura no momento.</p>
+          )}
 
-              <div className="card-info">
-                <div className="info-row">
-                  <CalendarDays size={18} />
-                  <span>{shift.date}</span>
-                </div>
+          <div className="section-heading">
+            <h2>Meus pedidos de cobertura</h2>
+          </div>
 
-                <div className="info-row">
-                  <Clock3 size={18} />
-                  <span>{shift.time}</span>
-                </div>
-
-                <div className="info-row">
-                  <UserRound size={18} />
-                  <span>Ofertado por: {shift.doctor}</span>
-                </div>
-              </div>
-
-              <div className="card-buttons">
-                <button className="details-btn">
-                  <Link to="/DetalhesOferta" className="detalhes-oferta">
-                    Ver Detalhes
-                  </Link>
-                </button>
-
-                <button className="accept-btn">Aceitar Plantão</button>
-              </div>
-            </div>
-          ))}
+          {loading ? (
+            <p>Carregando pedidos...</p>
+          ) : meusPedidos.length > 0 ? (
+            meusPedidos.map((pedido) => renderCard(pedido, "meu"))
+          ) : (
+            <p>Você ainda não abriu pedidos de cobertura.</p>
+          )}
         </section>
       </main>
     </div>

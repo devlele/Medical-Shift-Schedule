@@ -18,6 +18,7 @@ import com.mss.medShift.domain.repository.ManagerRepository;
 import com.mss.medShift.domain.repository.SetorRepository;
 import com.mss.medShift.domain.repository.UsuarioRepository;
 import com.mss.medShift.service.ManagerService;
+import com.mss.medShift.service.exception.ConflictException;
 
 @Service
 public class ManagerServiceImple implements ManagerService {
@@ -82,6 +83,7 @@ public class ManagerServiceImple implements ManagerService {
         if (setor.getHospital() == null || !setor.getHospital().getId().equals(hospitalLogado.getId())) {
             throw new IllegalArgumentException("O setor informado não pertence ao hospital logado");
         }
+        ensureSetorDisponivelParaEscalista(setor, null);
 
         LocalDateTime now = LocalDateTime.now();
         Usuario usuario = new Usuario(
@@ -115,12 +117,6 @@ public class ManagerServiceImple implements ManagerService {
         if (manager.getSetor() != null && manager.getSetor().getHospital() != null
                 && manager.getSetor().getHospital().getId().equals(hospitalLogado.getId())) {
             return List.of(assignSingleSetor(manager, manager.getSetor(), hospitalLogado.getUsuario(), LocalDateTime.now()));
-        }
-
-        List<EscalistaSetor> vinculos = escalistaSetorRepository.findByEscalistaIdAndAtivoTrue(manager.getId());
-        if (!vinculos.isEmpty() && vinculos.get(0).getSetor() != null) {
-            EscalistaSetor vinculo = vinculos.get(0);
-            return List.of(assignSingleSetor(manager, vinculo.getSetor(), hospitalLogado.getUsuario(), LocalDateTime.now()));
         }
         return List.of();
     }
@@ -188,7 +184,9 @@ public class ManagerServiceImple implements ManagerService {
     }
 
     private EscalistaSetor assignSingleSetor(Manager manager, Setor setor, Usuario usuarioLogado, LocalDateTime now) {
+        ensureSetorDisponivelParaEscalista(setor, manager);
         deactivateOtherActiveVinculos(manager.getId(), setor.getId(), now);
+        deactivateOtherActiveVinculosForSetor(manager.getId(), setor.getId(), now);
         EscalistaSetor vinculo = createOrReactivateVinculo(manager, setor, usuarioLogado, now);
 
         if (!isCanonicalSetor(manager, setor)) {
@@ -210,6 +208,28 @@ public class ManagerServiceImple implements ManagerService {
                     vinculo.setDesvinculadoEm(now);
                     escalistaSetorRepository.save(vinculo);
                 });
+    }
+
+    private void deactivateOtherActiveVinculosForSetor(Long managerId, Long setorId, LocalDateTime now) {
+        escalistaSetorRepository.findBySetorIdAndAtivoTrue(setorId).stream()
+                .filter(vinculo -> vinculo.getEscalista() == null
+                        || vinculo.getEscalista().getId() == null
+                        || !vinculo.getEscalista().getId().equals(managerId))
+                .forEach(vinculo -> {
+                    vinculo.setAtivo(false);
+                    vinculo.setDesvinculadoEm(now);
+                    escalistaSetorRepository.save(vinculo);
+                });
+    }
+
+    private void ensureSetorDisponivelParaEscalista(Setor setor, Manager manager) {
+        Long managerId = manager != null ? manager.getId() : null;
+        boolean ocupadoPorOutroEscalista = managerRepository.findAllBySetorId(setor.getId()).stream()
+                .anyMatch(existing -> existing.getId() != null && !existing.getId().equals(managerId));
+
+        if (ocupadoPorOutroEscalista) {
+            throw new ConflictException("Setor já possui um escalista responsável");
+        }
     }
 
     private EscalistaSetor createOrReactivateVinculo(Manager manager, Setor setor, Usuario usuarioLogado, LocalDateTime now) {

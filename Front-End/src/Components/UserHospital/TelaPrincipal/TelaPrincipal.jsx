@@ -15,6 +15,7 @@ import {
   getEscalistas,
   getSetores,
 } from "../Setores/setorServices.js";
+import { getStoredUser } from "../../../utils/authStorage";
 
 import "./TelaPrincipal.css";
 
@@ -163,15 +164,5 @@ export default function TelaPrincipal() {
 }
 
 function obterUsuarioLogado() {
-  const usuarioSalvo = localStorage.getItem("usuario");
-
-  if (!usuarioSalvo) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(usuarioSalvo);
-  } catch {
-    return { name: usuarioSalvo };
-  }
+  return getStoredUser();
 }

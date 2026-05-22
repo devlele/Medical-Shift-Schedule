@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Table(name = "tb_setor")
@@ -36,6 +37,10 @@ public class Setor {
     @OneToMany(mappedBy = "setor")
     @JsonIgnore
     private List<EscalistaSetor> escalistaSetores;
+
+    @OneToOne(mappedBy = "setor")
+    @JsonIgnore
+    private Manager escalista;
 
     @OneToMany(mappedBy = "setor")
     @JsonIgnore
@@ -127,6 +132,14 @@ public class Setor {
         this.escalistaSetores = escalistaSetores;
     }
 
+    public Manager getEscalista() {
+        return escalista;
+    }
+
+    public void setEscalista(Manager escalista) {
+        this.escalista = escalista;
+    }
+
     public List<MedicoSetor> getMedicoSetores() {
         return medicoSetores;
     }
@@ -164,6 +177,9 @@ public class Setor {
      */
     @JsonIgnore
     public List<Manager> getManagers() {
+        if (escalista != null) {
+            return List.of(escalista);
+        }
         return escalistaSetores == null
                 ? List.of()
                 : escalistaSetores.stream().map(EscalistaSetor::getEscalista).toList();

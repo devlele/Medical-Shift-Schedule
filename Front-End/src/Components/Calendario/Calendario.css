@@ -61,12 +61,29 @@
   color: var(--medical-text);
 }
 
-.bolinha {
+.calendar-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.calendar-dot {
   width: 6px;
   height: 6px;
-  background-color: var(--medical-teal);
   border-radius: 50%;
-  margin-top: 2px;
+}
+
+.calendar-dot-plantao {
+  background: #1f7a63;
+}
+
+.calendar-dot-cobertura {
+  background: #d64545;
+}
+
+.calendar-dot-pedido-proprio {
+  background: #2f80ed;
 }
 
 /* evento */

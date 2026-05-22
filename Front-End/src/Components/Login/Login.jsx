@@ -4,6 +4,10 @@ import { Mail, Lock, AlertCircle } from "lucide-react";
 
 import { validarEmail, validarSenha } from "../../utils/validacoes";
 import { loginUsuario } from "../../services/api";
+import {
+  getDefaultRouteForRole,
+  saveAuthSession,
+} from "../../utils/authStorage";
 import logo from "../../assets/Logo-H.png";
 import "./Login.css";
 import "../../utils/validacoes.css";
@@ -57,33 +61,17 @@ const Login = () => {
         const usuario = resposta.user;
         const role = usuario?.role;
 
-        localStorage.setItem("token", resposta.token);
-        localStorage.setItem("emailUsuario", payload.email);
-        if (usuario) {
-          localStorage.setItem("usuario", JSON.stringify(usuario));
-        }
-        if (role) {
-          localStorage.setItem("role", role);
+        if (!resposta.token || !role) {
+          throw new Error("Resposta de autenticação inválida.");
         }
 
-        const normalizedRole = role?.toUpperCase();
+        saveAuthSession({
+          token: resposta.token,
+          user: usuario,
+          email: payload.email,
+        });
 
-        if (normalizedRole === "HOSPITAL") {
-          navigate("/UserHospital/TelaPrincipal");
-          return;
-        }
-
-        if (normalizedRole === "ESCALISTA" || normalizedRole === "MANAGER") {
-          navigate("/UserEscalista/TelaPrincipal");
-          return;
-        }
-
-        if (normalizedRole === "MEDICO" || normalizedRole === "DOCTOR") {
-          navigate("/UserPlantonista/TelaPrincipal");
-          return;
-        }
-
-        navigate("/Login");
+        navigate(getDefaultRouteForRole(role), { replace: true });
       } catch (error) {
         setErroLogin(
           error.message.includes("Failed to fetch")

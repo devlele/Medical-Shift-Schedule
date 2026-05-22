@@ -18,6 +18,7 @@ import {
     getMeusSetoresEscalista,
     vincularMedicoSetor,
 } from "../../UserHospital/Setores/setorServices.js";
+import { getStoredUser } from "../../../utils/authStorage";
 import "./MedicosSetor.css";
 
 export default function MedicosSetor() {
@@ -326,15 +327,5 @@ function normalizarMedicos(medicosData) {
 }
 
 function obterUsuarioLogado() {
-    const usuarioSalvo = localStorage.getItem("usuario");
-
-    if (!usuarioSalvo) {
-        return null;
-    }
-
-    try {
-        return JSON.parse(usuarioSalvo);
-    } catch {
-        return { name: usuarioSalvo };
-    }
+    return getStoredUser();
 }

@@ -1,63 +1,83 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Bell, Settings } from "lucide-react";
 import Sidebar from "../../Sidebar/Sidebar";
 import userImg from "../../../assets/drhouse.png";
 import "./Historico.css";
-
-const hospitais = [
-  "Todos os Hospitais",
-  "Hospital Albert Einstein",
-  "Hospital Sírio-Libanês",
-  "Hospital Santa Marcelina",
-  "InCor - e CFM/SP",
-];
-
-const registros = [
-  {
-    id: 1,
-    date: "24 Mai 2024",
-    weekday: "Sexta-feira",
-    time: "07:00 — 19:00",
-    hospital: "Hospital Albert Einstein",
-    unit: "UTI Cardíaca",
-    status: "COMPLETED",
-    statusClass: "completed",
-  },
-  {
-    id: 2,
-    date: "22 Mai 2024",
-    weekday: "Quarta-feira",
-    time: "19:00 — 07:00",
-    hospital: "Hospital Sírio-Libanês",
-    unit: "Emergência Geral",
-    status: "COMPLETED",
-    statusClass: "completed",
-  },
-  {
-    id: 3,
-    date: "18 Mai 2024",
-    weekday: "Sábado",
-    time: "07:00 — 19:00",
-    hospital: "Hospital Santa Marcelina",
-    unit: "Radiologia",
-    status: "CANCELLED",
-    statusClass: "cancelled",
-  },
-  {
-    id: 4,
-    date: "15 Mai 2024",
-    weekday: "Quarta-feira",
-    time: "13:00 — 19:00",
-    hospital: "InCor - e CFM/SP",
-    unit: "Radiologia",
-    status: "AUSENTE",
-    statusClass: "absent",
-  },
-];
+import { getMinhaAgendaMedico } from "../../../services/doctorServices";
+import {
+  formatDateShort,
+  formatPlantaoTime,
+  formatWeekday,
+  getPlantaoDate,
+  getUsuarioLogado,
+} from "../../../utils/plantaoFormatters";
 
 const Historico = () => {
+  const usuario = getUsuarioLogado();
   const [selectedHospital, setSelectedHospital] =
     useState("Todos os Hospitais");
+  const [registros, setRegistros] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState("");
+
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarHistorico() {
+      try {
+        setLoading(true);
+        setErro("");
+
+        const agenda = await getMinhaAgendaMedico();
+        const agora = new Date();
+
+        const historico = (Array.isArray(agenda) ? agenda : [])
+          .filter((plantao) => {
+            if (!plantao.dataFim) {
+              return plantao.status !== "AGENDADO";
+            }
+
+            return new Date(plantao.dataFim) < agora;
+          })
+          .map((plantao) => ({
+            id: plantao.id,
+            date: formatDateShort(getPlantaoDate(plantao)),
+            weekday: formatWeekday(getPlantaoDate(plantao)),
+            time: formatPlantaoTime(plantao),
+            hospital: plantao.hospital || "Hospital nao informado",
+            unit: plantao.setor || "Setor nao informado",
+            status: plantao.status || "CONCLUIDO",
+            statusClass:
+              plantao.status === "CANCELADO" ? "cancelled" : "completed",
+          }));
+
+        if (ativo) {
+          setRegistros(historico);
+        }
+      } catch (error) {
+        if (ativo) {
+          setErro(error.message || "Nao foi possivel carregar o historico.");
+        }
+      } finally {
+        if (ativo) {
+          setLoading(false);
+        }
+      }
+    }
+
+    carregarHistorico();
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  const hospitais = useMemo(() => {
+    return [
+      "Todos os Hospitais",
+      ...Array.from(new Set(registros.map((registro) => registro.hospital))),
+    ];
+  }, [registros]);
 
   const filteredRegistros = useMemo(() => {
     if (selectedHospital === "Todos os Hospitais") {
@@ -102,8 +122,8 @@ const Historico = () => {
             <Bell className="icone-topo" />
             <Settings className="icone-topo" />
             <div className="user">
-              <img src={userImg} alt="Dr. House" />
-              <span>Dr. House</span>
+              <img src={userImg} alt={usuario?.name || "Medico"} />
+              <span>{usuario?.name || "Medico"}</span>
             </div>
           </div>
         </header>
@@ -139,41 +159,49 @@ const Historico = () => {
               </div>
             </div>
 
-            <table className="historico-table">
-              <thead>
-                <tr>
-                  <th>DATA</th>
-                  <th>HORÁRIO</th>
-                  <th>HOSPITAL</th>
-                  <th>UNIDADE / ESPECIALIDADE</th>
-                  <th>STATUS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentPageRegistros.map((registro) => (
-                  <tr key={registro.id}>
-                    <td>
-                      <div className="date-cell">
-                        <strong>{registro.date}</strong>
-                        <span>{registro.weekday}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="time-cell">
-                        <strong>{registro.time}</strong>
-                      </div>
-                    </td>
-                    <td>{registro.hospital}</td>
-                    <td>{registro.unit}</td>
-                    <td>
-                      <span className={`status-badge ${registro.statusClass}`}>
-                        {registro.status}
-                      </span>
-                    </td>
+            {loading ? (
+              <p>Carregando histórico...</p>
+            ) : erro ? (
+              <p>{erro}</p>
+            ) : currentPageRegistros.length > 0 ? (
+              <table className="historico-table">
+                <thead>
+                  <tr>
+                    <th>DATA</th>
+                    <th>HORÁRIO</th>
+                    <th>HOSPITAL</th>
+                    <th>UNIDADE / ESPECIALIDADE</th>
+                    <th>STATUS</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {currentPageRegistros.map((registro) => (
+                    <tr key={registro.id}>
+                      <td>
+                        <div className="date-cell">
+                          <strong>{registro.date}</strong>
+                          <span>{registro.weekday}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="time-cell">
+                          <strong>{registro.time}</strong>
+                        </div>
+                      </td>
+                      <td>{registro.hospital}</td>
+                      <td>{registro.unit}</td>
+                      <td>
+                        <span className={`status-badge ${registro.statusClass}`}>
+                          {registro.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p>Nenhum plantão concluído encontrado.</p>
+            )}
 
             {totalPages > 1 && (
               <div className="pagination">

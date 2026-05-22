@@ -184,6 +184,35 @@
 
 /* CALENDÁRIO SEMANAL */
 
+.week-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: #e8f5ef;
+  border-radius: 18px;
+  padding: 12px 16px;
+}
+
+.week-toolbar strong {
+  color: #223633;
+  text-align: center;
+}
+
+.week-toolbar button {
+  border: none;
+  background: #d9ebe2;
+  color: #24443a;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.week-toolbar button:hover {
+  background: #c8ddd3;
+}
+
 .week-calendar {
   display: grid;
   grid-template-columns: repeat(7, minmax(90px, 1fr));
@@ -230,15 +259,32 @@
   color: #0f3740;
 }
 
-.dot {
-  width: 9px;
-  height: 9px;
-  background: #0f3740;
-  border-radius: 50%;
+.day-dots {
   position: absolute;
   bottom: 18px;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.day-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.day-dot-plantao {
+  background: #1f7a63;
+}
+
+.day-dot-cobertura {
+  background: #d64545;
+}
+
+.day-dot-pedido-proprio {
+  background: #2f80ed;
 }
 
 /* PLANTÕES */
@@ -287,6 +333,16 @@
   color: #13434a;
 }
 
+.shift-icon.cobertura {
+  background: #ffd7d7;
+  color: #8f1f1f;
+}
+
+.shift-icon.pedido-proprio {
+  background: #d7e8ff;
+  color: #1754a6;
+}
+
 .shift-info {
   flex: 1;
   min-width: 0;
@@ -316,6 +372,14 @@
   gap: 8px;
   color: #6d8b84;
   font-size: 13px;
+}
+
+.shift-details .recurrence-badge {
+  background: #d9ebe2;
+  color: #1f4739;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-weight: 700;
 }
 
 .details-btn {
@@ -406,7 +470,15 @@
 }
 
 .event-night {
-  background: #59949b !important;
+  background: #3c8f75 !important;
+}
+
+.event-coverage {
+  background: #d64545 !important;
+}
+
+.event-own-coverage {
+  background: #2f80ed !important;
 }
 
 /* RESPONSIVO */

@@ -1,0 +1,272 @@
+TABELAS SQL - MEDSHIFT
+
+------------------------------------------------------------
+tb_usuario
+------------------------------------------------------------
+
+CREATE TABLE tb_usuario (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255),
+    email VARCHAR(255) UNIQUE,
+    senha_hash VARCHAR(255),
+    cpf VARCHAR(14) UNIQUE,
+    data_nascimento DATE,
+    telefone VARCHAR(50),
+    role VARCHAR(50),
+    ativo BOOLEAN DEFAULT TRUE,
+    criado_em TIMESTAMP,
+    atualizado_em TIMESTAMP
+);
+
+------------------------------------------------------------
+tb_hospital
+------------------------------------------------------------
+
+CREATE TABLE tb_hospital (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome_fantasia VARCHAR(255) NOT NULL,
+    cnpj VARCHAR(14) NOT NULL UNIQUE,
+    endereco VARCHAR(500),
+    nome_gestor VARCHAR(255),
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL,
+    usuario_id BIGINT,
+    criado_por_usuario_id BIGINT,
+    razao_social VARCHAR(255),
+    telefone VARCHAR(50),
+    ativo BOOLEAN DEFAULT TRUE,
+    criado_em TIMESTAMP,
+    atualizado_em TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES tb_usuario(id),
+    FOREIGN KEY (criado_por_usuario_id) REFERENCES tb_usuario(id)
+);
+
+------------------------------------------------------------
+tb_setor
+------------------------------------------------------------
+
+CREATE TABLE tb_setor (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    descricao VARCHAR(500),
+    hospital_id BIGINT NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE,
+    criado_em TIMESTAMP,
+    atualizado_em TIMESTAMP,
+    FOREIGN KEY (hospital_id) REFERENCES tb_hospital(id)
+);
+
+------------------------------------------------------------
+tb_escalista
+------------------------------------------------------------
+
+CREATE TABLE tb_escalista (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id BIGINT,
+    cargo VARCHAR(100),
+    ativo BOOLEAN DEFAULT TRUE,
+    criado_em TIMESTAMP,
+    atualizado_em TIMESTAMP,
+    role VARCHAR(50),
+    hospital_id BIGINT,
+    setor_id BIGINT,
+    name VARCHAR(255),
+    cpf VARCHAR(14) UNIQUE,
+    email VARCHAR(255) UNIQUE,
+    birthday DATE,
+    password VARCHAR(255),
+    FOREIGN KEY (usuario_id) REFERENCES tb_usuario(id),
+    FOREIGN KEY (hospital_id) REFERENCES tb_hospital(id),
+    FOREIGN KEY (setor_id) REFERENCES tb_setor(id),
+    CONSTRAINT uk_tb_escalista_setor UNIQUE (setor_id)
+);
+
+------------------------------------------------------------
+tb_medico
+------------------------------------------------------------
+
+CREATE TABLE tb_medico (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id BIGINT,
+    crm VARCHAR(20) NOT NULL,
+    uf_crm VARCHAR(2),
+    telefone VARCHAR(50),
+    foto_perfil_url VARCHAR(500),
+    ativo BOOLEAN DEFAULT TRUE,
+    criado_em TIMESTAMP,
+    atualizado_em TIMESTAMP,
+    specialty VARCHAR(100),
+    role VARCHAR(50),
+    hospital_id BIGINT,
+    setor_id BIGINT,
+    name VARCHAR(255),
+    cpf VARCHAR(14) UNIQUE,
+    email VARCHAR(255) UNIQUE,
+    birthday DATE,
+    password VARCHAR(255),
+    FOREIGN KEY (usuario_id) REFERENCES tb_usuario(id),
+    FOREIGN KEY (hospital_id) REFERENCES tb_hospital(id),
+    FOREIGN KEY (setor_id) REFERENCES tb_setor(id)
+);
+
+------------------------------------------------------------
+tb_escalista_setor
+------------------------------------------------------------
+
+CREATE TABLE tb_escalista_setor (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    escalista_id BIGINT,
+    setor_id BIGINT,
+    vinculado_por_usuario_id BIGINT,
+    ativo BOOLEAN DEFAULT TRUE,
+    vinculado_em TIMESTAMP,
+    desvinculado_em TIMESTAMP,
+    FOREIGN KEY (escalista_id) REFERENCES tb_escalista(id),
+    FOREIGN KEY (setor_id) REFERENCES tb_setor(id),
+    FOREIGN KEY (vinculado_por_usuario_id) REFERENCES tb_usuario(id)
+);
+
+------------------------------------------------------------
+tb_medico_setor
+------------------------------------------------------------
+
+CREATE TABLE tb_medico_setor (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    medico_id BIGINT,
+    setor_id BIGINT,
+    vinculado_por_escalista_id BIGINT,
+    ativo BOOLEAN DEFAULT TRUE,
+    vinculado_em TIMESTAMP,
+    desvinculado_em TIMESTAMP,
+    FOREIGN KEY (medico_id) REFERENCES tb_medico(id),
+    FOREIGN KEY (setor_id) REFERENCES tb_setor(id),
+    FOREIGN KEY (vinculado_por_escalista_id) REFERENCES tb_escalista(id)
+);
+
+------------------------------------------------------------
+tb_especialidade
+------------------------------------------------------------
+
+CREATE TABLE tb_especialidade (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) UNIQUE,
+    descricao VARCHAR(500),
+    ativo BOOLEAN DEFAULT TRUE,
+    criado_em TIMESTAMP,
+    atualizado_em TIMESTAMP
+);
+
+------------------------------------------------------------
+tb_medico_especialidade
+------------------------------------------------------------
+
+CREATE TABLE tb_medico_especialidade (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    medico_id BIGINT,
+    especialidade_id BIGINT,
+    principal BOOLEAN DEFAULT FALSE,
+    criado_em TIMESTAMP,
+    FOREIGN KEY (medico_id) REFERENCES tb_medico(id),
+    FOREIGN KEY (especialidade_id) REFERENCES tb_especialidade(id)
+);
+
+------------------------------------------------------------
+tb_regra_plantao_fixo
+------------------------------------------------------------
+
+CREATE TABLE tb_regra_plantao_fixo (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    hospital_id BIGINT,
+    setor_id BIGINT,
+    medico_titular_id BIGINT,
+    criado_por_escalista_id BIGINT,
+    tipo_recorrencia VARCHAR(50),
+    dia_semana VARCHAR(50),
+    semana_do_mes INT,
+    dia_do_mes INT,
+    hora_inicio TIME,
+    hora_fim TIME,
+    data_inicio_vigencia DATE,
+    data_fim_vigencia DATE,
+    ativo BOOLEAN DEFAULT TRUE,
+    criado_em TIMESTAMP,
+    atualizado_em TIMESTAMP,
+    FOREIGN KEY (hospital_id) REFERENCES tb_hospital(id),
+    FOREIGN KEY (setor_id) REFERENCES tb_setor(id),
+    FOREIGN KEY (medico_titular_id) REFERENCES tb_medico(id),
+    FOREIGN KEY (criado_por_escalista_id) REFERENCES tb_escalista(id)
+);
+
+------------------------------------------------------------
+tb_plantao
+------------------------------------------------------------
+
+CREATE TABLE tb_plantao (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    setor_id BIGINT NOT NULL,
+    doctor_assignado_id BIGINT,
+    data_inicio TIMESTAMP NOT NULL,
+    data_fim TIMESTAMP NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    hospital_id BIGINT,
+    regra_plantao_fixo_id BIGINT,
+    medico_titular_id BIGINT,
+    medico_responsavel_atual_id BIGINT,
+    criado_por_escalista_id BIGINT,
+    tipo VARCHAR(50),
+    turno VARCHAR(50),
+    criado_em TIMESTAMP,
+    atualizado_em TIMESTAMP,
+    FOREIGN KEY (setor_id) REFERENCES tb_setor(id),
+    FOREIGN KEY (doctor_assignado_id) REFERENCES tb_doctor(id),
+    FOREIGN KEY (hospital_id) REFERENCES tb_hospital(id),
+    FOREIGN KEY (regra_plantao_fixo_id) REFERENCES tb_regra_plantao_fixo(id),
+    FOREIGN KEY (medico_titular_id) REFERENCES tb_medico(id),
+    FOREIGN KEY (medico_responsavel_atual_id) REFERENCES tb_medico(id),
+    FOREIGN KEY (criado_por_escalista_id) REFERENCES tb_escalista(id)
+);
+
+------------------------------------------------------------
+tb_pedido_cobertura
+------------------------------------------------------------
+
+CREATE TABLE tb_pedido_cobertura (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    plantao_id BIGINT,
+    hospital_id BIGINT,
+    setor_id BIGINT,
+    medico_solicitante_id BIGINT,
+    medico_cobridor_id BIGINT,
+    status VARCHAR(50),
+    aberto_em TIMESTAMP,
+    assumido_em TIMESTAMP,
+    cancelado_em TIMESTAMP,
+    expirado_em TIMESTAMP,
+    atualizado_em TIMESTAMP,
+    FOREIGN KEY (plantao_id) REFERENCES tb_plantao(id),
+    FOREIGN KEY (hospital_id) REFERENCES tb_hospital(id),
+    FOREIGN KEY (setor_id) REFERENCES tb_setor(id),
+    FOREIGN KEY (medico_solicitante_id) REFERENCES tb_medico(id),
+    FOREIGN KEY (medico_cobridor_id) REFERENCES tb_medico(id)
+);
+
+------------------------------------------------------------
+tb_notificacao
+------------------------------------------------------------
+
+CREATE TABLE tb_notificacao (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    usuario_destino_id BIGINT,
+    pedido_cobertura_id BIGINT,
+    plantao_id BIGINT,
+    tipo VARCHAR(50),
+    titulo VARCHAR(255),
+    mensagem VARCHAR(1000),
+    lida_em TIMESTAMP,
+    criado_em TIMESTAMP,
+    FOREIGN KEY (usuario_destino_id) REFERENCES tb_usuario(id),
+    FOREIGN KEY (pedido_cobertura_id) REFERENCES tb_pedido_cobertura(id),
+    FOREIGN KEY (plantao_id) REFERENCES tb_plantao(id)
+);
+

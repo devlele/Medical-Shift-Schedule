@@ -45,7 +45,7 @@ public class Manager extends User {
      * Canonical sector managed by this escalista.
      * EscalistaSetor is kept only as link history/compatibility.
      */
-    @ManyToOne
+    @OneToOne
     private Setor setor;
 
     @OneToMany(mappedBy = "escalista")

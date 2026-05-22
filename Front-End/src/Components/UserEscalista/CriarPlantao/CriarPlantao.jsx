@@ -21,6 +21,7 @@ import {
     getDoctors,
     getMeusSetoresEscalista,
 } from "../../UserHospital/Setores/setorServices.js";
+import { getStoredUser } from "../../../utils/authStorage";
 
 const initialFormData = {
     dataPlantao: "",
@@ -341,17 +342,7 @@ export default function CriarPlantao() {
 }
 
 function obterUsuarioLogado() {
-    const usuarioSalvo = localStorage.getItem("usuario");
-
-    if (!usuarioSalvo) {
-        return null;
-    }
-
-    try {
-        return JSON.parse(usuarioSalvo);
-    } catch {
-        return { name: usuarioSalvo };
-    }
+    return getStoredUser();
 }
 
 function validarFormulario(dados) {
