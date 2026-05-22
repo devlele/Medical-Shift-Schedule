@@ -11,9 +11,14 @@ import {
   Menu,
   X,
   Users,
-  FileText,
-  Shield,
   Building2,
+  Shield,
+  FileText,
+  BriefcaseMedical, 
+  UserPlus,       
+  UsersRound,     
+  ArrowLeftRight, 
+  CircleUser      
 } from "lucide-react";
 
 import logo from "../../assets/logo.png";
@@ -22,6 +27,12 @@ import "./Sidebar.css";
 export default function Sidebar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+
+  // pega o role salvo no login - MUDAR AQUI TIRAR DPS O || "ROLE"
+  const role = localStorage
+    .getItem("role")
+    ?.toLowerCase()
+    ?.trim() || "escalista";  // MUDAR AQUI PARA ALTERAR A SIDEBAR (plantonista - hospital - escalista)
 
   function handleLogout() {
     localStorage.removeItem("token");
@@ -65,8 +76,82 @@ export default function Sidebar() {
     },
   ];
 
-  /* ESCOLHE MENU */
-  let menu = menuHospital;
+  /* MENU PLANTONISTA */
+  const menuPlantonista = [
+    {
+      to: "/TelaPrincipal",
+      label: "Home",
+      icon: Home,
+    },
+    {
+      to: "/Agenda",
+      label: "Agenda",
+      icon: CalendarDays,
+    },
+    {
+      to: "/PlantoesOfertados",
+      label: "Plantão",
+      icon: ClipboardPlus,
+    },
+    {
+      to: "/Historico",
+      label: "Histórico",
+      icon: History,
+    },
+    {
+      to: "/Perfil",
+      label: "Perfil",
+      icon: User,
+    },
+  ];
+
+  /*  ESCALISTA */
+  const menuEscalista = [
+    {
+      to: "/home",
+      label: "Home",
+      icon: Home,
+    },
+    {
+      to: "/criar-plantao",
+      label: "Criar Plantão",
+      icon: BriefcaseMedical,
+    },
+    {
+      to: "/cadastrar-profissional",
+      label: "Cadastrar Profissional",
+      icon: UserPlus,
+    },
+    {
+      to: "/setores",
+      label: "Setores",
+      icon: Building2,
+    },
+    {
+      to: "/plantonistas",
+      label: "Plantonistas",
+      icon: UsersRound,
+    },
+    {
+      to: "/delegacao",
+      label: "Delegação",
+      icon: ArrowLeftRight,
+    },
+    {
+      to: "/perfil",
+      label: "Perfil",
+      icon: CircleUser,
+    },
+  ];
+
+  /* ESCOLHE MENU PELO ROLE */
+  const menus = {
+    hospital: menuHospital,
+    plantonista: menuPlantonista,
+    escalista: menuEscalista,
+  };
+
+  const menu = menus[role] || [];
 
   return (
     <>
@@ -74,7 +159,9 @@ export default function Sidebar() {
       <button
         type="button"
         className="sidebar-toggle"
-        aria-label={isOpen ? "Fechar menu lateral" : "Abrir menu lateral"}
+        aria-label={
+          isOpen ? "Fechar menu lateral" : "Abrir menu lateral"
+        }
         aria-expanded={isOpen}
         onClick={() => setIsOpen((current) => !current)}
       >
@@ -105,7 +192,11 @@ export default function Sidebar() {
               <NavLink
                 key={item.to}
                 to={item.to}
-                className="item-menu"
+                className={({ isActive }) =>
+                  isActive
+                    ? "item-menu ativo"
+                    : "item-menu"
+                }
                 onClick={closeSidebar}
               >
                 <Icon className="icone" />
