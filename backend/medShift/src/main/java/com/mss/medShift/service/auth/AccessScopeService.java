@@ -116,17 +116,19 @@ public class AccessScopeService {
     public List<Long> resolveEscalistaSetorIds(Usuario usuario) {
         Manager escalista = requireEscalistaProfile(usuario);
 
+        if (escalista.getSetor() != null && escalista.getSetor().getId() != null) {
+            return List.of(escalista.getSetor().getId());
+        }
+
         List<Long> setorIds = escalistaSetorRepository.findByEscalistaIdAndAtivoTrue(escalista.getId()).stream()
                 .map(vinculo -> vinculo.getSetor() != null ? vinculo.getSetor().getId() : null)
                 .filter(id -> id != null)
                 .distinct()
+                .limit(1)
                 .toList();
 
         if (!setorIds.isEmpty()) {
             return setorIds;
-        }
-        if (escalista.getSetor() != null && escalista.getSetor().getId() != null) {
-            return List.of(escalista.getSetor().getId());
         }
         throw new AccessDeniedException("Escalista sem setor vinculado");
     }
@@ -191,11 +193,13 @@ public class AccessScopeService {
         if (setorId == null) {
             return false;
         }
+        if (escalista.getSetor() != null && escalista.getSetor().getId() != null) {
+            return setorId.equals(escalista.getSetor().getId());
+        }
         boolean linked = escalistaSetorRepository
                 .findByEscalistaIdAndSetorIdAndAtivoTrue(escalista.getId(), setorId)
                 .isPresent();
-        boolean legacy = escalista.getSetor() != null && setorId.equals(escalista.getSetor().getId());
-        return linked || legacy;
+        return linked;
     }
 
     private boolean setorBelongsToHospital(Long setorId, Long hospitalId) {

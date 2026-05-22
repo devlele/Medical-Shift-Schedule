@@ -96,6 +96,7 @@ public class SecurityConfiguration {
                         // Shift scheduling is scoped to escalistas.
                         .requestMatchers(HttpMethod.POST, "/plantao").hasAnyRole("ESCALISTA", "MANAGER")
                         .requestMatchers(HttpMethod.POST, "/plantao/avulso").hasAnyRole("ESCALISTA", "MANAGER")
+                        .requestMatchers(HttpMethod.POST, "/plantao/fixo").hasAnyRole("ESCALISTA", "MANAGER")
                         .requestMatchers(HttpMethod.PUT, "/plantao/{id}").hasAnyRole("ESCALISTA", "MANAGER")
                         
                         // Admin only

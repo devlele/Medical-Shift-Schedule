@@ -174,6 +174,27 @@
   color: #243b36;
 }
 
+.info-profissional p {
+  margin-top: 4px;
+  color: #68807a;
+  font-size: 0.95rem;
+}
+
+.estado-dashboard,
+.erro-dashboard {
+  background: #f8fffb;
+  border-radius: 18px;
+  padding: 22px;
+  color: #68807a;
+  font-weight: 500;
+}
+
+.erro-dashboard {
+  margin-bottom: 24px;
+  background: #fff5f5;
+  color: #b42318;
+}
+
 .botao-seta {
   width: 52px;
   height: 52px;

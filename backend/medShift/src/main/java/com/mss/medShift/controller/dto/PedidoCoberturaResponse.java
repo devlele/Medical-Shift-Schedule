@@ -8,7 +8,6 @@ import com.mss.medShift.domain.model.PedidoCoberturaStatus;
 public record PedidoCoberturaResponse(
         Long id,
         PedidoCoberturaStatus status,
-        String motivo,
         Long hospitalId,
         String hospitalNome,
         Long setorId,
@@ -33,7 +32,6 @@ public record PedidoCoberturaResponse(
         return new PedidoCoberturaResponse(
                 pedido.getId(),
                 pedido.getStatus(),
-                pedido.getMotivo(),
                 hospital != null ? hospital.getId() : null,
                 hospital != null ? hospital.getNomeFantasia() : null,
                 setor != null ? setor.getId() : null,

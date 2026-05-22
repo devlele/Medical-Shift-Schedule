@@ -111,14 +111,16 @@ public class ManagerServiceImple implements ManagerService {
 
     public List<EscalistaSetor> findSetoresVinculados(Long managerId, Hospital hospitalLogado) {
         Manager manager = findById(managerId, hospitalLogado);
-        List<EscalistaSetor> vinculos = escalistaSetorRepository.findByEscalistaIdAndAtivoTrue(manager.getId());
 
-        if (!vinculos.isEmpty()) {
-            return vinculos;
-        }
         if (manager.getSetor() != null && manager.getSetor().getHospital() != null
                 && manager.getSetor().getHospital().getId().equals(hospitalLogado.getId())) {
-            return List.of(createOrReactivateVinculo(manager, manager.getSetor(), hospitalLogado.getUsuario(), LocalDateTime.now()));
+            return List.of(assignSingleSetor(manager, manager.getSetor(), hospitalLogado.getUsuario(), LocalDateTime.now()));
+        }
+
+        List<EscalistaSetor> vinculos = escalistaSetorRepository.findByEscalistaIdAndAtivoTrue(manager.getId());
+        if (!vinculos.isEmpty() && vinculos.get(0).getSetor() != null) {
+            EscalistaSetor vinculo = vinculos.get(0);
+            return List.of(assignSingleSetor(manager, vinculo.getSetor(), hospitalLogado.getUsuario(), LocalDateTime.now()));
         }
         return List.of();
     }
@@ -126,20 +128,16 @@ public class ManagerServiceImple implements ManagerService {
     public EscalistaSetor vincularSetor(Long managerId, Long setorId, Hospital hospitalLogado, Usuario usuarioLogado) {
         Manager manager = findById(managerId, hospitalLogado);
         Setor setor = findSetorDoHospital(setorId, hospitalLogado);
-        EscalistaSetor vinculo = createOrReactivateVinculo(manager, setor, usuarioLogado, LocalDateTime.now());
-
-        if (manager.getSetor() == null) {
-            manager.setSetor(setor);
-            manager.setAtualizadoEm(LocalDateTime.now());
-            managerRepository.save(manager);
-        }
-
-        return vinculo;
+        return assignSingleSetor(manager, setor, usuarioLogado, LocalDateTime.now());
     }
 
     public void desvincularSetor(Long managerId, Long setorId, Hospital hospitalLogado) {
         Manager manager = findById(managerId, hospitalLogado);
         Setor setor = findSetorDoHospital(setorId, hospitalLogado);
+
+        if (isCanonicalSetor(manager, setor)) {
+            throw new IllegalArgumentException("Escalista deve permanecer vinculado a um setor. Para trocar, vincule-o a outro setor.");
+        }
 
         escalistaSetorRepository.findByEscalistaIdAndSetorIdAndAtivoTrue(manager.getId(), setor.getId())
                 .ifPresentOrElse(vinculo -> {
@@ -151,12 +149,6 @@ public class ManagerServiceImple implements ManagerService {
                         throw new IllegalArgumentException("Vínculo entre escalista e setor não encontrado");
                     }
                 });
-
-        if (isLegacySetor(manager, setor)) {
-            manager.setSetor(resolveNextSetor(manager.getId(), setor.getId()));
-            manager.setAtualizadoEm(LocalDateTime.now());
-            managerRepository.save(manager);
-        }
     }
 
     public void delete(Long id) {
@@ -182,7 +174,8 @@ public class ManagerServiceImple implements ManagerService {
         if (managerToUpdate.getSetor() != null && managerToUpdate.getSetor().getId() != null) {
             Setor setor = setorRepository.findById(managerToUpdate.getSetor().getId())
                     .orElseThrow(() -> new IllegalArgumentException("Setor não encontrado"));
-            manager.setSetor(setor);
+            assignSingleSetor(manager, setor, manager.getHospital() != null ? manager.getHospital().getUsuario() : null,
+                    LocalDateTime.now());
         }
 
         manager.setAtualizadoEm(LocalDateTime.now());
@@ -194,9 +187,34 @@ public class ManagerServiceImple implements ManagerService {
         return managerRepository.save(manager);
     }
 
+    private EscalistaSetor assignSingleSetor(Manager manager, Setor setor, Usuario usuarioLogado, LocalDateTime now) {
+        deactivateOtherActiveVinculos(manager.getId(), setor.getId(), now);
+        EscalistaSetor vinculo = createOrReactivateVinculo(manager, setor, usuarioLogado, now);
+
+        if (!isCanonicalSetor(manager, setor)) {
+            manager.setSetor(setor);
+        }
+        manager.setAtualizadoEm(now);
+        managerRepository.save(manager);
+
+        return vinculo;
+    }
+
+    private void deactivateOtherActiveVinculos(Long managerId, Long setorId, LocalDateTime now) {
+        escalistaSetorRepository.findByEscalistaIdAndAtivoTrue(managerId).stream()
+                .filter(vinculo -> vinculo.getSetor() == null
+                        || vinculo.getSetor().getId() == null
+                        || !vinculo.getSetor().getId().equals(setorId))
+                .forEach(vinculo -> {
+                    vinculo.setAtivo(false);
+                    vinculo.setDesvinculadoEm(now);
+                    escalistaSetorRepository.save(vinculo);
+                });
+    }
+
     private EscalistaSetor createOrReactivateVinculo(Manager manager, Setor setor, Usuario usuarioLogado, LocalDateTime now) {
         EscalistaSetor vinculo = escalistaSetorRepository
-                .findByEscalistaIdAndSetorId(manager.getId(), setor.getId())
+                .findFirstByEscalistaIdAndSetorIdOrderByIdAsc(manager.getId(), setor.getId())
                 .orElseGet(EscalistaSetor::new);
 
         vinculo.setEscalista(manager);
@@ -221,11 +239,8 @@ public class ManagerServiceImple implements ManagerService {
                 && manager.getSetor().getId().equals(setor.getId());
     }
 
-    private Setor resolveNextSetor(Long managerId, Long setorRemovidoId) {
-        return escalistaSetorRepository.findByEscalistaIdAndAtivoTrue(managerId).stream()
-                .map(EscalistaSetor::getSetor)
-                .filter(setor -> setor != null && setor.getId() != null && !setor.getId().equals(setorRemovidoId))
-                .findFirst()
-                .orElse(null);
+    private boolean isCanonicalSetor(Manager manager, Setor setor) {
+        return manager.getSetor() != null && manager.getSetor().getId() != null
+                && setor != null && manager.getSetor().getId().equals(setor.getId());
     }
 }

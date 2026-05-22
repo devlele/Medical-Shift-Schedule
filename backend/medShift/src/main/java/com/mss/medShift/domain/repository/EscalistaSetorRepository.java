@@ -12,6 +12,6 @@ import com.mss.medShift.domain.model.EscalistaSetor;
 public interface EscalistaSetorRepository extends JpaRepository<EscalistaSetor, Long> {
     List<EscalistaSetor> findByEscalistaIdAndAtivoTrue(Long escalistaId);
     List<EscalistaSetor> findBySetorIdAndAtivoTrue(Long setorId);
-    Optional<EscalistaSetor> findByEscalistaIdAndSetorId(Long escalistaId, Long setorId);
+    Optional<EscalistaSetor> findFirstByEscalistaIdAndSetorIdOrderByIdAsc(Long escalistaId, Long setorId);
     Optional<EscalistaSetor> findByEscalistaIdAndSetorIdAndAtivoTrue(Long escalistaId, Long setorId);
 }

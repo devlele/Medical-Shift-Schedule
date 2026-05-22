@@ -23,7 +23,7 @@ Criar endpoints para consultar plantoes conforme o contexto do usuario logado.
 Consultas prioritarias:
 
 - medico visualiza seus plantoes;
-- escalista visualiza plantoes dos setores em que atua;
+- escalista visualiza plantoes do setor pelo qual e responsavel;
 - hospital visualiza plantoes de seus setores;
 - filtros por periodo, hospital, setor e status.
 
@@ -31,7 +31,7 @@ Resultado esperado: o frontend consegue montar calendarios reais sem dados mocka
 
 ## 3. Plantao fixo e recorrencia
 
-Implementar `REGRA_PLANTAO_FIXO` para representar plantoes recorrentes.
+Implementado: `POST /plantao/fixo` cria uma `REGRA_PLANTAO_FIXO` e gera ocorrencias concretas em `PLANTAO`.
 
 Casos esperados:
 
@@ -147,7 +147,7 @@ Cenarios prioritarios:
 
 - hospital cadastra setor;
 - hospital cadastra escalista;
-- hospital vincula escalista a setor;
+- hospital define um setor responsavel para cada escalista;
 - medico se cadastra;
 - escalista vincula medico a setor;
 - escalista cria plantao avulso;

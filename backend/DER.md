@@ -5,8 +5,8 @@ Este documento e a fonte unica proposta para o DER do MedShift. Ele consolida as
 - o `ADMIN` cadastra hospitais;
 - o hospital acessa o sistema com suas credenciais;
 - o hospital cadastra setores e escalistas;
-- escalistas sao vinculados a setores especificos;
-- escalistas vinculam medicos a seus setores e atribuem plantoes;
+- cada escalista fica responsavel por um unico setor do hospital;
+- escalistas vinculam medicos ao seu setor e atribuem plantoes;
 - plantoes podem ser avulsos ou fixos/recorrentes;
 - o medico pode abrir um pedido para outro medico assumir seu plantao;
 - pedidos de cobertura aparecem apenas para medicos vinculados ao mesmo hospital e setor;
@@ -60,6 +60,7 @@ erDiagram
         bigint id PK
         bigint usuario_id FK
         bigint hospital_id FK
+        bigint setor_id FK
         string cargo
         boolean ativo
         datetime criado_em
@@ -157,7 +158,6 @@ erDiagram
         bigint medico_solicitante_id FK
         bigint medico_cobridor_id FK
         string status
-        string motivo
         datetime aberto_em
         datetime assumido_em
         datetime cancelado_em
@@ -189,8 +189,9 @@ erDiagram
     HOSPITAL ||--o{ PLANTAO : possui
     HOSPITAL ||--o{ PEDIDO_COBERTURA : restringe
 
-    SETOR ||--o{ ESCALISTA_SETOR : permite_escalista
-    ESCALISTA ||--o{ ESCALISTA_SETOR : atua_em
+    SETOR ||--o{ ESCALISTA : responsavel_por
+    SETOR ||--o{ ESCALISTA_SETOR : registra_historico
+    ESCALISTA ||--o{ ESCALISTA_SETOR : historico_setor
     USUARIO ||--o{ ESCALISTA_SETOR : vincula
 
     SETOR ||--o{ MEDICO_SETOR : permite_medico
@@ -319,6 +320,7 @@ Perfil operacional responsavel por montar escalas e vincular medicos a setores.
 - `id`: chave primaria.
 - `usuario_id`: FK para `USUARIO`.
 - `hospital_id`: FK para `HOSPITAL`.
+- `setor_id`: FK para `SETOR`; setor unico pelo qual o escalista responde.
 - `cargo`: cargo ou funcao interna.
 - `ativo`: indica se o escalista esta ativo.
 - `criado_em`: data de criacao.
@@ -327,10 +329,14 @@ Perfil operacional responsavel por montar escalas e vincular medicos a setores.
 Restricao recomendada:
 
 - o usuario associado deve ter `role = ESCALISTA`.
+- o setor informado deve pertencer ao mesmo hospital do escalista.
+- o escalista deve possuir exatamente um setor responsavel enquanto estiver ativo.
 
 ### ESCALISTA_SETOR
 
-Tabela associativa entre escalistas e setores.
+Tabela de historico/compatibilidade dos vinculos entre escalistas e setores.
+
+No modelo de negocio atual, ela nao representa mais uma relacao N:N funcional. O setor vigente do escalista e definido por `ESCALISTA.setor_id`. Esta tabela pode registrar o historico de trocas e manter compatibilidade com endpoints existentes.
 
 - `id`: chave primaria.
 - `escalista_id`: FK para `ESCALISTA`.
@@ -343,8 +349,9 @@ Tabela associativa entre escalistas e setores.
 Regras:
 
 - o setor deve pertencer ao mesmo hospital do escalista;
-- um escalista so pode criar plantoes em setores com vinculo ativo;
-- `escalista_id + setor_id` deve ser unico para vinculos ativos.
+- um escalista so pode ter um vinculo ativo por vez;
+- o vinculo ativo deve corresponder ao `ESCALISTA.setor_id`;
+- quando o escalista troca de setor, os vinculos ativos anteriores devem ser encerrados.
 
 ### MEDICO
 
@@ -409,7 +416,7 @@ Tabela associativa que define em quais setores o medico pode atuar.
 
 Regras:
 
-- o escalista que vincula o medico deve ter vinculo ativo com o mesmo setor;
+- o escalista que vincula o medico deve ser responsavel pelo mesmo setor;
 - o medico so visualiza pedidos de cobertura de setores em que possui `MEDICO_SETOR.ativo = true`;
 - o medico so pode assumir cobertura em setor em que possui vinculo ativo;
 - `medico_id + setor_id` deve ser unico para vinculos ativos.
@@ -438,7 +445,7 @@ Representa a regra recorrente de um plantao fixo.
 Regras:
 
 - o setor deve pertencer ao hospital informado;
-- o escalista deve ter vinculo ativo com o setor;
+- o escalista deve ser responsavel pelo setor;
 - o medico titular deve ter vinculo ativo com o setor;
 - a regra nao substitui a tabela `PLANTAO`; ela gera ou referencia ocorrencias concretas.
 
@@ -479,7 +486,6 @@ Representa o pedido aberto por um medico para passar um plantao a outro medico e
 - `medico_solicitante_id`: FK para `MEDICO`; medico que abriu o pedido.
 - `medico_cobridor_id`: FK para `MEDICO`; medico que assumiu, nulo enquanto estiver aberto.
 - `status`: `ABERTO`, `ASSUMIDO`, `CANCELADO`, `EXPIRADO`.
-- `motivo`: justificativa opcional.
 - `aberto_em`: data de abertura.
 - `assumido_em`: data em que outro medico assumiu.
 - `cancelado_em`: data de cancelamento pelo solicitante ou sistema.
@@ -527,7 +533,8 @@ Regra:
 - `USUARIO 1:N HOSPITAL` como admin que cadastra hospitais.
 - `HOSPITAL 1:N SETOR`.
 - `HOSPITAL 1:N ESCALISTA`.
-- `ESCALISTA N:N SETOR` via `ESCALISTA_SETOR`.
+- `SETOR 1:N ESCALISTA`; cada escalista responde por um unico setor.
+- `ESCALISTA_SETOR` registra historico/compatibilidade dos vinculos do escalista.
 - `MEDICO N:N SETOR` via `MEDICO_SETOR`.
 - `MEDICO N:N ESPECIALIDADE` via `MEDICO_ESPECIALIDADE`.
 - `SETOR 1:N REGRA_PLANTAO_FIXO`.
@@ -571,7 +578,8 @@ WHERE pc.status = 'ABERTO'
 - `hospital.usuario_id` unico.
 - `setor.hospital_id + setor.nome` unico.
 - `escalista.usuario_id + escalista.hospital_id` unico.
-- `escalista_setor.escalista_id + escalista_setor.setor_id` unico para vinculos ativos.
+- `escalista.setor_id` obrigatorio para escalistas ativos.
+- `escalista_setor.escalista_id` deve possuir no maximo um vinculo ativo.
 - `medico.crm + medico.uf_crm` unico.
 - `medico.usuario_id` unico.
 - `medico_especialidade.medico_id + medico_especialidade.especialidade_id` unico.

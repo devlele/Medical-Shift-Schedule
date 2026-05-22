@@ -9,7 +9,7 @@ Garantir o fluxo principal do sistema:
 1. hospital se cadastra e faz login;
 2. hospital cria setores;
 3. hospital cria escalistas;
-4. hospital vincula escalistas a setores;
+4. hospital define um setor responsavel para cada escalista;
 5. medico se cadastra e faz login;
 6. escalista busca medicos e os vincula a setores;
 7. escalista cria plantao avulso para medico do setor;
@@ -30,10 +30,11 @@ Implementado:
 - Cadastro publico de medico em `POST /doctor/register`.
 - Cadastro/listagem/edicao de setores pelo hospital.
 - Cadastro/listagem/edicao de escalistas pelo hospital.
-- Vinculo/desvinculo de escalistas a setores.
+- Escalista responsavel por um unico setor.
 - Vinculo/desvinculo de medicos a setores por escalista.
 - Busca de medicos candidatos para vinculo.
 - Criacao de plantao avulso por escalista.
+- Criacao de plantao fixo/recorrente por escalista.
 - Plantao por turno:
   - `DIURNO`: 07:00 ate 19:00;
   - `NOTURNO`: 19:00 ate 07:00 do dia seguinte;
@@ -235,19 +236,19 @@ Buscar escalista:
 GET /manager/{id}
 ```
 
-Vincular escalista a setor:
+Definir/trocar setor responsavel do escalista:
 
 ```http
 POST /manager/{id}/setores/{setorId}
 ```
 
-Listar setores de um escalista:
+Listar setor de um escalista:
 
 ```http
 GET /manager/{id}/setores
 ```
 
-Listar setores do escalista logado:
+Listar setor do escalista logado:
 
 ```http
 GET /manager/me/setores
@@ -258,6 +259,8 @@ Desvincular escalista de setor:
 ```http
 DELETE /manager/{id}/setores/{setorId}
 ```
+
+Observacao: pela regra atual, um escalista ativo deve permanecer associado a um setor. Para trocar o setor, use `POST /manager/{id}/setores/{setorId}` com o novo setor. A remocao direta do setor responsavel atual e bloqueada pelo backend.
 
 Resposta de escalista: `ManagerResponse`.
 
@@ -418,12 +421,97 @@ Campos importantes:
 Regras validadas:
 
 - usuario logado e escalista;
-- escalista atua no setor informado;
+- escalista e responsavel pelo setor informado;
 - medico possui vinculo ativo com o setor;
 - periodo valido;
 - medico nao possui outro plantao conflitante.
 
-### 6. Agenda
+### 6. Plantoes Fixos
+
+Criar regra fixa/recorrente como escalista:
+
+```http
+POST /plantao/fixo
+```
+
+Exemplo semanal:
+
+```json
+{
+  "setorId": 1,
+  "medicoId": 2,
+  "tipoRecorrencia": "SEMANAL",
+  "diaSemana": "SABADO",
+  "turno": "DIURNO",
+  "dataInicioVigencia": "2026-05-01",
+  "dataFimVigencia": "2026-08-31"
+}
+```
+
+Exemplo mensal no segundo sabado do mes:
+
+```json
+{
+  "setorId": 1,
+  "medicoId": 2,
+  "tipoRecorrencia": "MENSAL_N_ESIMO_DIA_SEMANA",
+  "diaSemana": "SABADO",
+  "semanaDoMes": 2,
+  "turno": "DIURNO",
+  "dataInicioVigencia": "2026-05-01",
+  "dataFimVigencia": "2026-12-31"
+}
+```
+
+Exemplo mensal por dia fixo:
+
+```json
+{
+  "setorId": 1,
+  "medicoId": 2,
+  "tipoRecorrencia": "MENSAL_DIA_FIXO",
+  "diaDoMes": 15,
+  "turno": "NOTURNO",
+  "dataInicioVigencia": "2026-05-01",
+  "dataFimVigencia": "2026-12-31"
+}
+```
+
+Exemplo com horario personalizado:
+
+```json
+{
+  "setorId": 1,
+  "medicoId": 2,
+  "tipoRecorrencia": "SEMANAL",
+  "diaSemana": "QUARTA",
+  "turno": "PERSONALIZADO",
+  "horaInicio": "08:00:00",
+  "horaFim": "14:00:00",
+  "dataInicioVigencia": "2026-05-01",
+  "dataFimVigencia": "2026-08-31"
+}
+```
+
+Resposta: `PlantaoFixoResponse`, contendo a regra criada e a lista de `PlantaoSummaryResponse` gerados.
+
+Regras validadas:
+
+- usuario logado e escalista;
+- escalista e responsavel pelo setor informado;
+- medico possui vinculo ativo com o setor;
+- recorrencia e vigencia validas;
+- medico nao possui outro plantao conflitante em nenhuma ocorrencia gerada;
+- geracao inicial limitada a 366 dias;
+- se `dataFimVigencia` nao for enviada, a regra fica aberta e o backend gera ocorrencias iniciais para 90 dias.
+
+Tipos de recorrencia:
+
+- `SEMANAL`: exige `diaSemana`;
+- `MENSAL_N_ESIMO_DIA_SEMANA`: exige `diaSemana` e `semanaDoMes`;
+- `MENSAL_DIA_FIXO`: exige `diaDoMes`.
+
+### 7. Agenda
 
 Endpoint principal recomendado:
 
@@ -441,7 +529,7 @@ Comportamento:
 
 - medico: retorna seus plantoes;
 - hospital: retorna plantoes do hospital;
-- escalista: retorna plantoes dos setores em que atua.
+- escalista: retorna plantoes do setor pelo qual e responsavel.
 
 Rotas especificas ainda disponiveis:
 
@@ -454,7 +542,7 @@ GET /agenda/hospital/{hospitalId}
 
 Resposta: lista de `PlantaoSummaryResponse`.
 
-### 7. Pedido de Cobertura
+### 8. Pedido de Cobertura
 
 Abrir pedido de cobertura como medico responsavel atual:
 
@@ -466,8 +554,7 @@ Payload:
 
 ```json
 {
-  "plantaoId": 10,
-  "motivo": "Compromisso pessoal"
+  "plantaoId": 10
 }
 ```
 
@@ -508,7 +595,7 @@ Regras:
 - ao assumir, `Plantao.medicoResponsavelAtual` muda para o cobridor;
 - ao assumir, solicitante recebe notificacao.
 
-### 8. Notificacoes
+### 9. Notificacoes
 
 Listar notificacoes do usuario logado:
 
@@ -544,17 +631,18 @@ Quando uma cobertura e assumida, o backend cria uma notificacao para o medico so
 6. Tela de setores cria setor com `POST /setor`.
 7. Tela de escalistas lista com `GET /manager`.
 8. Criar escalista com `POST /manager`.
-9. Opcionalmente vincular escalista a outros setores com `POST /manager/{id}/setores/{setorId}`.
+9. Para trocar o setor do escalista, usar `POST /manager/{id}/setores/{setorId}` com o novo setor.
 
 ### Fluxo do escalista
 
 1. Login em `POST /auth/login`.
 2. Se `role = ESCALISTA` ou `MANAGER`, direcionar para painel do escalista.
-3. Buscar setores do escalista em `GET /manager/me/setores`.
+3. Buscar o setor do escalista em `GET /manager/me/setores`.
 4. Buscar medicos candidatos em `GET /doctor/link-candidates?setorId={id}&termo={texto}`.
 5. Vincular medico ao setor com `POST /doctor/{id}/setores/{setorId}`.
 6. Criar plantao avulso com `POST /plantao/avulso`.
-7. Visualizar agenda com `GET /agenda/me`.
+7. Criar plantao fixo/recorrente com `POST /plantao/fixo`.
+8. Visualizar agenda com `GET /agenda/me`.
 
 ### Fluxo do medico
 
@@ -575,6 +663,7 @@ No front, usar `PlantaoSummaryResponse` para renderizar a agenda.
 Sugestao:
 
 - plantao normal do medico: cor neutra/azul;
+- plantao fixo: pode usar a mesma cor do plantao normal, diferenciando por legenda ou detalhe;
 - pedido de cobertura disponivel: vermelho;
 - plantao assumido por cobertura: tratar como plantao normal do medico cobridor;
 - `turno = DIURNO`: icone/label "Dia";
@@ -597,24 +686,24 @@ Para mostrar pedidos de cobertura no calendario do medico:
 5. Cadastrar medico A.
 6. Cadastrar medico B.
 7. Logar como escalista.
-8. Ver setores do escalista.
+8. Ver setor do escalista.
 9. Buscar medico A e medico B como candidatos.
 10. Vincular medico A e medico B ao setor.
 11. Criar plantao avulso para medico A usando `data + turno`.
-12. Logar como medico A.
-13. Ver plantao em `GET /agenda/me`.
-14. Medico A abre pedido de cobertura.
-15. Logar como medico B.
-16. Medico B ve pedido em `GET /coberturas/disponiveis`.
-17. Medico B assume cobertura.
-18. `GET /agenda/me` do medico B mostra o plantao assumido.
-19. `GET /agenda/me` do medico A nao mostra mais esse plantao como responsavel atual.
-20. Medico A ve notificacao em `GET /notificacoes/me`.
-21. Medico A marca notificacao como lida.
+12. Criar plantao fixo para medico A usando `POST /plantao/fixo`.
+13. Logar como medico A.
+14. Ver plantoes em `GET /agenda/me`.
+15. Medico A abre pedido de cobertura.
+16. Logar como medico B.
+17. Medico B ve pedido em `GET /coberturas/disponiveis`.
+18. Medico B assume cobertura.
+19. `GET /agenda/me` do medico B mostra o plantao assumido.
+20. `GET /agenda/me` do medico A nao mostra mais esse plantao como responsavel atual.
+21. Medico A ve notificacao em `GET /notificacoes/me`.
+22. Medico A marca notificacao como lida.
 
 ## Pendente ou Fora do MVP
 
-- Plantao fixo/recorrente.
 - Grupo de plantao com quantidade necessaria de medicos por turno.
 - Relatorios.
 - Dashboards analiticos completos.

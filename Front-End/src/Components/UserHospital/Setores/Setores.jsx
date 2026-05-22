@@ -41,7 +41,7 @@ export default function Setores() {
                     const quantidadeMedicos =
                         doctorsData.filter(
                             (doctor) =>
-                                doctor.setor?.id === setor.id
+                                doctor.setorId === setor.id
                         ).length;
 
                     return {

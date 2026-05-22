@@ -68,9 +68,9 @@ Atencao: a regra `DELETE /**` esta liberada apenas para `ADMIN`. Portanto delete
 | `GET` | `/manager` | Listar escalistas do hospital logado | `ManagerResponse[]` |
 | `GET` | `/manager/{id}` | Buscar escalista do hospital logado | `ManagerResponse` |
 | `PUT` | `/manager/{id}` | Atualizar escalista | `ManagerResponse` |
-| `GET` | `/manager/{id}/setores` | Listar setores vinculados ao escalista | `EscalistaSetorResponse[]` |
-| `POST` | `/manager/{id}/setores/{setorId}` | Vincular escalista ao setor | `EscalistaSetorResponse` |
-| `DELETE` | `/manager/{id}/setores/{setorId}` | Desvincular escalista do setor | `204` |
+| `GET` | `/manager/{id}/setores` | Listar setor responsavel do escalista | `EscalistaSetorResponse[]` com no maximo 1 item |
+| `POST` | `/manager/{id}/setores/{setorId}` | Definir/trocar setor responsavel do escalista | `EscalistaSetorResponse` |
+| `DELETE` | `/manager/{id}/setores/{setorId}` | Desvincular vinculo historico nao vigente | `204` |
 
 ### Medicos e Agenda
 
@@ -92,14 +92,14 @@ Valem para `ESCALISTA` e `MANAGER`.
 
 | Metodo | Endpoint | Uso no front | Resposta |
 |---|---|---|---|
-| `GET` | `/manager/me/setores` | Listar setores em que o escalista atua | `EscalistaSetorResponse[]` |
+| `GET` | `/manager/me/setores` | Listar setor pelo qual o escalista responde | `EscalistaSetorResponse[]` com no maximo 1 item |
 | `GET` | `/dashboard/me` | Resumo do escalista logado | `DashboardResponse` |
 
 ### Medicos do Setor
 
 | Metodo | Endpoint | Uso no front | Resposta |
 |---|---|---|---|
-| `GET` | `/doctor` | Listar medicos vinculados aos setores do escalista | `DoctorResponse[]` |
+| `GET` | `/doctor` | Listar medicos vinculados ao setor do escalista | `DoctorResponse[]` |
 | `GET` | `/doctor/link-candidates?setorId={id}&termo={texto}` | Buscar medicos candidatos para vinculo | `DoctorLookupResponse[]` |
 | `GET` | `/doctor/{id}` | Buscar medico se estiver no escopo | `DoctorResponse` |
 | `GET` | `/doctor/{id}/setores` | Listar setores do medico no escopo do escalista | `MedicoSetorResponse[]` |
@@ -112,10 +112,11 @@ Valem para `ESCALISTA` e `MANAGER`.
 | Metodo | Endpoint | Uso no front | Resposta |
 |---|---|---|---|
 | `POST` | `/plantao/avulso` | Criar plantao avulso | `PlantaoSummaryResponse` |
+| `POST` | `/plantao/fixo` | Criar plantao fixo/recorrente | `PlantaoFixoResponse` |
 | `POST` | `/plantao` | Criar plantao por payload legado | `PlantaoSummaryResponse` |
 | `PUT` | `/plantao/{id}` | Atualizar plantao | `PlantaoSummaryResponse` |
 | `GET` | `/plantao/{id}` | Buscar plantao | `PlantaoSummaryResponse` |
-| `GET` | `/agenda/me` | Agenda dos setores do escalista | `PlantaoSummaryResponse[]` |
+| `GET` | `/agenda/me` | Agenda do setor do escalista | `PlantaoSummaryResponse[]` |
 | `GET` | `/agenda/setor/{setorId}` | Agenda de setor do escalista | `PlantaoSummaryResponse[]` |
 | `GET` | `/agenda/hospital/{hospitalId}` | Agenda do hospital no escopo do escalista | `PlantaoSummaryResponse[]` |
 
@@ -135,6 +136,29 @@ Turnos aceitos:
 - `DIURNO` ou `DIA`: 07:00 ate 19:00;
 - `NOTURNO` ou `NOITE`: 19:00 ate 07:00 do dia seguinte;
 - `PERSONALIZADO`: exige `dataInicio` e `dataFim`.
+
+Payload recomendado para `POST /plantao/fixo`:
+
+```json
+{
+  "setorId": 1,
+  "medicoId": 2,
+  "tipoRecorrencia": "SEMANAL",
+  "diaSemana": "SABADO",
+  "turno": "DIURNO",
+  "dataInicioVigencia": "2026-05-01",
+  "dataFimVigencia": "2026-08-31"
+}
+```
+
+Tipos aceitos em `tipoRecorrencia`:
+
+- `SEMANAL`: exige `diaSemana`;
+- `MENSAL_N_ESIMO_DIA_SEMANA`: exige `diaSemana` e `semanaDoMes`;
+- `MENSAL_DIA_FIXO`: exige `diaDoMes`.
+
+Para `turno = PERSONALIZADO`, enviar `horaInicio` e `horaFim` no formato `HH:mm:ss`.
+Se `dataFimVigencia` nao for enviada, a regra fica aberta e o backend gera ocorrencias iniciais para 90 dias.
 
 ## Rotas do Medico
 
@@ -199,6 +223,7 @@ Valem para `MEDICO` e `DOCTOR`.
 | `/doctor` consultas | Nao | Sim | Sim | Sim | Nao, exceto `/doctor/me` |
 | `/doctor` vinculos com setor | Nao | Nao | Nao | Sim | Nao |
 | `/plantao/avulso` | Nao | Nao | Nao | Sim | Nao |
+| `/plantao/fixo` | Nao | Nao | Nao | Sim | Nao |
 | `/agenda/me` | Nao | Nao | Sim | Sim | Sim |
 | `/coberturas` | Nao | Nao | Nao | Nao | Sim |
 | `/notificacoes/me` | Nao | Sim | Sim | Sim | Sim |
@@ -227,4 +252,3 @@ Valem para `MEDICO` e `DOCTOR`.
 6. Medico: listar e assumir coberturas disponiveis.
 7. Notificacoes.
 8. Ajustes visuais de calendario por `turno` e status.
-

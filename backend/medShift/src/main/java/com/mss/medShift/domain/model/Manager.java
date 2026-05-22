@@ -42,8 +42,8 @@ public class Manager extends User {
     private Hospital hospital;
 
     /*
-     * Transitional single-sector field kept for existing controllers.
-     * The canonical N:N relationship is EscalistaSetor.
+     * Canonical sector managed by this escalista.
+     * EscalistaSetor is kept only as link history/compatibility.
      */
     @ManyToOne
     private Setor setor;

@@ -1,107 +1,176 @@
-import React, { useState } from "react";
-import Sidebar from "../../../components/Sidebar/Sidebar";
+import { useEffect, useState } from "react";
+import Sidebar from "../../Sidebar/Sidebar";
 import { validarCPF } from "../../../utils/validarCPF";
-
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CheckCircle } from "lucide-react";
 
 import {
-  validarEmail,
-  validarTelefone,
-  validarCRM,
   validarCampoObrigatorio,
-  formatarTelefone,
+  validarEmail,
+  validarSenha,
 } from "../../../utils/validacoes";
+
+import {
+  criarEscalista,
+  getSetores,
+} from "../Setores/setorServices.js";
 
 import "./CadastrarProfissional.css";
 
-export default function CadastrarProfissional() {
-  const [formData, setFormData] = useState({
-    nome: "",
-    cpf: "",
-    crm: "",
-    uf: "",
-    email: "",
-    nascimento: "",
-    telefone: "",
-    especialidade: "",
-  });
+const initialFormData = {
+  nome: "",
+  cpf: "",
+  email: "",
+  nascimento: "",
+  cargo: "",
+  setorId: "",
+  senha: "",
+  confirmaSenha: "",
+};
 
+export default function CadastrarProfissional() {
+  const [formData, setFormData] = useState(initialFormData);
+  const [setores, setSetores] = useState([]);
+  const [loadingSetores, setLoadingSetores] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [erros, setErros] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [erroEnvio, setErroEnvio] = useState("");
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
+
+  useEffect(() => {
+    carregarSetores();
+  }, []);
+
+  const carregarSetores = async () => {
+    try {
+      setLoadingSetores(true);
+      const setoresData = await getSetores();
+      setSetores(setoresData);
+    } catch (error) {
+      console.error(error);
+      setErroEnvio("Não foi possível carregar os setores do hospital.");
+    } finally {
+      setLoadingSetores(false);
+    }
+  };
 
   const formatarCPF = (valor) => {
-    valor = valor.replace(/\D/g, "");
+    valor = valor.replace(/\D/g, "").slice(0, 11);
     valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
     valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
     valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
     return valor;
   };
 
-  const validarFormulario = () => {
+  const normalizarCPF = (valor) => valor.replace(/\D/g, "");
+
+  const obterMensagemErro = (error) => {
+    const data = error.response?.data;
+
+    if (typeof data === "string") {
+      return data;
+    }
+
+    return error.message || data?.message || "Não foi possível cadastrar o escalista.";
+  };
+
+  const validarFormulario = (dados = formData) => {
     const novoErros = {};
 
-    if (!validarCampoObrigatorio(formData.nome))
+    if (!validarCampoObrigatorio(dados.nome)) {
       novoErros.nome = "Nome é obrigatório";
+    }
 
-    if (!validarCampoObrigatorio(formData.cpf))
+    if (!validarCampoObrigatorio(dados.cpf)) {
       novoErros.cpf = "CPF é obrigatório";
-    else if (!validarCPF(formData.cpf)) novoErros.cpf = "CPF inválido";
+    } else if (!validarCPF(dados.cpf)) {
+      novoErros.cpf = "CPF inválido";
+    }
 
-    if (!validarCampoObrigatorio(formData.crm))
-      novoErros.crm = "CRM é obrigatório";
-    else if (!validarCRM(formData.crm)) novoErros.crm = "CRM inválido";
-
-    if (!validarCampoObrigatorio(formData.uf))
-      novoErros.uf = "UF é obrigatória";
-
-    if (!validarCampoObrigatorio(formData.email))
+    if (!validarCampoObrigatorio(dados.email)) {
       novoErros.email = "Email é obrigatório";
-    else if (!validarEmail(formData.email)) novoErros.email = "Email inválido";
+    } else if (!validarEmail(dados.email)) {
+      novoErros.email = "Email inválido";
+    }
 
-    if (!validarCampoObrigatorio(formData.nascimento))
+    if (!validarCampoObrigatorio(dados.nascimento)) {
       novoErros.nascimento = "Data de nascimento é obrigatória";
+    }
 
-    if (!validarCampoObrigatorio(formData.telefone))
-      novoErros.telefone = "Telefone é obrigatório";
-    else if (!validarTelefone(formData.telefone))
-      novoErros.telefone = "Telefone inválido";
+    if (!validarCampoObrigatorio(dados.cargo)) {
+      novoErros.cargo = "Cargo é obrigatório";
+    }
 
-    if (!validarCampoObrigatorio(formData.especialidade))
-      novoErros.especialidade = "Especialidade é obrigatória";
+    if (!validarCampoObrigatorio(dados.setorId)) {
+      novoErros.setorId = "Setor é obrigatório";
+    }
+
+    if (!validarCampoObrigatorio(dados.senha)) {
+      novoErros.senha = "Senha é obrigatória";
+    } else if (!validarSenha(dados.senha)) {
+      novoErros.senha = "Senha deve ter pelo menos 6 caracteres";
+    }
+
+    if (!validarCampoObrigatorio(dados.confirmaSenha)) {
+      novoErros.confirmaSenha = "Confirme a senha";
+    } else if (dados.senha !== dados.confirmaSenha) {
+      novoErros.confirmaSenha = "As senhas não conferem";
+    }
 
     return novoErros;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    const novoValor = name === "cpf" ? formatarCPF(value) : value;
+    const dadosAtualizados = { ...formData, [name]: novoValor };
 
-    let novoValor = value;
-
-    if (name === "telefone") {
-      novoValor = formatarTelefone(value);
-    }
-
-    if (name === "cpf") {
-      novoValor = formatarCPF(value);
-    }
-
-    setFormData({ ...formData, [name]: novoValor });
+    setFormData(dadosAtualizados);
+    setErroEnvio("");
+    setMensagemSucesso("");
 
     if (submitted) {
-      setErros(validarFormulario());
+      setErros(validarFormulario(dadosAtualizados));
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitted(true);
+    setErroEnvio("");
+    setMensagemSucesso("");
 
     const novoErros = validarFormulario();
+    setErros(novoErros);
 
-    if (Object.keys(novoErros).length === 0) {
-      console.log("Form válido:", formData);
-    } else {
-      setErros(novoErros);
+    if (Object.keys(novoErros).length > 0) {
+      return;
+    }
+
+    const payload = {
+      name: formData.nome.trim(),
+      cpf: normalizarCPF(formData.cpf),
+      email: formData.email.trim(),
+      birthday: formData.nascimento,
+      department: formData.cargo.trim(),
+      password: formData.senha,
+      setor: {
+        id: Number(formData.setorId),
+      },
+    };
+
+    try {
+      setSubmitting(true);
+      await criarEscalista(payload);
+      setFormData(initialFormData);
+      setSubmitted(false);
+      setErros({});
+      setMensagemSucesso("Escalista cadastrado e vinculado ao setor com sucesso.");
+    } catch (error) {
+      console.error(error);
+      setErroEnvio(obterMensagemErro(error));
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -110,25 +179,37 @@ export default function CadastrarProfissional() {
       <Sidebar />
 
       <main className="cadastro-main">
-        {/* HEADER */}
         <header className="cadastro-header">
           <div>
             <h1>Cadastrar Escalista</h1>
-            <p>Preencha os dados do profissional</p>
+            <p>Preencha os dados do profissional responsável pelo setor</p>
           </div>
         </header>
 
-        {/* CARD */}
         <section className="cadastro-card">
           <form className="cadastro-form" onSubmit={handleSubmit}>
-            {/* NOME */}
+            {erroEnvio && (
+              <div className="alerta-formulario erro">
+                <AlertCircle size={18} />
+                <span>{erroEnvio}</span>
+              </div>
+            )}
+
+            {mensagemSucesso && (
+              <div className="alerta-formulario sucesso">
+                <CheckCircle size={18} />
+                <span>{mensagemSucesso}</span>
+              </div>
+            )}
+
             <div className="form-group">
               <label>Nome</label>
               <input
                 name="nome"
-                placeholder="Ex: Dr. João Silva"
+                placeholder="Ex: Ana Souza"
                 value={formData.nome}
                 onChange={handleChange}
+                className={submitted && erros.nome ? "input-erro" : ""}
               />
               {submitted && erros.nome && (
                 <span className="mensagem-erro">
@@ -137,7 +218,6 @@ export default function CadastrarProfissional() {
               )}
             </div>
 
-            {/* CPF + CRM */}
             <div className="form-row">
               <div className="form-group">
                 <label>CPF</label>
@@ -146,6 +226,7 @@ export default function CadastrarProfissional() {
                   placeholder="000.000.000-00"
                   value={formData.cpf}
                   onChange={handleChange}
+                  className={submitted && erros.cpf ? "input-erro" : ""}
                 />
                 {submitted && erros.cpf && (
                   <span className="mensagem-erro">
@@ -155,45 +236,14 @@ export default function CadastrarProfissional() {
               </div>
 
               <div className="form-group">
-                <label>CRM</label>
-                <input
-                  name="crm"
-                  placeholder="Ex: 123456"
-                  value={formData.crm}
-                  onChange={handleChange}
-                />
-                {submitted && erros.crm && (
-                  <span className="mensagem-erro">
-                    <AlertCircle size={14} /> {erros.crm}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* UF + EMAIL */}
-            <div className="form-row">
-              <div className="form-group">
-                <label>UF</label>
-                <select name="uf" value={formData.uf} onChange={handleChange}>
-                  <option value="">Selecione o estado</option>
-                  <option value="SP">SP</option>
-                  <option value="RJ">RJ</option>
-                  <option value="MG">MG</option>
-                </select>
-                {submitted && erros.uf && (
-                  <span className="mensagem-erro">
-                    <AlertCircle size={14} /> {erros.uf}
-                  </span>
-                )}
-              </div>
-
-              <div className="form-group">
                 <label>Email</label>
                 <input
+                  type="email"
                   name="email"
                   placeholder="exemplo@hospital.com"
                   value={formData.email}
                   onChange={handleChange}
+                  className={submitted && erros.email ? "input-erro" : ""}
                 />
                 {submitted && erros.email && (
                   <span className="mensagem-erro">
@@ -203,7 +253,6 @@ export default function CadastrarProfissional() {
               </div>
             </div>
 
-            {/* NASCIMENTO + TELEFONE */}
             <div className="form-row">
               <div className="form-group">
                 <label>Nascimento</label>
@@ -212,6 +261,7 @@ export default function CadastrarProfissional() {
                   name="nascimento"
                   value={formData.nascimento}
                   onChange={handleChange}
+                  className={submitted && erros.nascimento ? "input-erro" : ""}
                 />
                 {submitted && erros.nascimento && (
                   <span className="mensagem-erro">
@@ -221,44 +271,89 @@ export default function CadastrarProfissional() {
               </div>
 
               <div className="form-group">
-                <label>Telefone</label>
+                <label>Cargo</label>
                 <input
-                  name="telefone"
-                  placeholder="(11) 99999-9999"
-                  value={formData.telefone}
+                  name="cargo"
+                  placeholder="Ex: Escalista"
+                  value={formData.cargo}
                   onChange={handleChange}
+                  className={submitted && erros.cargo ? "input-erro" : ""}
                 />
-                {submitted && erros.telefone && (
+                {submitted && erros.cargo && (
                   <span className="mensagem-erro">
-                    <AlertCircle size={14} /> {erros.telefone}
+                    <AlertCircle size={14} /> {erros.cargo}
                   </span>
                 )}
               </div>
             </div>
 
-            {/* ESPECIALIDADE */}
             <div className="form-group">
-              <label>Especialidade</label>
+              <label>Setor responsável</label>
               <select
-                name="especialidade"
-                value={formData.especialidade}
+                name="setorId"
+                value={formData.setorId}
                 onChange={handleChange}
+                disabled={loadingSetores}
+                className={submitted && erros.setorId ? "input-erro" : ""}
               >
-                <option value="">Selecione a especialidade</option>
-                <option value="Cardiologia">Cardiologia</option>
-                <option value="Ortopedia">Ortopedia</option>
+                <option value="">
+                  {loadingSetores ? "Carregando setores..." : "Selecione o setor"}
+                </option>
+                {setores.map((setor) => (
+                  <option key={setor.id} value={setor.id}>
+                    {setor.nome}
+                  </option>
+                ))}
               </select>
-
-              {submitted && erros.especialidade && (
+              {submitted && erros.setorId && (
                 <span className="mensagem-erro">
-                  <AlertCircle size={14} /> {erros.especialidade}
+                  <AlertCircle size={14} /> {erros.setorId}
                 </span>
               )}
             </div>
 
-            {/* BOTÃO */}
-            <button type="submit" className="btn-submit">
-              Cadastrar
+            <div className="form-row">
+              <div className="form-group">
+                <label>Senha</label>
+                <input
+                  type="password"
+                  name="senha"
+                  placeholder="Mínimo de 6 caracteres"
+                  value={formData.senha}
+                  onChange={handleChange}
+                  className={submitted && erros.senha ? "input-erro" : ""}
+                />
+                {submitted && erros.senha && (
+                  <span className="mensagem-erro">
+                    <AlertCircle size={14} /> {erros.senha}
+                  </span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Confirmar senha</label>
+                <input
+                  type="password"
+                  name="confirmaSenha"
+                  placeholder="Repita a senha"
+                  value={formData.confirmaSenha}
+                  onChange={handleChange}
+                  className={submitted && erros.confirmaSenha ? "input-erro" : ""}
+                />
+                {submitted && erros.confirmaSenha && (
+                  <span className="mensagem-erro">
+                    <AlertCircle size={14} /> {erros.confirmaSenha}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="btn-submit"
+              disabled={submitting || loadingSetores}
+            >
+              {submitting ? "Cadastrando..." : "Cadastrar Escalista"}
             </button>
           </form>
         </section>

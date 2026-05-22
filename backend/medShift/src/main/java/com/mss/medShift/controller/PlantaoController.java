@@ -19,6 +19,8 @@ import com.mss.medShift.domain.model.Hospital;
 import com.mss.medShift.domain.model.Manager;
 import com.mss.medShift.domain.model.Usuario;
 import com.mss.medShift.controller.dto.PlantaoAvulsoRequest;
+import com.mss.medShift.controller.dto.PlantaoFixoRequest;
+import com.mss.medShift.controller.dto.PlantaoFixoResponse;
 import com.mss.medShift.controller.dto.PlantaoSummaryResponse;
 import com.mss.medShift.service.PlantaoService;
 import com.mss.medShift.service.auth.AccessScopeService;
@@ -53,6 +55,31 @@ public class PlantaoController {
                 .buildAndExpand(plantaoCriado.getId())
                 .toUri();
         return ResponseEntity.created(location).body(PlantaoSummaryResponse.from(plantaoCriado));
+    }
+
+    @PostMapping("/fixo")
+    public ResponseEntity<PlantaoFixoResponse> createFixo(@RequestBody PlantaoFixoRequest request,
+            @AuthenticationPrincipal Usuario usuarioLogado) {
+        Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, request.setorId());
+        var resultado = plantaoService.createFixo(
+                request.setorId(),
+                request.medicoId(),
+                request.tipoRecorrencia(),
+                request.diaSemana(),
+                request.semanaDoMes(),
+                request.diaDoMes(),
+                request.turno(),
+                request.horaInicio(),
+                request.horaFim(),
+                request.dataInicioVigencia(),
+                request.dataFimVigencia(),
+                escalista);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(resultado.regra().getId())
+                .toUri();
+        return ResponseEntity.created(location).body(PlantaoFixoResponse.from(resultado));
     }
 
     @PostMapping

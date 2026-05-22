@@ -40,7 +40,7 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
 
     @Override
     @Transactional
-    public PedidoCobertura abrirPedido(Long plantaoId, String motivo, Doctor medicoSolicitante) {
+    public PedidoCobertura abrirPedido(Long plantaoId, Doctor medicoSolicitante) {
         if (plantaoId == null) {
             throw new IllegalArgumentException("Plantão é obrigatório");
         }
@@ -64,7 +64,6 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
         pedido.setSetor(plantao.getSetor());
         pedido.setMedicoSolicitante(medicoSolicitante);
         pedido.setStatus(PedidoCoberturaStatus.ABERTO);
-        pedido.setMotivo(normalizeMotivo(motivo));
         pedido.setAbertoEm(now);
         pedido.setAtualizadoEm(now);
 
@@ -221,13 +220,6 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
         }
 
         return setorIds.stream().distinct().toList();
-    }
-
-    private String normalizeMotivo(String motivo) {
-        if (motivo == null || motivo.isBlank()) {
-            return null;
-        }
-        return motivo.trim();
     }
 
     private boolean hasConflitoHorario(Long medicoId, LocalDateTime dataInicio, LocalDateTime dataFim) {

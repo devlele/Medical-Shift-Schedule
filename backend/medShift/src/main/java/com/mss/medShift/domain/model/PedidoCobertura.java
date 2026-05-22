@@ -41,7 +41,6 @@ public class PedidoCobertura {
     @Enumerated(EnumType.STRING)
     private PedidoCoberturaStatus status = PedidoCoberturaStatus.ABERTO;
 
-    private String motivo;
     private LocalDateTime abertoEm;
     private LocalDateTime assumidoEm;
     private LocalDateTime canceladoEm;
@@ -110,14 +109,6 @@ public class PedidoCobertura {
 
     public void setStatus(PedidoCoberturaStatus status) {
         this.status = status;
-    }
-
-    public String getMotivo() {
-        return motivo;
-    }
-
-    public void setMotivo(String motivo) {
-        this.motivo = motivo;
     }
 
     public LocalDateTime getAbertoEm() {

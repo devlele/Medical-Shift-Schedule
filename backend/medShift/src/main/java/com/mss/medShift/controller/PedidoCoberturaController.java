@@ -37,7 +37,7 @@ public class PedidoCoberturaController {
     public ResponseEntity<PedidoCoberturaResponse> abrirPedido(@RequestBody PedidoCoberturaCreateRequest request,
             @AuthenticationPrincipal Usuario usuarioLogado) {
         Doctor medicoLogado = accessScopeService.requireMedicoProfile(usuarioLogado);
-        var pedido = pedidoCoberturaService.abrirPedido(request.plantaoId(), request.motivo(), medicoLogado);
+        var pedido = pedidoCoberturaService.abrirPedido(request.plantaoId(), medicoLogado);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
