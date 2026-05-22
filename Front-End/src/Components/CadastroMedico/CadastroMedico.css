@@ -153,6 +153,24 @@
   transform: none;
 }
 
+.alerta-formulario {
+  border-radius: 10px;
+  margin: 8px 0 0;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.alerta-formulario.erro {
+  background: rgba(220, 53, 69, 0.08);
+  color: var(--error);
+}
+
+.alerta-formulario.sucesso {
+  background: rgba(40, 167, 69, 0.08);
+  color: var(--success);
+}
+
 /* LINK */
 .link-login {
   display: block;

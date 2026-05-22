@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, AlertCircle } from "lucide-react";
 
 import { validarEmail, validarSenha } from "../../utils/validacoes";
-import { loginHospital } from "../../services/api";
+import { loginUsuario } from "../../services/api";
 import logo from "../../assets/Logo-H.png";
 import "./Login.css";
 import "../../utils/validacoes.css";
@@ -53,10 +53,23 @@ const Login = () => {
 
       try {
         setEnviando(true);
-        const resposta = await loginHospital(payload);
+        const resposta = await loginUsuario(payload);
+        const usuario = resposta.user;
+        const role = usuario?.role;
 
         localStorage.setItem("token", resposta.token);
         localStorage.setItem("emailUsuario", payload.email);
+        if (usuario) {
+          localStorage.setItem("usuario", JSON.stringify(usuario));
+        }
+        if (role) {
+          localStorage.setItem("role", role);
+        }
+
+        if (role === "HOSPITAL") {
+          navigate("/UserHospital/TelaPrincipal");
+          return;
+        }
 
         navigate("/TelaPrincipal");
       } catch (error) {

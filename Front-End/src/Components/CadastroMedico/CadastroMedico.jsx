@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { AlertCircle } from "lucide-react";
 import logo from "../../assets/logo-icon.png";
 import Footer from "../../Components/Footer/Footer.jsx";
@@ -11,12 +12,13 @@ import {
   validarCampoObrigatorio,
   formatarTelefone,
 } from "../../utils/validacoes";
-import { useState } from "react";
+import { cadastrarMedico } from "../../services/api";
 
 import "./CadastroMedico.css";
 import "../../utils/validacoes.css";
 
 function CadastroUsuario() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nome: "",
     crm: "",
@@ -33,6 +35,9 @@ function CadastroUsuario() {
   const [erros, setErros] = useState({});
   const [formularioTocado, setFormularioTocado] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
+  const [erroEnvio, setErroEnvio] = useState("");
 
   const formatarCPF = (valor) => {
     valor = valor.replace(/\D/g, "");
@@ -112,6 +117,8 @@ function CadastroUsuario() {
     }
 
     setFormData({ ...formData, [name]: novoValor });
+    setErroEnvio("");
+    setMensagemSucesso("");
 
     // Validação em tempo real se o campo foi tocado
     if (formularioTocado[name] && submitted) {
@@ -128,14 +135,42 @@ function CadastroUsuario() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitted(true);
     const novoErros = validarFormulario();
+    setErroEnvio("");
+    setMensagemSucesso("");
 
     if (Object.keys(novoErros).length === 0) {
-      console.log("Formulário válido! Dados:", formData);
-      // Aqui irá a lógica de cadastro
+      const payload = {
+        name: formData.nome.trim(),
+        crm: formData.crm.replace(/\D/g, ""),
+        uf: formData.uf,
+        email: formData.email.trim(),
+        cpf: formData.cpf.replace(/\D/g, ""),
+        birthday: formData.dataNascimento,
+        telefone: formData.telefone.trim(),
+        specialty: formData.especialidade,
+        password: formData.senha,
+      };
+
+      try {
+        setEnviando(true);
+        await cadastrarMedico(payload);
+        setMensagemSucesso(
+          "Médico cadastrado com sucesso. Redirecionando para login...",
+        );
+        setTimeout(() => navigate("/Login"), 1200);
+      } catch (error) {
+        setErroEnvio(
+          error.message.includes("Failed to fetch")
+            ? "Nao foi possivel conectar à API. Confirme se o backend está rodando em http://localhost:8080."
+            : "Nao foi possivel cadastrar o médico. Verifique se email, CPF ou CRM já estao cadastrados.",
+        );
+      } finally {
+        setEnviando(false);
+      }
     } else {
       setErros(novoErros);
       setFormularioTocado({
@@ -427,8 +462,15 @@ function CadastroUsuario() {
               </div>
             </div>
 
-            <button type="submit" className="btn-cadastrar">
-              Cadastrar
+            {erroEnvio && (
+              <div className="alerta-formulario erro">{erroEnvio}</div>
+            )}
+            {mensagemSucesso && (
+              <div className="alerta-formulario sucesso">{mensagemSucesso}</div>
+            )}
+
+            <button type="submit" className="btn-cadastrar" disabled={enviando}>
+              {enviando ? "Enviando..." : "Cadastrar"}
             </button>
 
             <Link to="/Login" className="link-login">
