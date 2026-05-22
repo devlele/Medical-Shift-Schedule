@@ -17,29 +17,57 @@ import DetalhesOferta from "./Components/UserPlantonista/Plantoes/DetalhesOferta
 import OferecerPlantao from "./Components/UserPlantonista/Plantoes/OferecerPlantao.jsx";
 import TelaPrincipalHospital from "./Components/UserHospital/TelaPrincipal/TelaPrincipal";
 import Setores from "./Components/UserHospital/Setores/Setores.jsx";
+import CadastrarProfissional from "./Components/UserHospital/CadastrarProfissional/CadastrarProfissional.jsx";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        //TODOS
         <Route path="/" element={<Home />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/CadastroTipo" element={<CadastroTipo />} />
         <Route path="/CadastroHospital" element={<CadastroHospital />} />
         <Route path="/CadastroMedico" element={<CadastroMedico />} />
-        <Route path="/Perfil" element={<Perfil />} />
-        <Route path="/TelaPrincipal" element={<TelaPrincipal />} />
-        <Route path="/ResolucaoConflito" element={<ResolucaoConflito />} />
         <Route path="/RecuperarSenha" element={<RecuperarSenha />} />
-        <Route path="/Agenda" element={<Agenda />} />
-        <Route path="/DetalhePlantao/:id" element={<DetalhePlantao />} />
-        <Route path="/historico" element={<Historico />} />
-        <Route path="/PlantoesOfertados" element={<PlantoesOfertados />} />
-        <Route path="/OferecerPlantao" element={<OferecerPlantao />} />
-        <Route path="/DetalhesOferta" element={<DetalhesOferta />} />
-        <Route path="/UserHospital/TelaPrincipal" element={<TelaPrincipalHospital />} />
-        <Route path="/Setores" element={<Setores />} />
-
+        //PLNTONISTA
+        <Route path="/UserPlantonista/Perfil" element={<Perfil />} />
+        <Route
+          path="/UserPlantonista/TelaPrincipal"
+          element={<TelaPrincipal />}
+        />
+        <Route
+          path="/UserPlantonista/ResolucaoConflito"
+          element={<ResolucaoConflito />}
+        />
+        <Route path="/UserPlantonista/Agenda" element={<Agenda />} />
+        <Route
+          path="/UserPlantonista/DetalhePlantao/:id"
+          element={<DetalhePlantao />}
+        />
+        <Route path="/UserPlantonista/Historico" element={<Historico />} />
+        <Route
+          path="/UserPlantonista/PlantoesOfertados"
+          element={<PlantoesOfertados />}
+        />
+        <Route
+          path="/UserPlantonista/OferecerPlantao"
+          element={<OferecerPlantao />}
+        />
+        <Route
+          path="/UserPlantonista/DetalhesOferta"
+          element={<DetalhesOferta />}
+        />
+        //HOSPITAL
+        <Route
+          path="/UserHospital/TelaPrincipal"
+          element={<TelaPrincipalHospital />}
+        />
+        <Route
+          path="/UserHospital/CadastrarProfissional"
+          element={<CadastrarProfissional />}
+        />
+        <Route path="/UserHospital/Setores" element={<Setores />} />
       </Routes>
     </BrowserRouter>
   );
