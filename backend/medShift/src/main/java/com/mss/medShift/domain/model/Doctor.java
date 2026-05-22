@@ -1,12 +1,11 @@
 package com.mss.medShift.domain.model;
 
 import java.sql.Date;
-import java.util.Collection;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,28 +14,76 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
-@Table(name = "tb_doctor")
+@Table(name = "tb_medico")
 @Entity
-public class Doctor extends User implements UserDetails {
+public class Doctor extends User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private  String crm;
-    private String specialty;
-    private String uf;
+
+    @OneToOne
+    @JsonIgnore
+    private Usuario usuario;
+
+    private String crm;
+    private String ufCrm;
     private String telefone;
     private String fotoPerfilUrl;
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+    private Boolean ativo = true;
+    private LocalDateTime criadoEm;
+    private LocalDateTime atualizadoEm;
 
+    /*
+     * Transitional free-text specialty kept for existing profile endpoints.
+     * The canonical relationship is MedicoEspecialidade.
+     */
+    private String specialty;
+
+    @Enumerated(EnumType.STRING)
+    private UserRole role = UserRole.MEDICO;
+
+    /*
+     * Transitional single hospital/sector fields kept for existing services.
+     * The canonical sector relationship is MedicoSetor.
+     */
     @ManyToOne
     private Hospital hospital;
 
     @ManyToOne
     private Setor setor;
+
+    @OneToMany(mappedBy = "medico")
+    @JsonIgnore
+    private List<MedicoSetor> medicoSetores;
+
+    @OneToMany(mappedBy = "medico")
+    @JsonIgnore
+    private List<MedicoEspecialidade> medicoEspecialidades;
+
+    @OneToMany(mappedBy = "medicoTitular")
+    @JsonIgnore
+    private List<RegraPlantaoFixo> regrasPlantaoFixo;
+
+    @OneToMany(mappedBy = "medicoTitular")
+    @JsonIgnore
+    private List<Plantao> plantoesComoTitular;
+
+    @OneToMany(mappedBy = "medicoResponsavelAtual")
+    @JsonIgnore
+    private List<Plantao> plantoesComoResponsavelAtual;
+
+    @OneToMany(mappedBy = "medicoSolicitante")
+    @JsonIgnore
+    private List<PedidoCobertura> pedidosSolicitados;
+
+    @OneToMany(mappedBy = "medicoCobridor")
+    @JsonIgnore
+    private List<PedidoCobertura> pedidosAssumidos;
 
     public Doctor() {
     }
@@ -45,7 +92,8 @@ public class Doctor extends User implements UserDetails {
         super(name, email, cpf, birthday, password);
         this.specialty = specialty;
         this.crm = crm;
-        this.role = role;
+        this.role = role != null ? role : UserRole.MEDICO;
+        this.ativo = true;
     }
 
     public Long getId() {
@@ -56,6 +104,14 @@ public class Doctor extends User implements UserDetails {
         this.id = id;
     }
 
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
     public String getCrm() {
         return crm;
     }
@@ -64,20 +120,28 @@ public class Doctor extends User implements UserDetails {
         this.crm = crm;
     }
 
+    public String getUfCrm() {
+        return ufCrm;
+    }
+
+    public void setUfCrm(String ufCrm) {
+        this.ufCrm = ufCrm;
+    }
+
+    public String getUf() {
+        return ufCrm;
+    }
+
+    public void setUf(String uf) {
+        this.ufCrm = uf;
+    }
+
     public String getSpecialty() {
         return specialty;
     }
 
     public void setSpecialty(String specialty) {
         this.specialty = specialty;
-    }
-
-    public String getUf() {
-        return uf;
-    }
-
-    public void setUf(String uf) {
-        this.uf = uf;
     }
 
     public String getTelefone() {
@@ -96,12 +160,39 @@ public class Doctor extends User implements UserDetails {
         this.fotoPerfilUrl = fotoPerfilUrl;
     }
 
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public LocalDateTime getCriadoEm() {
+        return criadoEm;
+    }
+
+    public void setCriadoEm(LocalDateTime criadoEm) {
+        this.criadoEm = criadoEm;
+    }
+
+    public LocalDateTime getAtualizadoEm() {
+        return atualizadoEm;
+    }
+
+    public void setAtualizadoEm(LocalDateTime atualizadoEm) {
+        this.atualizadoEm = atualizadoEm;
+    }
+
     public UserRole getRole() {
-        return role;
+        return usuario != null && usuario.getRole() != null ? usuario.getRole() : role;
     }
 
     public void setRole(UserRole role) {
         this.role = role;
+        if (this.usuario != null) {
+            this.usuario.setRole(role);
+        }
     }
 
     public Hospital getHospital() {
@@ -120,44 +211,66 @@ public class Doctor extends User implements UserDetails {
         this.setor = setor;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        if(this.role == UserRole.ADMIN) {
-            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        }
-        else if (this.role == UserRole.HOSPITAL) {
-            return List.of(new SimpleGrantedAuthority("ROLE_HOSPITAL"));
-        }
-        else if (this.role == UserRole.MANAGER) {
-            return List.of(new SimpleGrantedAuthority("ROLE_MANAGER"));
-        }
-        else {
-            return List.of(new SimpleGrantedAuthority("ROLE_DOCTOR"));
-        }
+    public List<MedicoSetor> getMedicoSetores() {
+        return medicoSetores;
+    }
+
+    public void setMedicoSetores(List<MedicoSetor> medicoSetores) {
+        this.medicoSetores = medicoSetores;
+    }
+
+    public List<MedicoEspecialidade> getMedicoEspecialidades() {
+        return medicoEspecialidades;
+    }
+
+    public void setMedicoEspecialidades(List<MedicoEspecialidade> medicoEspecialidades) {
+        this.medicoEspecialidades = medicoEspecialidades;
+    }
+
+    public List<RegraPlantaoFixo> getRegrasPlantaoFixo() {
+        return regrasPlantaoFixo;
+    }
+
+    public void setRegrasPlantaoFixo(List<RegraPlantaoFixo> regrasPlantaoFixo) {
+        this.regrasPlantaoFixo = regrasPlantaoFixo;
+    }
+
+    public List<Plantao> getPlantoesComoTitular() {
+        return plantoesComoTitular;
+    }
+
+    public void setPlantoesComoTitular(List<Plantao> plantoesComoTitular) {
+        this.plantoesComoTitular = plantoesComoTitular;
+    }
+
+    public List<Plantao> getPlantoesComoResponsavelAtual() {
+        return plantoesComoResponsavelAtual;
+    }
+
+    public void setPlantoesComoResponsavelAtual(List<Plantao> plantoesComoResponsavelAtual) {
+        this.plantoesComoResponsavelAtual = plantoesComoResponsavelAtual;
+    }
+
+    public List<PedidoCobertura> getPedidosSolicitados() {
+        return pedidosSolicitados;
+    }
+
+    public void setPedidosSolicitados(List<PedidoCobertura> pedidosSolicitados) {
+        this.pedidosSolicitados = pedidosSolicitados;
+    }
+
+    public List<PedidoCobertura> getPedidosAssumidos() {
+        return pedidosAssumidos;
+    }
+
+    public void setPedidosAssumidos(List<PedidoCobertura> pedidosAssumidos) {
+        this.pedidosAssumidos = pedidosAssumidos;
     }
 
     @Override
-    public String getUsername() {
-        return super.getEmail();
-    }
-    
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    public String getPassword() {
+        return usuario != null ? usuario.getPassword() : super.getPassword();
     }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

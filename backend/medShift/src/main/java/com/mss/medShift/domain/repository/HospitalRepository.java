@@ -8,6 +8,7 @@ import com.mss.medShift.domain.model.Hospital;
 
 public interface HospitalRepository extends JpaRepository<Hospital, Long> {
     Optional<Hospital> findByEmail(String email);
+    Optional<Hospital> findByUsuarioId(Long usuarioId);
     Optional<Hospital> findByCnpj(String cnpj);
     boolean existsByCnpj(String cnpj);
     boolean existsByEmail(String email);

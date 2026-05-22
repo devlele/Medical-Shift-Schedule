@@ -25,7 +25,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        //TODOS:
+        //TODOS
         <Route path="/" element={<Home />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/CadastroTipo" element={<CadastroTipo />} />

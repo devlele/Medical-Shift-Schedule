@@ -15,33 +15,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.mss.medShift.controller.dto.SetorResponse;
 import com.mss.medShift.domain.model.Hospital;
 import com.mss.medShift.domain.model.Setor;
+import com.mss.medShift.domain.model.Usuario;
 import com.mss.medShift.service.SetorService;
+import com.mss.medShift.service.auth.AccessScopeService;
 
 @RestController
 @RequestMapping("/setor")
 public class SetorController {
 
     private final SetorService setorService;
+    private final AccessScopeService accessScopeService;
 
-    public SetorController(SetorService setorService) {
+    public SetorController(SetorService setorService, AccessScopeService accessScopeService) {
         this.setorService = setorService;
+        this.accessScopeService = accessScopeService;
     }
 
-    /*@PostMapping
-    public ResponseEntity<Setor> create(@RequestBody Setor setorToCreate) {
-        var setorCreated = setorService.create(setorToCreate);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                        .path("/{id}")
-                        .buildAndExpand(setorCreated.getId())
-                        .toUri();
-
-        return ResponseEntity.created(location).body(setorCreated);
-    }*/
-
     @PostMapping
-    public ResponseEntity<Setor> create(@RequestBody Setor setorToCreate, @AuthenticationPrincipal Hospital hospitalLogado) {  // ← pega direto do token
+    public ResponseEntity<SetorResponse> create(@RequestBody Setor setorToCreate, @AuthenticationPrincipal Usuario usuarioLogado) {
+        Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
 
         var setorCreated = setorService.create(setorToCreate, hospitalLogado);
 
@@ -50,49 +45,43 @@ public class SetorController {
                     .buildAndExpand(setorCreated.getId())
                     .toUri();
 
-        return ResponseEntity.created(location).body(setorCreated);
+        return ResponseEntity.created(location).body(SetorResponse.from(setorCreated));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Setor> getSetor(@PathVariable Long id, @AuthenticationPrincipal Hospital hospitalLogado) {
-        try {
-            var setor = setorService.findById(id, hospitalLogado);
-            return ResponseEntity.ok(setor);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<SetorResponse> getSetor(@PathVariable Long id, @AuthenticationPrincipal Usuario usuarioLogado) {
+        var setor = accessScopeService.requireSetorOfAuthenticatedHospital(usuarioLogado, id);
+        return ResponseEntity.ok(SetorResponse.from(setor));
     }
 
     @GetMapping
-    public ResponseEntity<List<Setor>> getSetoresDoHospitalLogado(@AuthenticationPrincipal Hospital hospitalLogado) {
+    public ResponseEntity<List<SetorResponse>> getSetoresDoHospitalLogado(@AuthenticationPrincipal Usuario usuarioLogado) {
+        Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
         var setores = setorService.findByHospitalId(hospitalLogado.getId());
-        return ResponseEntity.ok(setores);
+        return ResponseEntity.ok(setores.stream()
+                .map(SetorResponse::from)
+                .toList());
     }
 
     @GetMapping("/hospital/{hospitalId}")
-    public ResponseEntity<List<Setor>> getSetoresByHospital(@PathVariable Long hospitalId) {
+    public ResponseEntity<List<SetorResponse>> getSetoresByHospital(@PathVariable Long hospitalId) {
         var setores = setorService.findByHospitalId(hospitalId);
-        return ResponseEntity.ok(setores);
+        return ResponseEntity.ok(setores.stream()
+                .map(SetorResponse::from)
+                .toList());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Setor> update(@PathVariable Long id, @RequestBody Setor setor,
-            @AuthenticationPrincipal Hospital hospitalLogado) {
-        try {
-            var setorUpdated = setorService.update(id, setor, hospitalLogado);
-            return ResponseEntity.ok(setorUpdated);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<SetorResponse> update(@PathVariable Long id, @RequestBody Setor setor,
+            @AuthenticationPrincipal Usuario usuarioLogado) {
+        Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
+        var setorUpdated = setorService.update(id, setor, hospitalLogado);
+        return ResponseEntity.ok(SetorResponse.from(setorUpdated));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        try {
-            setorService.delete(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        setorService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

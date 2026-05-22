@@ -1,234 +1,174 @@
-# Next Steps - Medical Shift Schedule
+# Proximos passos do backend
 
-Este documento organiza os principais pontos encontrados na analise da logica atual da aplicacao, comparando o codigo existente com o `PROJECT_SUMMARY.md`, o `README.md` e os casos de uso.
+Este documento registra a ordem recomendada para completar o backend do MedShift, considerando os fluxos principais do sistema: hospital, setores, escalistas, medicos, plantoes, cobertura e notificacoes.
 
-## Conclusao Geral
+## 1. Plantao avulso (IMPLEMENTADO)
 
-A aplicacao faz sentido como um primeiro nucleo de autenticacao, cadastro e estrutura organizacional:
+Implementar o fluxo em que o escalista cria um plantao unico para um medico em uma data e horario especificos.
 
-- Hospital cadastra setores.
-- Hospital cadastra managers/escalistas.
-- Doctor se cadastra.
-- Hospital, Manager e Doctor autenticam via JWT.
-- As roles principais ja existem: `ADMIN`, `HOSPITAL`, `MANAGER`, `DOCTOR`.
+O backend deve validar:
 
-Porem, a aplicacao ainda nao implementa o dominio central do produto: gerenciamento de escalas e plantoes. No estado atual, ela esta mais proxima de um modulo de identidade e cadastro institucional do que de um sistema completo de escala medica.
+- o usuario logado e um escalista;
+- o escalista atua no setor informado;
+- o medico possui vinculo ativo com o setor;
+- `dataInicio` e anterior a `dataFim`;
+- o medico nao possui outro plantao conflitante no mesmo periodo.
 
-## Prioridade 1 - Corrigir Base Tecnica
+Resultado esperado: um registro `PLANTAO` com `tipo = AVULSO`, `status = AGENDADO`, hospital, setor, medico titular, medico responsavel atual e escalista criador.
 
-### 1. Corrigir Flyway e migrations
+## 2. Listagens de agenda e calendario
 
-**Problema:** As migrations estao em `src/main/resources/db/migrations`, mas o padrao do Flyway e `src/main/resources/db/migration`. Durante a execucao dos testes, o log indicou que nenhuma migration foi encontrada.
+Criar endpoints para consultar plantoes conforme o contexto do usuario logado.
 
-**Impacto:** O banco esta sendo criado pelo Hibernate via `ddl-auto=update`, nao pelas migrations. Isso torna o schema imprevisivel entre ambientes e invalida a promessa de controle por Flyway.
+Consultas prioritarias:
 
-**Acoes recomendadas:**
+- medico visualiza seus plantoes;
+- escalista visualiza plantoes dos setores em que atua;
+- hospital visualiza plantoes de seus setores;
+- filtros por periodo, hospital, setor e status.
 
-- Renomear a pasta `db/migrations` para `db/migration`.
-- Corrigir a migration `V1__create-doctor-table.sql`, que possui virgula sobrando no final.
-- Adicionar `AUTO_INCREMENT`/identity nos IDs quando necessario.
-- Garantir que as colunas das migrations batam com as entidades JPA.
-- Incluir coluna `role` em `tb_doctor` e `tb_hospital`, se a persistencia da role for mantida.
-- Depois disso, considerar trocar `spring.jpa.hibernate.ddl-auto` de `update` para `validate`.
+Resultado esperado: o frontend consegue montar calendarios reais sem dados mockados.
 
-### 2. Corrigir metodos de delete
+## 3. Plantao fixo e recorrencia
 
-**Problema:** `DoctorServiceImple.delete` e `ManagerServiceImple.delete` deletam o registro, mas continuam a execucao e lancam excecao logo depois.
+Implementar `REGRA_PLANTAO_FIXO` para representar plantoes recorrentes.
 
-**Impacto:** Mesmo quando a delecao funciona, a API pode responder como erro.
+Casos esperados:
 
-**Acoes recomendadas:**
+- todo sabado das 07h as 19h;
+- todo segundo sabado do mes;
+- recorrencia com data de inicio e fim de vigencia;
+- geracao de ocorrencias concretas em `PLANTAO`.
 
-- Adicionar `return` apos `deleteById`.
-- Ou reestruturar com `else`.
-- Padronizar excecoes de recurso nao encontrado.
+Resultado esperado: o sistema separa a regra recorrente das ocorrencias reais exibidas na agenda.
 
-## Prioridade 2 - Alinhar Seguranca com a Regra de Negocio
+## 4. Pedido de cobertura
 
-### 3. Revisar autorizacao dos endpoints
+Implementar o fluxo em que o medico solicita que outro medico assuma um plantao.
 
-**Problema:** O `PROJECT_SUMMARY.md` documenta alguns endpoints como `ROLE_ADMIN`, mas no codigo eles acabam liberados para qualquer usuario autenticado ou para `ROLE_HOSPITAL`.
+Regras esperadas:
 
-**Exemplos:**
+- apenas o medico responsavel atual pode abrir pedido para seu plantao;
+- o pedido fica associado ao plantao, hospital, setor e medico solicitante;
+- medicos elegiveis do mesmo hospital e setor conseguem visualizar o pedido;
+- um medico elegivel pode assumir o plantao;
+- ao assumir, `medicoResponsavelAtual` do plantao e atualizado.
 
-- `GET /hospital/{id}` esta documentado como admin, mas cai em `.anyRequest().authenticated()`.
-- `GET /doctor/{id}` esta documentado como admin, mas tambem cai em `.anyRequest().authenticated()`.
-- `GET /setor/hospital/{id}` esta documentado como admin, mas a configuracao atual permite hospital.
+Resultado esperado: plantao ofertado aparece no calendario dos medicos elegiveis como pedido de cobertura.
 
-**Impacto:** Usuarios podem consultar dados fora do escopo esperado.
+## 5. Controle de concorrencia na cobertura
 
-**Acoes recomendadas:**
+Garantir que dois medicos nao assumam o mesmo pedido ao mesmo tempo.
 
-- Definir uma matriz oficial de permissoes.
-- Atualizar `SecurityConfiguration` para refletir essa matriz.
-- Ordenar matchers especificos antes de matchers amplos, por exemplo `/setor/hospital/**` antes de `/setor/**`.
-- Criar testes de autorizacao para cada role.
+Regras esperadas:
 
-### 4. Garantir isolamento entre hospitais
+- transacao ao assumir pedido;
+- verificacao de status `ABERTO` antes de aceitar;
+- mudanca atomica para `ASSUMIDO`;
+- rejeicao caso o pedido ja tenha sido assumido, cancelado ou expirado.
 
-**Problema:** Endpoints como `GET /setor/{id}` e `PUT /setor/{id}` buscam ou alteram setor por ID, sem conferir se o setor pertence ao hospital autenticado.
+Resultado esperado: consistencia mesmo com cliques simultaneos.
 
-**Impacto:** Um hospital pode acessar ou alterar dados de outro hospital, se souber o ID.
+## 6. Notificacoes
 
-**Acoes recomendadas:**
+Implementar notificacoes para eventos importantes do sistema.
 
-- Ao buscar setor por ID, validar `setor.hospital.id == hospitalLogado.id`.
-- Repetir essa regra para managers, doctors e futuros plantoes.
-- Criar metodos como `findByIdAndHospitalId`.
-- Evitar endpoints que recebem `hospitalId` quando o contexto pode vir do token.
+Prioridade inicial:
 
-## Prioridade 3 - Completar o Fluxo de Cadastro e Vinculos
+- notificar medico solicitante quando outro medico assumir seu pedido de cobertura;
+- listar notificacoes do usuario logado;
+- marcar notificacao como lida.
 
-### 5. Definir fluxo de vinculo Doctor-Hospital-Setor
+Resultado esperado: o medico recebe aviso quando seu plantao for assumido por outro profissional.
 
-**Problema:** O medico se cadastra publicamente em `/doctor/register`, mas fica sem hospital e sem setor. O projeto diz que profissionais devem ser vinculados a hospitais e setores por intermedio de escalistas.
+## 7. Endpoints de perfil por contexto
 
-**Impacto:** A aplicacao ainda nao consegue responder bem a perguntas como:
+Criar endpoints para o frontend buscar dados do usuario logado sem depender apenas do token ou do `localStorage`.
 
-- Quais medicos trabalham neste hospital?
-- Quais medicos pertencem a este setor?
-- Qual manager pode gerenciar este medico?
-- Quem pode receber ou cobrir determinado plantao?
+Endpoints recomendados:
 
-**Acoes recomendadas:**
+- `GET /dashboard/me`;
+- `GET /hospital/me`;
+- `GET /doctor/me`;
+- `GET /manager/me`.
 
-- Criar endpoint para hospital ou manager vincular doctor a hospital/setor.
-- Decidir se um doctor pode atuar em multiplos hospitais e setores.
-- Se puder, substituir `Doctor.hospital` e `Doctor.setor` por uma entidade de vinculo, por exemplo `DoctorHospitalSetor`.
-- Se nao puder, deixar essa limitacao explicita nos requisitos.
+Resultado esperado: o frontend consegue montar cabecalhos, menus e paineis com dados reais e atuais.
 
-### 6. Validacoes de cadastro
+## 8. DTOs e padronizacao de respostas
 
-**Problema:** Os casos de uso falam em validacao de e-mail, CPF, senha forte e idade minima, mas o codigo valida apenas algumas unicidades.
+Substituir retornos diretos de entidades JPA por DTOs.
 
-**Impacto:** Dados invalidos podem entrar no banco e comprometer fluxos futuros.
+Prioridades:
 
-**Acoes recomendadas:**
+- hospital;
+- medico;
+- escalista;
+- setor;
+- plantao;
+- pedido de cobertura;
+- notificacao.
 
-- Usar Bean Validation com `@Valid`.
-- Adicionar DTOs de entrada em vez de receber entidades JPA diretamente nos controllers.
-- Validar formato de e-mail.
-- Validar CPF/CNPJ.
-- Validar idade minima.
-- Validar senha minima/forte.
-- Validar campos obrigatorios.
+Resultado esperado: respostas mais estaveis, sem vazamento de campos internos e sem risco de serializacao circular.
 
-## Prioridade 4 - Implementar o Dominio Principal
+## 9. Tratamento global de erros
 
-### 7. Criar modelo de Plantao/Escala
+Criar um `@ControllerAdvice` para padronizar erros da API.
 
-**Problema:** O produto e descrito como um sistema de escala medica, mas ainda nao ha entidades para escala, plantao, agenda, historico, disponibilidade ou troca.
+Mapeamentos esperados:
 
-**Impacto:** A aplicacao ainda nao atende aos principais casos de uso do projeto.
+- `400 Bad Request` para payload invalido ou regra de negocio quebrada;
+- `401 Unauthorized` para usuario nao autenticado;
+- `403 Forbidden` para usuario sem permissao;
+- `404 Not Found` para recurso inexistente;
+- `409 Conflict` para conflitos de agenda, email, CRM, CNPJ ou vinculo duplicado.
 
-**Acoes recomendadas:**
+Resultado esperado: integracao mais previsivel para o frontend e mensagens mais claras para o usuario.
 
-- Criar entidade `Plantao`.
-- Definir campos minimos:
-  - data/hora de inicio;
-  - data/hora de fim;
-  - hospital;
-  - setor;
-  - medico responsavel;
-  - manager responsavel;
-  - status;
-  - tipo: fixo ou variavel.
-- Criar entidade ou enum para status do plantao:
-  - pendente;
-  - confirmado;
-  - disponivel para troca;
-  - em andamento;
-  - finalizado;
-  - cancelado.
-- Criar endpoints de CRUD de plantao para `MANAGER`.
-- Validar conflito de horario para o medico.
+## 10. Regras e constraints no banco
 
-### 8. Implementar visualizacao de agenda
+Fortalecer a integridade no banco de dados.
 
-**Problema:** Os casos de uso preveem visualizacao diaria, semanal e mensal, mas nao existe endpoint para isso.
+Prioridades:
 
-**Acoes recomendadas:**
+- unicidade de email em `USUARIO`;
+- unicidade de CNPJ em `HOSPITAL`;
+- unicidade de CRM em `MEDICO`;
+- unicidade logica de vinculo ativo em `MEDICO_SETOR`;
+- unicidade logica de vinculo ativo em `ESCALISTA_SETOR`;
+- indices para consultas de agenda por hospital, setor, medico e periodo.
 
-- Criar endpoints de consulta por periodo:
-  - agenda do doctor autenticado;
-  - escala por setor;
-  - escala por profissional;
-  - escala por hospital.
-- Adicionar filtros por status, turno, setor, especialidade e hospital.
+Resultado esperado: o banco ajuda a impedir dados duplicados ou inconsistentes.
 
-### 9. Implementar check-in/check-out
+## 11. Testes de integracao dos fluxos principais
 
-**Problema:** Check-in e check-out aparecem nos casos de uso, mas nao existem no backend.
+Expandir a cobertura dos testes para os fluxos de negocio completos.
 
-**Acoes recomendadas:**
+Cenarios prioritarios:
 
-- Adicionar campos em `Plantao` ou entidade separada de ponto:
-  - `checkInAt`;
-  - `checkOutAt`;
-  - `totalHoras`;
-  - status final.
-- Permitir check-in apenas para o medico responsavel.
-- Validar janela de horario permitida para check-in/check-out.
+- hospital cadastra setor;
+- hospital cadastra escalista;
+- hospital vincula escalista a setor;
+- medico se cadastra;
+- escalista vincula medico a setor;
+- escalista cria plantao avulso;
+- medico visualiza agenda;
+- medico abre pedido de cobertura;
+- outro medico assume cobertura;
+- notificacao e criada.
 
-### 10. Implementar troca/cobertura de plantoes
+Resultado esperado: confianca para evoluir o sistema sem quebrar fluxos essenciais.
 
-**Problema:** O sistema promete permitir que medicos oferecam plantoes e manifestem interesse, mas nao existe estrutura para isso.
+## 12. Dashboards reais
 
-**Acoes recomendadas:**
+Substituir dados mockados por agregacoes reais vindas do backend.
 
-- Criar entidade `InteressePlantao`.
-- Permitir que doctor marque um plantao futuro como disponivel para troca.
-- Listar oportunidades compativeis por setor/especialidade/hospital.
-- Permitir manifestacao de interesse.
-- Definir se a troca precisa de aprovacao do manager.
+Indicadores iniciais:
 
-## Prioridade 5 - Melhorar Arquitetura da API
+- total de setores ativos;
+- total de escalistas do hospital;
+- total de medicos vinculados;
+- total de plantoes no periodo;
+- total de pedidos de cobertura abertos;
+- proximos plantoes.
 
-### 11. Separar DTOs de entidades
-
-**Problema:** Controllers recebem e retornam entidades JPA diretamente.
-
-**Impacto:** Isso expõe campos internos, dificulta validacao e pode gerar problemas de serializacao.
-
-**Acoes recomendadas:**
-
-- Criar DTOs de request e response.
-- Nunca retornar `password`.
-- Retornar apenas dados necessarios para cada tela/fluxo.
-- Evitar que o cliente envie campos sensiveis como `role`, `hospital` e `setor` diretamente quando eles devem vir da regra de negocio.
-
-### 12. Padronizar tratamento de erros
-
-**Problema:** Varios controllers usam `try/catch` generico e retornam `404` para qualquer excecao.
-
-**Impacto:** Erros de validacao, autorizacao e regra de negocio podem ser mascarados como recurso nao encontrado.
-
-**Acoes recomendadas:**
-
-- Criar `@RestControllerAdvice`.
-- Retornar:
-  - `400` para dados invalidos;
-  - `401` para nao autenticado;
-  - `403` para sem permissao;
-  - `404` para recurso inexistente;
-  - `409` para conflito de unicidade ou conflito de horario.
-
-## Ordem Recomendada de Execucao
-
-1. Corrigir Flyway/migrations e alinhar schema com entidades.
-2. Corrigir deletes e erros evidentes de service.
-3. Ajustar `SecurityConfiguration` conforme a matriz real de permissoes.
-4. Implementar isolamento por hospital nos endpoints existentes.
-5. Criar DTOs e validacoes para cadastros.
-6. Definir e implementar o vinculo entre Doctor, Hospital e Setor.
-7. Criar entidade e endpoints de Plantao.
-8. Implementar consultas de agenda/escala.
-9. Implementar check-in/check-out.
-10. Implementar troca de plantoes e manifestacao de interesse.
-
-## Observacao Sobre Testes
-
-Foi executado `./mvnw test`, mas os testes nao chegaram a validar regras de negocio porque o ambiente bloqueou a abertura de porta do Tomcat com `SocketException: Operation not permitted`.
-
-Mesmo assim, o log mostrou um ponto importante: o Flyway nao encontrou migrations e o Hibernate criou as tabelas automaticamente via `ddl-auto=update`.
-
+Resultado esperado: paineis hospitalar, medico e escalista refletindo o estado real do sistema.

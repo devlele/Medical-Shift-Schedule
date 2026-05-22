@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,23 +16,26 @@ import com.mss.medShift.controller.dto.DashboardResponse;
 import com.mss.medShift.controller.dto.PlantaoSummaryResponse;
 import com.mss.medShift.domain.model.Doctor;
 import com.mss.medShift.domain.model.Hospital;
-import com.mss.medShift.domain.model.Manager;
 import com.mss.medShift.domain.model.Plantao;
 import com.mss.medShift.domain.model.UserRole;
+import com.mss.medShift.domain.model.Usuario;
 import com.mss.medShift.service.PlantaoService;
+import com.mss.medShift.service.auth.AccessScopeService;
 
 @RestController
 @RequestMapping("/dashboard")
 public class DashboardController {
 
     private final PlantaoService plantaoService;
+    private final AccessScopeService accessScopeService;
 
-    public DashboardController(PlantaoService plantaoService) {
+    public DashboardController(PlantaoService plantaoService, AccessScopeService accessScopeService) {
         this.plantaoService = plantaoService;
+        this.accessScopeService = accessScopeService;
     }
 
     @GetMapping("/me")
-    public ResponseEntity<DashboardResponse> getMyDashboard(@AuthenticationPrincipal UserDetails user) {
+    public ResponseEntity<DashboardResponse> getMyDashboard(@AuthenticationPrincipal Usuario user) {
         LocalDate today = LocalDate.now();
         LocalDateTime monthStart = today.withDayOfMonth(1).atStartOfDay();
         LocalDateTime monthEnd = today.withDayOfMonth(today.lengthOfMonth()).atTime(LocalTime.MAX);
@@ -60,15 +62,19 @@ public class DashboardController {
                 proximosPlantoes));
     }
 
-    private List<Plantao> findPlantoesForUser(UserDetails user) {
-        if (user instanceof Doctor doctor) {
+    private List<Plantao> findPlantoesForUser(Usuario user) {
+        if (accessScopeService.isMedico(user)) {
+            Doctor doctor = accessScopeService.requireMedicoProfile(user);
             return plantaoService.findByDoctorId(doctor.getId());
         }
-        if (user instanceof Hospital hospital) {
+        if (accessScopeService.isHospital(user)) {
+            Hospital hospital = accessScopeService.requireHospitalProfile(user);
             return plantaoService.findByHospitalId(hospital.getId());
         }
-        if (user instanceof Manager manager && manager.getSetor() != null) {
-            return plantaoService.findBySetorId(manager.getSetor().getId());
+        if (accessScopeService.isEscalista(user)) {
+            return accessScopeService.resolveEscalistaSetorIds(user).stream()
+                    .flatMap(setorId -> plantaoService.findBySetorId(setorId).stream())
+                    .toList();
         }
         return List.of();
     }
@@ -96,9 +102,9 @@ public class DashboardController {
     }
 
     private boolean sameDoctor(Plantao first, Plantao second) {
-        return first.getDoctorAssignado() != null
-                && second.getDoctorAssignado() != null
-                && first.getDoctorAssignado().getId().equals(second.getDoctorAssignado().getId());
+        return first.getMedicoResponsavelAtual() != null
+                && second.getMedicoResponsavelAtual() != null
+                && first.getMedicoResponsavelAtual().getId().equals(second.getMedicoResponsavelAtual().getId());
     }
 
     private boolean overlaps(Plantao first, Plantao second) {
@@ -110,42 +116,15 @@ public class DashboardController {
                 && second.getDataInicio().isBefore(first.getDataFim());
     }
 
-    private Long resolveId(UserDetails user) {
-        if (user instanceof Doctor doctor) {
-            return doctor.getId();
-        }
-        if (user instanceof Hospital hospital) {
-            return hospital.getId();
-        }
-        if (user instanceof Manager manager) {
-            return manager.getId();
-        }
-        return null;
+    private Long resolveId(Usuario user) {
+        return accessScopeService.resolveProfileId(user);
     }
 
-    private String resolveName(UserDetails user) {
-        if (user instanceof Doctor doctor) {
-            return doctor.getName();
-        }
-        if (user instanceof Hospital hospital) {
-            return hospital.getNomeFantasia();
-        }
-        if (user instanceof Manager manager) {
-            return manager.getName();
-        }
-        return user.getUsername();
+    private String resolveName(Usuario user) {
+        return accessScopeService.resolveProfileName(user);
     }
 
-    private UserRole resolveRole(UserDetails user) {
-        if (user instanceof Doctor doctor) {
-            return doctor.getRole();
-        }
-        if (user instanceof Hospital hospital) {
-            return hospital.getRole();
-        }
-        if (user instanceof Manager manager) {
-            return manager.getRole();
-        }
-        return null;
+    private UserRole resolveRole(Usuario user) {
+        return user.getRole();
     }
 }

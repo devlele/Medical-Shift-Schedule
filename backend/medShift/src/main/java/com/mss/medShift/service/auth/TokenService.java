@@ -8,9 +8,12 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.mss.medShift.domain.model.Usuario;
+
 import org.springframework.security.core.userdetails.UserDetails;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -22,13 +25,20 @@ public class TokenService {
     private String secret;
 
     public String generateToken(UserDetails userDetails) {
-        return Jwts.builder()
+        JwtBuilder builder = Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .setIssuer("MedShift API")
                 .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(generateExpirationDate()))
-                .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
-                .compact();
+                .setExpiration(Date.from(generateExpirationDate()));
+
+        if (userDetails instanceof Usuario usuario) {
+            builder.claim("userId", usuario.getId());
+            if (usuario.getRole() != null) {
+                builder.claim("role", usuario.getRole().name());
+            }
+        }
+
+        return builder.signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256).compact();
     }
 
     public String getSubject(String token) {
