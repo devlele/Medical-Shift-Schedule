@@ -1,5 +1,6 @@
 package com.mss.medShift;
 
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -159,6 +160,163 @@ class MedShiftApplicationTests {
         assertThat(managerResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
+    @Test
+    @Order(6)
+    void hospitalVinculaEDesvinculaEscalistaASetores() {
+        var hospitalEmail = "hospital-link-manager@example.com";
+        var hospitalPassword = "senha123";
+
+        createHospital(hospitalEmail, hospitalPassword);
+        var hospitalToken = loginAndGetToken(hospitalEmail, hospitalPassword);
+
+        var setorInicialId = createSetor(hospitalToken, "UTI", "Unidade de Terapia Intensiva");
+        var setorExtraId = createSetor(hospitalToken, "Emergência", "Setor de Emergência");
+        var managerId = createManager(hospitalToken, setorInicialId, "Bruno Escalista", "09876543213",
+                "bruno.manager@example.com", "senha456", "Escalas");
+
+        var vinculosIniciais = getManagerSetores(hospitalToken, managerId);
+        assertThat(vinculosIniciais)
+                .extracting(vinculo -> ((Number) ((Map<?, ?>) vinculo).get("setorId")).longValue())
+                .contains(setorInicialId);
+
+        var vinculoCriado = vincularManagerSetor(hospitalToken, managerId, setorExtraId);
+        assertThat(vinculoCriado).containsEntry("setorId", setorExtraId.intValue());
+
+        var vinculosAtualizados = getManagerSetores(hospitalToken, managerId);
+        assertThat(vinculosAtualizados)
+                .extracting(vinculo -> ((Number) ((Map<?, ?>) vinculo).get("setorId")).longValue())
+                .contains(setorInicialId, setorExtraId);
+
+        desvincularManagerSetor(hospitalToken, managerId, setorExtraId);
+
+        var vinculosDepoisDaRemocao = getManagerSetores(hospitalToken, managerId);
+        assertThat(vinculosDepoisDaRemocao)
+                .extracting(vinculo -> ((Number) ((Map<?, ?>) vinculo).get("setorId")).longValue())
+                .contains(setorInicialId)
+                .doesNotContain(setorExtraId);
+    }
+
+    @Test
+    @Order(7)
+    void escalistaVinculaEDesvinculaMedicoASetorPermitido() {
+        var hospitalEmail = "hospital-link-doctor@example.com";
+        var hospitalPassword = "senha123";
+
+        createHospital(hospitalEmail, hospitalPassword);
+        var hospitalToken = loginAndGetToken(hospitalEmail, hospitalPassword);
+
+        var setorId = createSetor(hospitalToken, "Clinica Medica", "Setor de Clinica Medica");
+        createManager(hospitalToken, setorId, "Laura Escalista", "09876543214",
+                "laura.manager@example.com", "senha456", "Escalas");
+        var escalistaToken = loginAndGetToken("laura.manager@example.com", "senha456");
+
+        var doctorId = createDoctor("doctor-link-setor@example.com", "senha123", "Pedro Almeida",
+                "12345678901", "1991-02-03", "Clinica Medica", "54321");
+
+        var vinculoCriado = vincularDoctorSetor(escalistaToken, doctorId, setorId);
+        assertThat(vinculoCriado).containsEntry("setorId", setorId.intValue());
+        assertThat(vinculoCriado).containsEntry("medicoId", doctorId.intValue());
+
+        var vinculosAtualizados = getDoctorSetores(escalistaToken, doctorId);
+        assertThat(vinculosAtualizados)
+                .extracting(vinculo -> ((Number) ((Map<?, ?>) vinculo).get("setorId")).longValue())
+                .contains(setorId);
+
+        desvincularDoctorSetor(escalistaToken, doctorId, setorId);
+
+        var vinculosDepoisDaRemocao = getDoctorSetores(escalistaToken, doctorId);
+        assertThat(vinculosDepoisDaRemocao)
+                .extracting(vinculo -> ((Number) ((Map<?, ?>) vinculo).get("setorId")).longValue())
+                .doesNotContain(setorId);
+    }
+
+    @Test
+    @Order(8)
+    void escalistaCriaPlantaoAvulsoApenasParaMedicoDoSetorSemConflito() {
+        var hospitalEmail = "hospital-plantao-avulso@example.com";
+        var hospitalPassword = "senha123";
+
+        createHospital(hospitalEmail, hospitalPassword);
+        var hospitalToken = loginAndGetToken(hospitalEmail, hospitalPassword);
+
+        var setorId = createSetor(hospitalToken, "Pronto Atendimento", "Setor de Pronto Atendimento");
+        createManager(hospitalToken, setorId, "Marcela Escalista", "09876543215",
+                "marcela.manager@example.com", "senha456", "Escalas");
+        var escalistaToken = loginAndGetToken("marcela.manager@example.com", "senha456");
+
+        var doctorId = createDoctor("doctor-plantao-avulso@example.com", "senha123", "Renata Costa",
+                "12345678902", "1992-03-04", "Pronto Atendimento", "67890");
+        var doctorSemVinculoId = createDoctor("doctor-sem-vinculo@example.com", "senha123", "Rafael Lima",
+                "12345678903", "1993-04-05", "Pronto Atendimento", "67891");
+
+        vincularDoctorSetor(escalistaToken, doctorId, setorId);
+
+        var plantaoCriado = createPlantaoAvulso(
+                escalistaToken,
+                setorId,
+                doctorId,
+                "2026-05-15T07:00:00",
+                "2026-05-15T19:00:00");
+
+        assertThat(plantaoCriado).containsEntry("status", "AGENDADO");
+        assertThat(plantaoCriado).containsEntry("setorId", setorId.intValue());
+        assertThat(plantaoCriado).containsEntry("doctorId", doctorId.intValue());
+
+        createPlantaoAvulsoExpectBadRequest(
+                escalistaToken,
+                setorId,
+                doctorId,
+                "2026-05-15T13:00:00",
+                "2026-05-15T20:00:00");
+
+        createPlantaoAvulsoExpectBadRequest(
+                escalistaToken,
+                setorId,
+                doctorSemVinculoId,
+                "2026-05-16T07:00:00",
+                "2026-05-16T19:00:00");
+    }
+
+    @Test
+    @Order(9)
+    void escalistaConsultaSetoresCandidatosEVinculadosParaIntegracao() {
+        var hospitalEmail = "hospital-consultas-integracao@example.com";
+        var hospitalPassword = "senha123";
+
+        createHospital(hospitalEmail, hospitalPassword);
+        var hospitalToken = loginAndGetToken(hospitalEmail, hospitalPassword);
+
+        var setorId = createSetor(hospitalToken, "Observacao", "Setor de Observacao");
+        createManager(hospitalToken, setorId, "Paula Escalista", "09876543216",
+                "paula.manager@example.com", "senha456", "Escalas");
+        var escalistaToken = loginAndGetToken("paula.manager@example.com", "senha456");
+
+        var doctorId = createDoctor("doctor-candidato@example.com", "senha123", "Helena Nunes",
+                "12345678904", "1994-05-06", "Clinica Medica", "67892");
+
+        var meusSetores = getManagerMeSetores(escalistaToken);
+        assertThat(meusSetores)
+                .extracting(vinculo -> ((Number) ((Map<?, ?>) vinculo).get("setorId")).longValue())
+                .contains(setorId);
+
+        var candidatosAntes = getDoctorLinkCandidates(escalistaToken, setorId, "helena");
+        assertThat(candidatosAntes)
+                .extracting(candidate -> ((Number) ((Map<?, ?>) candidate).get("id")).longValue())
+                .contains(doctorId);
+
+        vincularDoctorSetor(escalistaToken, doctorId, setorId);
+
+        var medicosDoEscalista = getDoctorsForEscalista(escalistaToken);
+        assertThat(medicosDoEscalista)
+                .extracting(doctor -> ((Number) ((Map<?, ?>) doctor).get("id")).longValue())
+                .contains(doctorId);
+
+        var candidatosDepois = getDoctorLinkCandidates(escalistaToken, setorId, "helena");
+        assertThat(candidatosDepois)
+                .extracting(candidate -> ((Number) ((Map<?, ?>) candidate).get("id")).longValue())
+                .doesNotContain(doctorId);
+    }
+
     private Long createHospital(String email, String password) {
         String cnpjSuffix = String.format("%04d", Math.abs(email.hashCode()) % 10000);
         var hospitalRequest = Map.of(
@@ -223,6 +381,192 @@ class MedShiftApplicationTests {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).containsEntry("email", email);
         return ((Number) response.getBody().get("id")).longValue();
+    }
+
+    private List<?> getManagerSetores(String token, Long managerId) {
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        ResponseEntity<List> response = restTemplate.exchange(
+                "/manager/" + managerId + "/setores",
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                List.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        return response.getBody();
+    }
+
+    private Map<String, Object> vincularManagerSetor(String token, Long managerId, Long setorId) {
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        ResponseEntity<Map> response = restTemplate.exchange(
+                "/manager/" + managerId + "/setores/" + setorId,
+                HttpMethod.POST,
+                new HttpEntity<>(headers),
+                Map.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        return response.getBody();
+    }
+
+    private void desvincularManagerSetor(String token, Long managerId, Long setorId) {
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                "/manager/" + managerId + "/setores/" + setorId,
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers),
+                Void.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    private List<?> getManagerMeSetores(String token) {
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        ResponseEntity<List> response = restTemplate.exchange(
+                "/manager/me/setores",
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                List.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        return response.getBody();
+    }
+
+    private List<?> getDoctorSetores(String token, Long doctorId) {
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        ResponseEntity<List> response = restTemplate.exchange(
+                "/doctor/" + doctorId + "/setores",
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                List.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        return response.getBody();
+    }
+
+    private Map<String, Object> vincularDoctorSetor(String token, Long doctorId, Long setorId) {
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        ResponseEntity<Map> response = restTemplate.exchange(
+                "/doctor/" + doctorId + "/setores/" + setorId,
+                HttpMethod.POST,
+                new HttpEntity<>(headers),
+                Map.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        return response.getBody();
+    }
+
+    private void desvincularDoctorSetor(String token, Long doctorId, Long setorId) {
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                "/doctor/" + doctorId + "/setores/" + setorId,
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers),
+                Void.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    private List<?> getDoctorsForEscalista(String token) {
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        ResponseEntity<List> response = restTemplate.exchange(
+                "/doctor",
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                List.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        return response.getBody();
+    }
+
+    private List<?> getDoctorLinkCandidates(String token, Long setorId, String termo) {
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        ResponseEntity<List> response = restTemplate.exchange(
+                "/doctor/link-candidates?setorId=" + setorId + "&termo=" + termo,
+                HttpMethod.GET,
+                new HttpEntity<>(headers),
+                List.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        return response.getBody();
+    }
+
+    private Map<String, Object> createPlantaoAvulso(String token, Long setorId, Long doctorId,
+            String dataInicio, String dataFim) {
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        var request = Map.of(
+                "setorId", setorId,
+                "medicoId", doctorId,
+                "dataInicio", dataInicio,
+                "dataFim", dataFim
+        );
+
+        ResponseEntity<Map> response = restTemplate.exchange(
+                "/plantao/avulso",
+                HttpMethod.POST,
+                new HttpEntity<>(request, headers),
+                Map.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isNotNull();
+        return response.getBody();
+    }
+
+    private void createPlantaoAvulsoExpectBadRequest(String token, Long setorId, Long doctorId,
+            String dataInicio, String dataFim) {
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        var request = Map.of(
+                "setorId", setorId,
+                "medicoId", doctorId,
+                "dataInicio", dataInicio,
+                "dataFim", dataFim
+        );
+
+        ResponseEntity<Map> response = restTemplate.exchange(
+                "/plantao/avulso",
+                HttpMethod.POST,
+                new HttpEntity<>(request, headers),
+                Map.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     private Long createDoctor(String email, String password, String name, String cpf, String birthday, String specialty, String crm) {

@@ -1,8 +1,9 @@
 package com.mss.medShift.domain.model;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,10 +12,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.JoinColumn;
 
 @Table(name = "tb_plantao")
 @Entity
@@ -25,41 +24,61 @@ public class Plantao {
     private Long id;
 
     @ManyToOne
+    private Hospital hospital;
+
+    @ManyToOne
     private Setor setor;
 
     @ManyToOne
-    private Doctor doctorAssignado;
+    private RegraPlantaoFixo regraPlantaoFixo;
+
+    @ManyToOne
+    private Doctor medicoTitular;
+
+    @ManyToOne
+    private Doctor medicoResponsavelAtual;
+
+    @ManyToOne
+    private Manager criadoPorEscalista;
+
+    @Enumerated(EnumType.STRING)
+    private PlantaoTipo tipo;
+
+    @Enumerated(EnumType.STRING)
+    private PlantaoTurno turno;
 
     private LocalDateTime dataInicio;
     private LocalDateTime dataFim;
 
     @Enumerated(EnumType.STRING)
-    private PlantaoStatus status;
+    private PlantaoStatus status = PlantaoStatus.AGENDADO;
 
-    private LocalDateTime checkInTime;
-    private LocalDateTime checkOutTime;
+    private LocalDateTime criadoEm;
+    private LocalDateTime atualizadoEm;
 
-    @ManyToMany
-    @JoinTable(
-        name = "tb_plantao_interest",
-        joinColumns = @JoinColumn(name = "plantao_id"),
-        inverseJoinColumns = @JoinColumn(name = "doctor_id")
-    )
-    private List<Doctor> doctorsInterested = new ArrayList<>();
+    @OneToMany(mappedBy = "plantao")
+    @JsonIgnore
+    private List<PedidoCobertura> pedidosCobertura;
+
+    @OneToMany(mappedBy = "plantao")
+    @JsonIgnore
+    private List<Notificacao> notificacoes;
 
     public Plantao() {
-        this.status = PlantaoStatus.SCHEDULED;
     }
 
     public Plantao(Setor setor, Doctor doctorAssignado, LocalDateTime dataInicio, LocalDateTime dataFim) {
         this.setor = setor;
-        this.doctorAssignado = doctorAssignado;
+        this.hospital = setor != null ? setor.getHospital() : null;
+        this.medicoTitular = doctorAssignado;
+        this.medicoResponsavelAtual = doctorAssignado;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
-        this.status = PlantaoStatus.SCHEDULED;
+        this.status = PlantaoStatus.AGENDADO;
+        this.tipo = PlantaoTipo.AVULSO;
+        this.turno = PlantaoTurno.fromPeriodo(dataInicio, dataFim);
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -68,20 +87,74 @@ public class Plantao {
         this.id = id;
     }
 
+    public Hospital getHospital() {
+        return hospital;
+    }
+
+    public void setHospital(Hospital hospital) {
+        this.hospital = hospital;
+    }
+
     public Setor getSetor() {
         return setor;
     }
 
     public void setSetor(Setor setor) {
         this.setor = setor;
+        if (setor != null && this.hospital == null) {
+            this.hospital = setor.getHospital();
+        }
     }
 
-    public Doctor getDoctorAssignado() {
-        return doctorAssignado;
+    public RegraPlantaoFixo getRegraPlantaoFixo() {
+        return regraPlantaoFixo;
     }
 
-    public void setDoctorAssignado(Doctor doctorAssignado) {
-        this.doctorAssignado = doctorAssignado;
+    public void setRegraPlantaoFixo(RegraPlantaoFixo regraPlantaoFixo) {
+        this.regraPlantaoFixo = regraPlantaoFixo;
+    }
+
+    public Doctor getMedicoTitular() {
+        return medicoTitular;
+    }
+
+    public void setMedicoTitular(Doctor medicoTitular) {
+        this.medicoTitular = medicoTitular;
+        if (this.medicoResponsavelAtual == null) {
+            this.medicoResponsavelAtual = medicoTitular;
+        }
+    }
+
+    public Doctor getMedicoResponsavelAtual() {
+        return medicoResponsavelAtual;
+    }
+
+    public void setMedicoResponsavelAtual(Doctor medicoResponsavelAtual) {
+        this.medicoResponsavelAtual = medicoResponsavelAtual;
+    }
+
+    public Manager getCriadoPorEscalista() {
+        return criadoPorEscalista;
+    }
+
+    public void setCriadoPorEscalista(Manager criadoPorEscalista) {
+        this.criadoPorEscalista = criadoPorEscalista;
+    }
+
+    public PlantaoTipo getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(PlantaoTipo tipo) {
+        this.tipo = tipo;
+    }
+
+    public PlantaoTurno getTurno() {
+        return turno;
+    }
+
+    public void setTurno(PlantaoTurno turno) {
+        this.turno = turno;
     }
 
     public LocalDateTime getDataInicio() {
@@ -108,37 +181,47 @@ public class Plantao {
         this.status = status;
     }
 
-    public LocalDateTime getCheckInTime() {
-        return checkInTime;
+    public LocalDateTime getCriadoEm() {
+        return criadoEm;
     }
 
-    public void setCheckInTime(LocalDateTime checkInTime) {
-        this.checkInTime = checkInTime;
+    public void setCriadoEm(LocalDateTime criadoEm) {
+        this.criadoEm = criadoEm;
     }
 
-    public LocalDateTime getCheckOutTime() {
-        return checkOutTime;
+    public LocalDateTime getAtualizadoEm() {
+        return atualizadoEm;
     }
 
-    public void setCheckOutTime(LocalDateTime checkOutTime) {
-        this.checkOutTime = checkOutTime;
+    public void setAtualizadoEm(LocalDateTime atualizadoEm) {
+        this.atualizadoEm = atualizadoEm;
     }
 
-    public List<Doctor> getDoctorsInterested() {
-        return doctorsInterested;
+    public List<PedidoCobertura> getPedidosCobertura() {
+        return pedidosCobertura;
     }
 
-    public void setDoctorsInterested(List<Doctor> doctorsInterested) {
-        this.doctorsInterested = doctorsInterested;
+    public void setPedidosCobertura(List<PedidoCobertura> pedidosCobertura) {
+        this.pedidosCobertura = pedidosCobertura;
     }
 
-    public void addInterestedDoctor(Doctor doctor) {
-        if (!this.doctorsInterested.contains(doctor)) {
-            this.doctorsInterested.add(doctor);
-        }
+    public List<Notificacao> getNotificacoes() {
+        return notificacoes;
     }
 
-    public void removeInterestedDoctor(Doctor doctor) {
-        this.doctorsInterested.remove(doctor);
+    public void setNotificacoes(List<Notificacao> notificacoes) {
+        this.notificacoes = notificacoes;
+    }
+
+    /**
+     * Legacy alias for existing services/DTOs. Use medicoResponsavelAtual.
+     */
+    public Doctor getDoctorAssignado() {
+        return medicoResponsavelAtual;
+    }
+
+    public void setDoctorAssignado(Doctor doctorAssignado) {
+        setMedicoTitular(doctorAssignado);
+        setMedicoResponsavelAtual(doctorAssignado);
     }
 }

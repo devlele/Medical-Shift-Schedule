@@ -51,7 +51,18 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/doctor/me/**").hasRole("DOCTOR")
                         .requestMatchers(HttpMethod.POST, "/doctor/me/**").hasRole("DOCTOR")
                         .requestMatchers(HttpMethod.PUT, "/doctor/me/**").hasRole("DOCTOR")
-                        .requestMatchers(HttpMethod.GET, "/agenda/doctor/me/**").hasRole("DOCTOR")
+                        .requestMatchers(HttpMethod.GET, "/agenda/me").hasAnyRole("DOCTOR", "MEDICO", "HOSPITAL", "ESCALISTA", "MANAGER")
+                        .requestMatchers(HttpMethod.GET, "/agenda/doctor/me").hasAnyRole("DOCTOR", "MEDICO")
+                        .requestMatchers(HttpMethod.GET, "/agenda/doctor/me/**").hasAnyRole("DOCTOR", "MEDICO")
+                        .requestMatchers(HttpMethod.GET, "/agenda/setor/**").hasAnyRole("HOSPITAL", "ESCALISTA", "MANAGER", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/agenda/hospital/**").hasAnyRole("HOSPITAL", "ESCALISTA", "MANAGER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/coberturas").hasAnyRole("DOCTOR", "MEDICO")
+                        .requestMatchers(HttpMethod.GET, "/coberturas/disponiveis").hasAnyRole("DOCTOR", "MEDICO")
+                        .requestMatchers(HttpMethod.GET, "/coberturas/me").hasAnyRole("DOCTOR", "MEDICO")
+                        .requestMatchers(HttpMethod.POST, "/coberturas/{id}/assumir").hasAnyRole("DOCTOR", "MEDICO")
+                        .requestMatchers(HttpMethod.POST, "/coberturas/{id}/cancelar").hasAnyRole("DOCTOR", "MEDICO")
+                        .requestMatchers(HttpMethod.GET, "/notificacoes/me").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/notificacoes/{id}/lida").authenticated()
                         
                         // Admin-only lookups documented as administrative endpoints.
                         .requestMatchers(HttpMethod.GET, "/hospital").hasRole("ADMIN")
@@ -64,15 +75,28 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/setor").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.GET, "/setor/{id}").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.PUT, "/setor/{id}").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.GET, "/manager/me/setores").hasAnyRole("ESCALISTA", "MANAGER")
                         .requestMatchers(HttpMethod.GET, "/manager").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.GET, "/manager/{id}").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.GET, "/manager/{id}/setores").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.POST, "/manager").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.POST, "/manager/**").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.PUT, "/manager/{id}").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.DELETE, "/manager/{id}/setores/{setorId}").hasRole("HOSPITAL")
 
                         // Manager endpoints - MANAGER, HOSPITAL or ADMIN role
                         .requestMatchers(HttpMethod.GET, "/doctor").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/doctor/link-candidates").hasAnyRole("ESCALISTA", "MANAGER")
+                        .requestMatchers(HttpMethod.GET, "/doctor/{id}/setores").hasAnyRole("ESCALISTA", "MANAGER")
+                        .requestMatchers(HttpMethod.POST, "/doctor/{id}/setores/{setorId}").hasAnyRole("ESCALISTA", "MANAGER")
+                        .requestMatchers(HttpMethod.DELETE, "/doctor/{id}/setores/{setorId}").hasAnyRole("ESCALISTA", "MANAGER")
                         .requestMatchers(HttpMethod.GET, "/doctor/{id}").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/doctor/**").hasAnyRole("MANAGER", "HOSPITAL", "ADMIN")
+
+                        // Shift scheduling is scoped to escalistas.
+                        .requestMatchers(HttpMethod.POST, "/plantao").hasAnyRole("ESCALISTA", "MANAGER")
+                        .requestMatchers(HttpMethod.POST, "/plantao/avulso").hasAnyRole("ESCALISTA", "MANAGER")
+                        .requestMatchers(HttpMethod.PUT, "/plantao/{id}").hasAnyRole("ESCALISTA", "MANAGER")
                         
                         // Admin only
                         .requestMatchers(HttpMethod.DELETE, "/**").hasRole("ADMIN")

@@ -5,35 +5,20 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.mss.medShift.service.DoctorService;
-import com.mss.medShift.service.HospitalService;
-import com.mss.medShift.service.ManagerService;
+import com.mss.medShift.domain.repository.UsuarioRepository;
 
 @Service
 public class AuthorizationService implements UserDetailsService {
 
-    private final DoctorService doctorService;
-    private final ManagerService managerService;
-    private final HospitalService hospitalService;
+    private final UsuarioRepository usuarioRepository;
 
-    public AuthorizationService(DoctorService doctorService, ManagerService managerService, HospitalService hospitalService) {
-        this.doctorService = doctorService;
-        this.managerService = managerService;
-        this.hospitalService = hospitalService;
+    public AuthorizationService(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDetails user = doctorService.findByEmail(username);
-        if (user == null) {
-            user = managerService.findByEmail(username);
-        }
-        if (user == null) {
-            user = hospitalService.findByEmail(username);
-        }
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with email: " + username);
-        }
-        return user;
+        return usuarioRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
     }
 }

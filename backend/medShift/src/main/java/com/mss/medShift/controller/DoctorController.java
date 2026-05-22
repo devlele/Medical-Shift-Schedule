@@ -10,7 +10,6 @@ import java.util.Locale;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,49 +26,67 @@ import com.mss.medShift.domain.model.Doctor;
 import com.mss.medShift.domain.model.Hospital;
 import com.mss.medShift.domain.model.Manager;
 import com.mss.medShift.domain.model.Plantao;
+import com.mss.medShift.domain.model.Usuario;
+import com.mss.medShift.controller.dto.DoctorLookupResponse;
 import com.mss.medShift.controller.dto.DoctorProfileResponse;
+import com.mss.medShift.controller.dto.DoctorResponse;
+import com.mss.medShift.controller.dto.MedicoSetorResponse;
 import com.mss.medShift.controller.dto.PlantaoSummaryResponse;
 import com.mss.medShift.service.DoctorService;
 import com.mss.medShift.service.PlantaoService;
+import com.mss.medShift.service.auth.AccessScopeService;
 
 @RestController
 @RequestMapping("/doctor")
 public class DoctorController {
-    private DoctorService doctorService;
-    private PlantaoService plantaoService;
+    private final DoctorService doctorService;
+    private final PlantaoService plantaoService;
+    private final AccessScopeService accessScopeService;
 
-    public DoctorController(DoctorService doctorService, PlantaoService plantaoService) {
+    public DoctorController(DoctorService doctorService, PlantaoService plantaoService,
+            AccessScopeService accessScopeService) {
         this.doctorService = doctorService;
         this.plantaoService = plantaoService;
+        this.accessScopeService = accessScopeService;
     }
 
     @GetMapping
-    public ResponseEntity<List<Doctor>> getAllDoctors(@AuthenticationPrincipal UserDetails user) {
-        try {
-            var doctors = findDoctorsForUser(user);
-            return ResponseEntity.ok(doctors);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<List<DoctorResponse>> getAllDoctors(@AuthenticationPrincipal Usuario user) {
+        var doctors = findDoctorsForUser(user);
+        return ResponseEntity.ok(doctors.stream()
+                .map(DoctorResponse::from)
+                .toList());
+    }
+
+    @GetMapping("/link-candidates")
+    public ResponseEntity<List<DoctorLookupResponse>> getLinkCandidates(
+            @AuthenticationPrincipal Usuario usuarioLogado,
+            @RequestParam(required = false) Long setorId,
+            @RequestParam(required = false) String termo) {
+        Manager escalista = setorId != null
+                ? accessScopeService.requireEscalistaInSetor(usuarioLogado, setorId)
+                : accessScopeService.requireEscalistaProfile(usuarioLogado);
+        var candidates = doctorService.findLinkCandidates(escalista, setorId, termo).stream()
+                .map(DoctorLookupResponse::from)
+                .toList();
+        return ResponseEntity.ok(candidates);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Doctor> getDoctor(@PathVariable Long id, @AuthenticationPrincipal UserDetails user) {
-       try {
-            var doctor = findDoctorForUser(id, user);
-            return ResponseEntity.ok(doctor);
-       } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-       }
+    public ResponseEntity<DoctorResponse> getDoctor(@PathVariable Long id, @AuthenticationPrincipal Usuario user) {
+        var doctor = findDoctorForUser(id, user);
+        return ResponseEntity.ok(DoctorResponse.from(doctor));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Doctor> getMyProfile(@AuthenticationPrincipal Doctor doctorLogado) {
-        return ResponseEntity.ok(doctorLogado);
+    public ResponseEntity<DoctorResponse> getMyProfile(@AuthenticationPrincipal Usuario usuarioLogado) {
+        Doctor doctorLogado = accessScopeService.requireMedicoProfile(usuarioLogado);
+        return ResponseEntity.ok(DoctorResponse.from(doctorLogado));
     }
 
     @GetMapping("/me/profile")
-    public ResponseEntity<DoctorProfileResponse> getMyCompleteProfile(@AuthenticationPrincipal Doctor doctorLogado) {
+    public ResponseEntity<DoctorProfileResponse> getMyCompleteProfile(@AuthenticationPrincipal Usuario usuarioLogado) {
+        Doctor doctorLogado = accessScopeService.requireMedicoProfile(usuarioLogado);
         List<PlantaoSummaryResponse> historico = plantaoService.findByDoctorId(doctorLogado.getId()).stream()
                 .sorted(Comparator.comparing(Plantao::getDataInicio, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
                 .limit(5)
@@ -81,31 +98,29 @@ public class DoctorController {
 
     @PutMapping("/me/profile")
     public ResponseEntity<DoctorProfileResponse> updateMyCompleteProfile(
-            @AuthenticationPrincipal Doctor doctorLogado,
+            @AuthenticationPrincipal Usuario usuarioLogado,
             @RequestBody Doctor doctor) {
-        try {
-            var doctorAtualizado = doctorService.update(doctorLogado.getId(), doctor);
-            List<PlantaoSummaryResponse> historico = plantaoService.findByDoctorId(doctorAtualizado.getId()).stream()
-                    .sorted(Comparator.comparing(Plantao::getDataInicio, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
-                    .limit(5)
-                    .map(PlantaoSummaryResponse::from)
-                    .toList();
+        Doctor doctorLogado = accessScopeService.requireMedicoProfile(usuarioLogado);
+        var doctorAtualizado = doctorService.update(doctorLogado.getId(), doctor);
+        List<PlantaoSummaryResponse> historico = plantaoService.findByDoctorId(doctorAtualizado.getId()).stream()
+                .sorted(Comparator.comparing(Plantao::getDataInicio, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .limit(5)
+                .map(PlantaoSummaryResponse::from)
+                .toList();
 
-            return ResponseEntity.ok(DoctorProfileResponse.from(doctorAtualizado, historico));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        return ResponseEntity.ok(DoctorProfileResponse.from(doctorAtualizado, historico));
     }
 
     @PostMapping("/me/profile-photo")
     public ResponseEntity<DoctorProfileResponse> uploadMyProfilePhoto(
-            @AuthenticationPrincipal Doctor doctorLogado,
+            @AuthenticationPrincipal Usuario usuarioLogado,
             @RequestParam("file") MultipartFile file) {
         if (file == null || file.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
 
         try {
+            Doctor doctorLogado = accessScopeService.requireMedicoProfile(usuarioLogado);
             String extension = getSafeExtension(file.getOriginalFilename());
             Path uploadDir = Path.of("uploads", "profile-photos");
             Files.createDirectories(uploadDir);
@@ -126,7 +141,7 @@ public class DoctorController {
 
             return ResponseEntity.ok(DoctorProfileResponse.from(doctorAtualizado, historico));
         } catch (IOException e) {
-            return ResponseEntity.badRequest().build();
+            throw new IllegalArgumentException("Falha ao salvar foto de perfil");
         }
     }
 
@@ -143,58 +158,81 @@ public class DoctorController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Doctor> create(@RequestBody Doctor doctorToCreate) {
+    public ResponseEntity<DoctorResponse> create(@RequestBody Doctor doctorToCreate) {
         var doctorCreated = doctorService.create(doctorToCreate);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                         .path("/{id}")
                         .buildAndExpand(doctorToCreate.getId())
                         .toUri();
 
-        return ResponseEntity.created(location).body(doctorCreated);
+        return ResponseEntity.created(location).body(DoctorResponse.from(doctorCreated));
+    }
+
+    @GetMapping("/{id}/setores")
+    public ResponseEntity<List<MedicoSetorResponse>> getSetoresVinculados(@PathVariable Long id,
+            @AuthenticationPrincipal Usuario usuarioLogado) {
+        Manager escalistaLogado = accessScopeService.requireEscalistaProfile(usuarioLogado);
+        var setorIdsPermitidos = accessScopeService.resolveEscalistaSetorIds(usuarioLogado);
+        var vinculos = doctorService.findSetoresVinculados(id, escalistaLogado, setorIdsPermitidos).stream()
+                .map(MedicoSetorResponse::from)
+                .toList();
+        return ResponseEntity.ok(vinculos);
+    }
+
+    @PostMapping("/{id}/setores/{setorId}")
+    public ResponseEntity<MedicoSetorResponse> vincularSetor(@PathVariable Long id,
+            @PathVariable Long setorId,
+            @AuthenticationPrincipal Usuario usuarioLogado) {
+        Manager escalistaLogado = accessScopeService.requireEscalistaInSetor(usuarioLogado, setorId);
+        var vinculo = doctorService.vincularSetor(id, setorId, escalistaLogado);
+        return ResponseEntity.ok(MedicoSetorResponse.from(vinculo));
+    }
+
+    @DeleteMapping("/{id}/setores/{setorId}")
+    public ResponseEntity<Void> desvincularSetor(@PathVariable Long id,
+            @PathVariable Long setorId,
+            @AuthenticationPrincipal Usuario usuarioLogado) {
+        Manager escalistaLogado = accessScopeService.requireEscalistaInSetor(usuarioLogado, setorId);
+        doctorService.desvincularSetor(id, setorId, escalistaLogado);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Doctor> update(@PathVariable Long id, @RequestBody Doctor doctor) {
-        try {
-            var doctorAtualizado = doctorService.update(id, doctor);
-            return ResponseEntity.ok(doctorAtualizado);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<DoctorResponse> update(@PathVariable Long id, @RequestBody Doctor doctor) {
+        var doctorAtualizado = doctorService.update(id, doctor);
+        return ResponseEntity.ok(DoctorResponse.from(doctorAtualizado));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        try {
-            doctorService.delete(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        doctorService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
-    private List<Doctor> findDoctorsForUser(UserDetails user) {
-        if (user instanceof Hospital hospital) {
+    private List<Doctor> findDoctorsForUser(Usuario user) {
+        if (accessScopeService.isHospital(user)) {
+            Hospital hospital = accessScopeService.requireHospitalProfile(user);
             return doctorService.findByHospitalId(hospital.getId());
         }
-        if (user instanceof Manager manager) {
-            if (manager.getHospital() == null || manager.getSetor() == null) {
+        if (accessScopeService.isEscalista(user)) {
+            Manager manager = accessScopeService.requireEscalistaProfile(user);
+            if (manager.getHospital() == null) {
                 return List.of();
             }
-            return doctorService.findByHospitalIdAndSetorId(manager.getHospital().getId(), manager.getSetor().getId());
+            return doctorService.findBySetorIds(accessScopeService.resolveEscalistaSetorIds(user));
         }
         return doctorService.findAll();
     }
 
-    private Doctor findDoctorForUser(Long id, UserDetails user) {
-        if (user instanceof Hospital hospital) {
+    private Doctor findDoctorForUser(Long id, Usuario user) {
+        if (accessScopeService.isHospital(user)) {
+            Hospital hospital = accessScopeService.requireHospitalProfile(user);
             return doctorService.findByIdAndHospitalId(id, hospital.getId());
         }
-        if (user instanceof Manager manager) {
-            if (manager.getHospital() == null || manager.getSetor() == null) {
-                throw new IllegalArgumentException("Manager sem hospital ou setor");
-            }
-            return doctorService.findByIdAndHospitalIdAndSetorId(id, manager.getHospital().getId(), manager.getSetor().getId());
+        if (accessScopeService.isEscalista(user)) {
+            Doctor doctor = doctorService.findById(id);
+            accessScopeService.requireEscalistaCanAccessDoctor(user, doctor);
+            return doctor;
         }
         return doctorService.findById(id);
     }

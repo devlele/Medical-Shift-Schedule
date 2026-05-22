@@ -2,6 +2,8 @@ package com.mss.medShift.domain.model;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -14,6 +16,7 @@ public class User {
     private String cpf;
     @Temporal(TemporalType.DATE)
     private Date birthday;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     public User() {

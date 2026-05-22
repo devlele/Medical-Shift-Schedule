@@ -28,12 +28,14 @@ export function cadastrarHospital(payload) {
   });
 }
 
-export function loginHospital(payload) {
+export function loginUsuario(payload) {
   return request("/auth/login", {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
+
+export const loginHospital = loginUsuario;
 
 export function cadastrarMedico(payload) {
   return request("/doctor/register", {

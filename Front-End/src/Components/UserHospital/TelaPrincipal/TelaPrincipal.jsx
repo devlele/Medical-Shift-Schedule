@@ -33,7 +33,8 @@ const profissionais = [
 ];
 
 export default function TelaPrincipal() {
-  const usuario = localStorage.getItem("usuario") || "Usuário Hospital";
+  const usuario = obterUsuarioLogado();
+  const nomeUsuario = usuario?.name || "Usuário Hospital";
 
   return (
     <div className="layout-escalista">
@@ -44,7 +45,7 @@ export default function TelaPrincipal() {
         <header className="topo-escalista">
           <div>
             <h1>Painel Hospitalar</h1>
-            <p>Bem-vindo de volta, {usuario}.</p>
+            <p>Bem-vindo de volta, {nomeUsuario}.</p>
           </div>
 
           <div className="topo-direita">
@@ -56,7 +57,7 @@ export default function TelaPrincipal() {
               <User size={18} />
             </div>
 
-            <span className="nome-hospital">Hospital</span>
+            <span className="nome-hospital">{nomeUsuario}</span>
           </div>
         </header>
 
@@ -117,4 +118,18 @@ export default function TelaPrincipal() {
       </main>
     </div>
   );
+}
+
+function obterUsuarioLogado() {
+  const usuarioSalvo = localStorage.getItem("usuario");
+
+  if (!usuarioSalvo) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(usuarioSalvo);
+  } catch {
+    return { name: usuarioSalvo };
+  }
 }
