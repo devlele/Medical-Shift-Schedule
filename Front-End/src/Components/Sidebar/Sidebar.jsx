@@ -14,11 +14,11 @@ import {
   Building2,
   Shield,
   FileText,
-  BriefcaseMedical, 
-  UserPlus,       
-  UsersRound,     
-  ArrowLeftRight, 
-  CircleUser      
+  BriefcaseMedical,
+  UserPlus,
+  UsersRound,
+  ArrowLeftRight,
+  CircleUser,
 } from "lucide-react";
 
 import logo from "../../assets/logo.png";
@@ -29,10 +29,8 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
 
   // pega o role salvo no login - MUDAR AQUI TIRAR DPS O || "ROLE"
-  const role = localStorage
-    .getItem("role")
-    ?.toLowerCase()
-    ?.trim() || "escalista";  // MUDAR AQUI PARA ALTERAR A SIDEBAR (plantonista - hospital - escalista)
+  const role =
+    localStorage.getItem("role")?.toLowerCase()?.trim() || "hospital"; // MUDAR AQUI PARA ALTERAR A SIDEBAR (plantonista - hospital - escalista)
 
   function handleLogout() {
     localStorage.removeItem("token");
@@ -55,22 +53,22 @@ export default function Sidebar() {
       icon: Home,
     },
     {
-      to: "/Colaboradores",
+      to: "/UserHospital/Colaboradores",
       label: "Colaboradores",
       icon: Users,
     },
     {
-      to: "/CadastrarProfissional",
+      to: "/UserHospital/CadastrarProfissional",
       label: "Cadastrar Profissional",
       icon: ClipboardPlus,
     },
     {
-      to: "/Setores",
+      to: "/UserHospital/Setores",
       label: "Setores",
       icon: Building2,
     },
     {
-      to: "/perfil",
+      to: "/UserHospital/Perfil",
       label: "Perfil",
       icon: User,
     },
@@ -79,27 +77,27 @@ export default function Sidebar() {
   /* MENU PLANTONISTA */
   const menuPlantonista = [
     {
-      to: "/TelaPrincipal",
+      to: "/UserPlantonista/TelaPrincipal",
       label: "Home",
       icon: Home,
     },
     {
-      to: "/Agenda",
+      to: "/UserPlantonista/Agenda",
       label: "Agenda",
       icon: CalendarDays,
     },
     {
-      to: "/PlantoesOfertados",
+      to: "/UserPlantonista/PlantoesOfertados",
       label: "Plantão",
       icon: ClipboardPlus,
     },
     {
-      to: "/Historico",
+      to: "/UserPlantonista/Historico",
       label: "Histórico",
       icon: History,
     },
     {
-      to: "/Perfil",
+      to: "/UserPlantonista/Perfil",
       label: "Perfil",
       icon: User,
     },
@@ -159,9 +157,7 @@ export default function Sidebar() {
       <button
         type="button"
         className="sidebar-toggle"
-        aria-label={
-          isOpen ? "Fechar menu lateral" : "Abrir menu lateral"
-        }
+        aria-label={isOpen ? "Fechar menu lateral" : "Abrir menu lateral"}
         aria-expanded={isOpen}
         onClick={() => setIsOpen((current) => !current)}
       >
@@ -193,9 +189,7 @@ export default function Sidebar() {
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  isActive
-                    ? "item-menu ativo"
-                    : "item-menu"
+                  isActive ? "item-menu ativo" : "item-menu"
                 }
                 onClick={closeSidebar}
               >
