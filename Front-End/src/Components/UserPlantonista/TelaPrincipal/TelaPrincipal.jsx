@@ -38,17 +38,13 @@ export default function TelaPrincipal() {
         setLoading(true);
         setErro("");
 
-        const [
-          dashboardData,
-          agendaData,
-          coberturasData,
-          meusPedidosData,
-        ] = await Promise.all([
-          getDoctorDashboard(),
-          getMinhaAgendaMedico(),
-          getCoberturasDisponiveis(),
-          getMeusPedidosCobertura(),
-        ]);
+        const [dashboardData, agendaData, coberturasData, meusPedidosData] =
+          await Promise.all([
+            getDoctorDashboard(),
+            getMinhaAgendaMedico(),
+            getCoberturasDisponiveis(),
+            getMeusPedidosCobertura(),
+          ]);
 
         if (!ativo) {
           return;
@@ -237,7 +233,9 @@ export default function TelaPrincipal() {
               <div className="plantao">
                 <div className="info">
                   <p>Nenhum plantão agendado.</p>
-                  <span>Quando o escalista criar um plantão, ele aparecerá aqui.</span>
+                  <span>
+                    Quando o escalista criar um plantão, ele aparecerá aqui.
+                  </span>
                 </div>
               </div>
             )}

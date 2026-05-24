@@ -59,7 +59,7 @@ export default function TelaPrincipal() {
 
   const dadosDashboard = useMemo(() => {
     const escalistasAtivos = escalistas.filter(
-      (escalista) => escalista.ativo !== false
+      (escalista) => escalista.ativo !== false,
     );
 
     const medicosAtivos = medicos.filter((medico) => medico.ativo !== false);
@@ -150,7 +150,11 @@ export default function TelaPrincipal() {
                     <p>{profissional.setorNome || "Sem setor vinculado"}</p>
                   </div>
 
-                  <button type="button" className="botao-seta" aria-label="Abrir escalista">
+                  <button
+                    type="button"
+                    className="botao-seta"
+                    aria-label="Abrir escalista"
+                  >
                     <ArrowRight size={18} />
                   </button>
                 </article>

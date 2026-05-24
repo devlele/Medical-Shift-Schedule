@@ -1,0 +1,199 @@
+.colaboradores-page {
+  background: #f5f7fb;
+  min-height: 100vh;
+}
+
+/* LAYOUT PRINCIPAL */
+.colaboradores-content {
+  margin-left: 260px;
+  min-height: 100vh;
+  padding: 40px;
+}
+
+/* HEADER PADRÃO (IGUAL TELA PRINCIPAL) */
+.topo-hospital {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.topo-hospital h1 {
+  font-size: 2.2rem;
+  color: #1e3732;
+}
+
+.topo-hospital p {
+  color: #68807a;
+}
+
+/* LADO DIREITO HEADER */
+.topo-direita {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.icone-topo {
+  cursor: pointer;
+  color: #24443d;
+}
+
+/* AVATAR USUÁRIO */
+.avatar-default {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f5fbf7;
+  border: 2px solid #dff3e8;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #24443d;
+}
+
+.nome-hospital {
+  font-weight: 600;
+  color: #24443d;
+}
+
+/* CARDS */
+.cards-colaboradores {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.card-info {
+  background: white;
+  border-radius: 22px;
+  padding: 28px;
+  box-shadow: 0 2px 15px rgba(15, 23, 42, 0.06);
+}
+
+.card-info h3 {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.card-info span {
+  font-size: 34px;
+  font-weight: bold;
+  color: #0f172a;
+}
+
+/* BOTÃO NOVO ESCALISTA (AGORA À DIREITA) */
+.acoes-colaboradores {
+  display: flex;
+  justify-content: flex-end; /* 👈 aqui fica no lado direito */
+  margin-bottom: 20px;
+}
+
+.btn-novo-escalista {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  background: #1b725f;
+  color: white;
+
+  border: none;
+  border-radius: 12px;
+
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-novo-escalista:hover {
+  transform: translateY(-2px);
+}
+
+/* TABELA */
+.table-container {
+  background: white;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 2px 15px rgba(15, 23, 42, 0.06);
+  overflow-x: auto;
+}
+
+.table-top {
+  margin-bottom: 20px;
+}
+
+.table-top input {
+  width: 100%;
+  max-width: 350px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px 18px;
+  outline: none;
+}
+
+.table-top input:focus {
+  border-color: #0f172a;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+thead th {
+  text-align: left;
+  padding: 18px;
+  background: #f8fafc;
+  color: #475569;
+}
+
+tbody td {
+  padding: 18px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* TAGS */
+.tag {
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tag.escalista {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.tag.plantonista {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+/* RESPONSIVO */
+@media (max-width: 900px) {
+  .cards-colaboradores {
+    grid-template-columns: 1fr;
+  }
+
+  .colaboradores-content {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .acoes-colaboradores {
+    justify-content: center;
+  }
+}

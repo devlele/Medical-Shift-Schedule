@@ -45,12 +45,22 @@ export default function Sidebar() {
     {
       to: "/UserHospital/CadastrarProfissional",
       label: "Cadastrar Profissional",
+      icon: UserPlus,
+    },
+    {
+      to: "/UserHospital/Colaboradores",
+      label: "Colaboradores",
       icon: ClipboardPlus,
     },
     {
       to: "/UserHospital/Setores",
       label: "Setores",
       icon: Building2,
+    },
+    {
+      to: "/UserHospital/Perfil",
+      label: "Perfil",
+      icon: User,
     },
   ];
 

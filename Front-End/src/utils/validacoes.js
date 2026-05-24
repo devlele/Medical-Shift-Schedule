@@ -15,33 +15,42 @@ export const validarTelefone = (telefone) => {
   return regex.test(telefone);
 };
 
-// Validação de CNPJ
+// Validação de CNPJ Corrigida
 export const validarCNPJ = (cnpj) => {
-  const cleanCNPJ = cnpj.replace(/\D/g, "");
-  if (cleanCNPJ.length !== 14) return false;
+  if (!cnpj) return false;
 
-  let tamanho = cleanCNPJ.length - 2;
+  // Remove caracteres não numéricos
+  const cleanCNPJ = cnpj.toString().replace(/\D/g, "");
+
+  // Verifica tamanho e rejeita sequências repetidas conhecidas
+  if (cleanCNPJ.length !== 14 || /^(\d)\1+$/.test(cleanCNPJ)) return false;
+
+  // Validação do primeiro dígito verificador (DV)
+  let tamanho = 12;
   let numeros = cleanCNPJ.substring(0, tamanho);
   let digitos = cleanCNPJ.substring(tamanho);
   let soma = 0;
-  let pos = 0;
+  let pos = 5; // O primeiro cálculo começa com peso 5
 
-  for (let i = tamanho - 7; i >= 0; i--) {
-    soma += numeros.charAt(tamanho - 7 - i) * (pos + 2);
-    pos++;
+  for (let i = tamanho; i >= 1; i--) {
+    soma += numeros.charAt(tamanho - i) * pos;
+    pos--;
+    if (pos < 2) pos = 9; // Após o 2, o peso volta para 9
   }
 
   let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
   if (resultado !== parseInt(digitos.charAt(0))) return false;
 
-  tamanho = tamanho + 1;
+  // Validação do segundo dígito verificador (DV)
+  tamanho = 13;
   numeros = cleanCNPJ.substring(0, tamanho);
   soma = 0;
-  pos = 0;
+  pos = 6; // O segundo cálculo começa com peso 6
 
-  for (let i = tamanho - 7; i >= 0; i--) {
-    soma += numeros.charAt(tamanho - 7 - i) * (pos + 2);
-    pos++;
+  for (let i = tamanho; i >= 1; i--) {
+    soma += numeros.charAt(tamanho - i) * pos;
+    pos--;
+    if (pos < 2) pos = 9; // Após o 2, o peso volta para 9
   }
 
   resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);

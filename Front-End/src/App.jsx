@@ -6,7 +6,7 @@ import ProtectedRoute from "./Components/Auth/ProtectedRoute.jsx";
 import CadastroMedico from "./Components/CadastroMedico/CadastroMedico";
 import CadastroHospital from "./Components/CadastroHospital/CadastroHospital";
 import CadastroTipo from "./Components/CadastroTipo/CadastroTipo";
-import Perfil from "./Components/UserPlantonista/Perfil/Perfil";
+import PerfilPlantonista from "./Components/UserPlantonista/Perfil/Perfil";
 import TelaPrincipal from "./Components/UserPlantonista/TelaPrincipal/TelaPrincipal";
 import ResolucaoConflito from "./Components/UserPlantonista/ResolucaoConflito/ResolucaoConflito";
 import RecuperarSenha from "./Components/RecuperarSenha/RecuperarSenha";
@@ -22,6 +22,8 @@ import CadastrarProfissional from "./Components/UserHospital/CadastrarProfission
 import TelaPrincipalEscalista from "./Components/UserEscalista/TelaPrincipal/TelaPrincipal.jsx";
 import CriarPlantao from "./Components/UserEscalista/CriarPlantao/CriarPlantao.jsx";
 import MedicosSetor from "./Components/UserEscalista/MedicosSetor/MedicosSetor.jsx";
+import Colaboradores from "./Components/UserHospital/Colaboradores/Colaboradores.jsx";
+import PerfilHospital from "./Components/UserHospital/Perfil/Perfil.jsx";
 
 function App() {
   return (
@@ -34,13 +36,12 @@ function App() {
         <Route path="/CadastroHospital" element={<CadastroHospital />} />
         <Route path="/CadastroMedico" element={<CadastroMedico />} />
         <Route path="/RecuperarSenha" element={<RecuperarSenha />} />
-
-        //PLNTONISTA:
+        {/* PLNTONISTA */}
         <Route
           path="/UserPlantonista/Perfil"
           element={
             <ProtectedRoute allowedRoles={["medico"]}>
-              <Perfil />
+              <PerfilPlantonista />
             </ProtectedRoute>
           }
         />
@@ -108,8 +109,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        //HOSPITAL:
+        {/*HOSPITAL: */}
         <Route
           path="/UserHospital/TelaPrincipal"
           element={
@@ -127,6 +127,14 @@ function App() {
           }
         />
         <Route
+          path="/UserHospital/Colaboradores"
+          element={
+            <ProtectedRoute allowedRoles={["hospital"]}>
+              <Colaboradores />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/UserHospital/Setores"
           element={
             <ProtectedRoute allowedRoles={["hospital"]}>
@@ -134,8 +142,15 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        //ESCALISTA:
+        <Route
+          path="/UserHospital/Perfil"
+          element={
+            <ProtectedRoute allowedRoles={["hospital"]}>
+              <PerfilHospital />
+            </ProtectedRoute>
+          }
+        />
+        {/* ESCALISTA */}
         <Route
           path="/UserEscalista/TelaPrincipal"
           element={
@@ -160,7 +175,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
       </Routes>
     </BrowserRouter>
   );
