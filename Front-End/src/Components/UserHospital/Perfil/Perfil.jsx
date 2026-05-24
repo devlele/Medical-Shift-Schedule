@@ -96,9 +96,6 @@ const Perfil = () => {
           <div className="dados-perfil">
             <h2>{loading ? "Carregando..." : nome}</h2>
           </div>
-          <p>
-            {endereco} -{uf}
-          </p>
         </section>
 
         {/* ÁREA INFERIOR */}

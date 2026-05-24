@@ -24,6 +24,7 @@ import CriarPlantao from "./Components/UserEscalista/CriarPlantao/CriarPlantao.j
 import MedicosSetor from "./Components/UserEscalista/MedicosSetor/MedicosSetor.jsx";
 import Colaboradores from "./Components/UserHospital/Colaboradores/Colaboradores.jsx";
 import PerfilHospital from "./Components/UserHospital/Perfil/Perfil.jsx";
+import PerfilEscalista from "./Components/UserEscalista/Perfil/Perfil.jsx"
 
 function App() {
   return (
@@ -172,6 +173,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["escalista"]}>
               <CriarPlantao />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route 
+          path="/UserEscalista/Perfil"
+          element={
+            <ProtectedRoute allowedRoles={["escalista"]} >
+              <PerfilEscalista/>
             </ProtectedRoute>
           }
         />

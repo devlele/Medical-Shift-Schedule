@@ -110,6 +110,12 @@ export default function Sidebar() {
       label: "Criar Plantão",
       icon: BriefcaseMedical,
     },
+    {
+      to: "/UserEscalista/Perfil",
+      label: "Perfil",
+      icon: User,
+    },
+    
   ];
 
   /* ESCOLHE MENU PELO ROLE */
