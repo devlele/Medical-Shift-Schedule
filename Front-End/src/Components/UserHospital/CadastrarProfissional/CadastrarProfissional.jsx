@@ -21,7 +21,7 @@ const initialFormData = {
   cpf: "",
   email: "",
   nascimento: "",
-  cargo: "",
+  // cargo: "",
   setorId: "",
   senha: "",
   confirmaSenha: "",
@@ -87,9 +87,9 @@ export default function CadastrarProfissional() {
       novoErros.nascimento = "Data de nascimento é obrigatória";
     }
 
-    if (!validarCampoObrigatorio(dados.cargo)) {
-      novoErros.cargo = "Cargo é obrigatório";
-    }
+    // if (!validarCampoObrigatorio(dados.cargo)) {
+    //   novoErros.cargo = "Cargo é obrigatório";
+    // }
 
     if (!validarCampoObrigatorio(dados.setorId)) {
       novoErros.setorId = "Setor é obrigatório";
@@ -142,7 +142,7 @@ export default function CadastrarProfissional() {
       cpf: normalizarCPF(formData.cpf),
       email: formData.email.trim(),
       birthday: formData.nascimento,
-      department: formData.cargo.trim(),
+      // department: formData.cargo.trim(),
       password: formData.senha,
       setor: {
         id: Number(formData.setorId),
@@ -261,45 +261,29 @@ export default function CadastrarProfissional() {
               </div>
 
               <div className="form-group">
-                <label>Cargo</label>
-                <input
-                  name="cargo"
-                  placeholder="Ex: Escalista"
-                  value={formData.cargo}
+                <label>Setor responsável</label>
+                <select
+                  name="setorId"
+                  value={formData.setorId}
                   onChange={handleChange}
-                  className={submitted && erros.cargo ? "input-erro" : ""}
-                />
-                {submitted && erros.cargo && (
+                  disabled={loadingSetores}
+                  className={submitted && erros.setorId ? "input-erro" : ""}
+                >
+                  <option value="">
+                    {loadingSetores ? "Carregando setores..." : "Selecione o setor"}
+                  </option>
+                  {setores.map((setor) => (
+                    <option key={setor.id} value={setor.id}>
+                      {setor.nome}
+                    </option>
+                  ))}
+                </select>
+                {submitted && erros.setorId && (
                   <span className="mensagem-erro">
-                    <AlertCircle size={14} /> {erros.cargo}
+                    <AlertCircle size={14} /> {erros.setorId}
                   </span>
                 )}
               </div>
-            </div>
-
-            <div className="form-group">
-              <label>Setor responsável</label>
-              <select
-                name="setorId"
-                value={formData.setorId}
-                onChange={handleChange}
-                disabled={loadingSetores}
-                className={submitted && erros.setorId ? "input-erro" : ""}
-              >
-                <option value="">
-                  {loadingSetores ? "Carregando setores..." : "Selecione o setor"}
-                </option>
-                {setores.map((setor) => (
-                  <option key={setor.id} value={setor.id}>
-                    {setor.nome}
-                  </option>
-                ))}
-              </select>
-              {submitted && erros.setorId && (
-                <span className="mensagem-erro">
-                  <AlertCircle size={14} /> {erros.setorId}
-                </span>
-              )}
             </div>
 
             <div className="form-row">

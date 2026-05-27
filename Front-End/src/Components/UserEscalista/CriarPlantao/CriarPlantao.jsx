@@ -240,22 +240,20 @@ export default function CriarPlantao() {
                         <div className="input-box">
                             <Building2 size={18} />
 
-                            <select
+                            {/* ALTERAÇÃO SETOR FIXO */}
+                            <input
+                                type="hidden"
                                 name="setorId"
                                 value={formData.setorId}
-                                onChange={handleChange}
-                                disabled={loadingDados || setores.length === 0}
-                            >
-                                <option value="">
-                                    {loadingDados ? "Carregando setores..." : "Selecione"}
-                                </option>
+                            /> 
 
-                                {setores.map((setor) => (
-                                    <option key={setor.id} value={setor.id}>
-                                        {setor.nome}
-                                    </option>
-                                ))}
-                            </select>
+                            <input
+                                type="text"
+                                value={loadingDados ? "Carregando setor..." : setores.find(s => s.id == formData.setorId)?.nome || ""}
+                                readOnly
+                                disabled
+                            />
+
                         </div>
                     </div>
 

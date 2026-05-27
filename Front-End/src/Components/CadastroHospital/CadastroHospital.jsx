@@ -282,7 +282,7 @@ export default function CadastroHospital() {
                 <input
                   type="password"
                   name="senha"
-                  placeholder="••••••••"
+                  placeholder="Mínimo 6 caracteres"
                   value={formData.senha}
                   onChange={handleChange}
                   onBlur={() => handleBlur("senha")}
@@ -302,7 +302,7 @@ export default function CadastroHospital() {
                 <input
                   type="password"
                   name="confirmaSenha"
-                  placeholder="••••••••"
+                  placeholder="Repita a senha"
                   value={formData.confirmaSenha}
                   onChange={handleChange}
                   onBlur={() => handleBlur("confirmaSenha")}

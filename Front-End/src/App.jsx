@@ -12,7 +12,6 @@ import ResolucaoConflito from "./Components/UserPlantonista/ResolucaoConflito/Re
 import RecuperarSenha from "./Components/RecuperarSenha/RecuperarSenha";
 import Agenda from "./Components/UserPlantonista/Agenda/Agenda";
 import DetalhePlantao from "./Components/UserPlantonista/Agenda/DetalhePlantao";
-import Historico from "./Components/UserPlantonista/Historico/Historico";
 import PlantoesOfertados from "./Components/UserPlantonista/Plantoes/PlantoesOfertados.jsx";
 import DetalhesOferta from "./Components/UserPlantonista/Plantoes/DetalhesOferta.jsx";
 import OferecerPlantao from "./Components/UserPlantonista/Plantoes/OferecerPlantao.jsx";
@@ -75,14 +74,6 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["medico"]}>
               <DetalhePlantao />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/UserPlantonista/Historico"
-          element={
-            <ProtectedRoute allowedRoles={["medico"]}>
-              <Historico />
             </ProtectedRoute>
           }
         />

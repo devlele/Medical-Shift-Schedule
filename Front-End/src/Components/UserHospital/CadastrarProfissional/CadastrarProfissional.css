@@ -103,6 +103,11 @@
   transition: 0.2s ease;
 }
 
+/* .form-group select {
+  width: min-content;
+
+} */
+
 /* FOCUS */
 .form-group input:focus,
 .form-group select:focus {

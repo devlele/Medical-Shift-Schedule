@@ -217,7 +217,7 @@ function CadastroUsuario() {
               <input
                 type="text"
                 name="nome"
-                placeholder="Dr(a). Seu Nome"
+                placeholder="Seu Nome"
                 value={formData.nome}
                 onChange={handleChange}
                 onBlur={() => handleBlur("nome")}
@@ -428,7 +428,7 @@ function CadastroUsuario() {
                 <input
                   type="password"
                   name="senha"
-                  placeholder="••••••••"
+                  placeholder="Mínimo 6 caracteres "
                   value={formData.senha}
                   onChange={handleChange}
                   onBlur={() => handleBlur("senha")}
@@ -448,7 +448,7 @@ function CadastroUsuario() {
                 <input
                   type="password"
                   name="confirmaSenha"
-                  placeholder="••••••••"
+                  placeholder="Repita a senha"
                   value={formData.confirmaSenha}
                   onChange={handleChange}
                   onBlur={() => handleBlur("confirmaSenha")}

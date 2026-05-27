@@ -241,8 +241,8 @@
 }
 
 .medico-remover-btn {
-    width: 44px;
-    background: #fff5f5;
+    /* width: 44px; */
+    background: #cfe6da;
     color: #b42318;
 }
 

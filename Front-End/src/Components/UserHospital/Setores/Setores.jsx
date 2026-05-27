@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import "./Setores.css";
 import Sidebar from "../../Sidebar/Sidebar";
-import { User, Bell, Settings,} from "lucide-react";
+import { User, Bell, CircleUserRound, } from "lucide-react";
+import { getStoredUser } from "../../../utils/authStorage";
 
 import {
     getDoctors,
@@ -133,6 +134,9 @@ export default function Setores() {
         }
     };
 
+    const usuario = getStoredUser();
+    const nomeUsuario = usuario?.name || "Hospital";
+
     return (
         <div className="setores-page">
             <Sidebar />
@@ -148,14 +152,13 @@ export default function Setores() {
 
                         <div className="topo-direita">
                             <Bell className="icone-topo" />
-                            <Settings className="icone-topo" />
 
                             {/* ROSQUINHA DO USUÁRIO */}
-                            <div className="avatar-default">
-                                <User size={18} />
+                            <div className="usuario-topo">
+                                <CircleUserRound className="perfilHospital" />
+                                <span className="perfilHospital">{nomeUsuario}</span>
                             </div>
 
-                            <span className="nome-hospital">Hospital</span>
                         </div>
                     </header>
 
@@ -320,7 +323,8 @@ export default function Setores() {
                             />
                         </div>
 
-                        <div className="form-group">
+                        {/* RESPOSÁVEL TECNICO TIRADO */}
+                        {/* <div className="form-group">
                             <label>
                                 RESPONSÁVEL TÉCNICO
                             </label>
@@ -329,7 +333,7 @@ export default function Setores() {
                                 type="text"
                                 placeholder="Buscar escalista..."
                             />
-                        </div>
+                        </div> */}
 
                         <div className="modal-actions">
                             <button

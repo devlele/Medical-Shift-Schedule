@@ -19,6 +19,10 @@
 .cabecalho-tipo {
   text-align: center;
   margin-bottom: 48px;
+  justify-items: center;
+}
+.cabecalho-tipo p {
+  margin-top: 20px;
 }
 
 /* LOGO */

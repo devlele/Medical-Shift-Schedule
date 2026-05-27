@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Bell, Settings, ImagePlus } from "lucide-react";
+import { Bell, CircleUserRound  } from "lucide-react";
 import fotoPerfil from "../../../assets/drhouse.png";
 import "./Perfil.css";
 import Sidebar from "../../Sidebar/Sidebar";
@@ -73,11 +73,10 @@ const Perfil = () => {
 
           <div className="acoes-topo">
             <Bell className="icone icone-click" />
-            <Settings className="icone icone-click" />
 
             <div className="usuario-topo">
-              <img src={foto} alt="Usuário" className="foto-usuario-topo" />
-              <span>{nome}</span>
+              <CircleUserRound className="perfilHospital" />
+              <span className="perfilHospital">{nome}</span>
             </div>
           </div>
         </header>
@@ -87,10 +86,7 @@ const Perfil = () => {
         {/* CARD PERFIL */}
         <section className="card-perfil">
           <div className="lado-foto">
-            <img src={foto} alt="Perfil" className="foto-perfil" />
-            <button className="botao-foto">
-              <ImagePlus className="icone" />
-            </button>
+            <CircleUserRound alt="Perfil" className="foto-perfil perfilHospital" />
           </div>
 
           <div className="dados-perfil">

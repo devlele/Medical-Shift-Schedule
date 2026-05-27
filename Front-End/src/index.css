@@ -16,6 +16,7 @@
   --error: #dc3545;
   --success: #28a745;
   --warning: #ffc107;
+  --perfil-hospital: #e81111;
 
   /* Fontes */
   --font-primary: "Poppins", sans-serif;
@@ -312,6 +313,9 @@ button:active {
   }
 }
 
+.perfilHospital{
+  color: var(--perfil-hospital);
+}
 @media (max-width: 480px) {
   .card {
     padding: var(--spacing-lg);

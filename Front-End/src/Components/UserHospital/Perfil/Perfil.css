@@ -67,13 +67,6 @@
   border-left: 1px solid #c6d8cf;
 }
 
-.foto-usuario-topo {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
 /* CARD PERFIL */
 .card-perfil {
   background: #dff0e8;
@@ -89,28 +82,6 @@
   position: relative;
 }
 
-.foto-perfil {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.botao-foto {
-  position: absolute;
-  right: -8px;
-  bottom: -8px;
-  width: 38px;
-  height: 38px;
-  border: none;
-  border-radius: 12px;
-  background: var(--white);
-  cursor: pointer;
-}
-
-.botao-foto:hover {
-  background: #d1d9da;
-}
 
 .dados-perfil h2 {
   font-size: 30px;

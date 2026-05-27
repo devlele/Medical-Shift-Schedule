@@ -95,13 +95,13 @@ export default function TelaPrincipal() {
                         </div>
                     </div>
 
-                    <div className="card live-card">
+                    {/* <div className="card live-card">
                         <h2>{loading ? "..." : `${setores.length} Setor${setores.length === 1 ? "" : "es"}`}</h2>
 
                         <p>
                             {setores[0]?.setorNome || "Nenhum setor vinculado"}
                         </p>
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className="setores-grid">

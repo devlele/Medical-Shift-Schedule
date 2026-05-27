@@ -78,13 +78,8 @@ export default function Sidebar() {
     },
     {
       to: "/UserPlantonista/PlantoesOfertados",
-      label: "Plantão",
+      label: "Oferta de Plantões",
       icon: ClipboardPlus,
-    },
-    {
-      to: "/UserPlantonista/Historico",
-      label: "Histórico",
-      icon: History,
     },
     {
       to: "/UserPlantonista/Perfil",

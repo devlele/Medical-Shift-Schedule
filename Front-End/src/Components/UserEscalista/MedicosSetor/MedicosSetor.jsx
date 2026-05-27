@@ -188,21 +188,6 @@ export default function MedicosSetor() {
                         <span className="medicos-label">Setor responsável</span>
                         <strong>{setorAtual?.nome || "Nenhum setor vinculado"}</strong>
                     </div>
-
-                    <select
-                        value={setorId}
-                        onChange={(event) => setSetorId(event.target.value)}
-                        disabled={loading || setores.length === 0}
-                    >
-                        <option value="">
-                            {loading ? "Carregando setores..." : "Selecione o setor"}
-                        </option>
-                        {setores.map((setor) => (
-                            <option key={setor.id} value={setor.id}>
-                                {setor.nome}
-                            </option>
-                        ))}
-                    </select>
                 </section>
 
                 <section className="medicos-grid">

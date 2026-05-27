@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Bell, Settings, User, Plus } from "lucide-react";
+import { Bell, CircleUserRound, Plus } from "lucide-react";
 
 import Sidebar from "../../Sidebar/Sidebar";
 import { useNavigate } from "react-router-dom";
@@ -67,13 +67,11 @@ export default function Colaboradores() {
 
           <div className="topo-direita">
             <Bell className="icone-topo" />
-            <Settings className="icone-topo" />
 
-            <div className="avatar-default">
-              <User size={18} />
+            <div className="usuario-topo">
+              <CircleUserRound className="perfilHospital" />
+              <span className="perfilHospital">{nomeUsuario}</span>
             </div>
-
-            <span className="nome-hospital">{nomeUsuario}</span>
           </div>
         </header>
 

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Bell,
-  Settings,
   ArrowRight,
   Users,
   CalendarCheck,
   Building2,
+  CircleUserRound,
   User,
 } from "lucide-react";
 
@@ -87,14 +87,12 @@ export default function TelaPrincipal() {
 
           <div className="topo-direita">
             <Bell className="icone-topo" />
-            <Settings className="icone-topo" />
 
             {/* ROSQUINHA DO USUÁRIO */}
-            <div className="avatar-default">
-              <User size={18} />
+            <div className="usuario-topo">
+              <CircleUserRound className="perfilHospital" />
+              <span className="perfilHospital">{nomeUsuario}</span>
             </div>
-
-            <span className="nome-hospital">{nomeUsuario}</span>
           </div>
         </header>
 

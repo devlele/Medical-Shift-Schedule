@@ -59,14 +59,6 @@
 }
 
 /* TOP CARDS */
-
-.top-cards {
-    display: grid;
-    grid-template-columns: 1.8fr 1fr;
-    gap: 22px;
-    margin-bottom: 28px;
-}
-
 .card {
     border-radius: 28px;
 }
@@ -108,31 +100,7 @@
     font-size: 20px;
 }
 
-/* Live Card */
-
-.live-card {
-    background: linear-gradient(135deg,
-            #173d36,
-            #29594f);
-
-    color: white;
-    padding: 28px;
-    min-height: 210px;
-}
-
-.live-card h2 {
-    font-size: 28px;
-    margin: 22px 0 12px;
-}
-
-.live-card p {
-    font-size: 15px;
-    line-height: 1.6;
-    color: #d8e6e0;
-}
-
 /* GRID DOS SETORES */
-
 .setores-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
