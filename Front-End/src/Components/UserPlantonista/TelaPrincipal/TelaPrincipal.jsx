@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Bell, Settings } from "lucide-react";
+import { Bell, CircleUserRound } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import Sidebar from "../../Sidebar/Sidebar";
-import userImg from "../../../assets/drhouse.png";
 import Calendario from "../../Calendario/Calendario";
 import {
   getCoberturasDisponiveis,
@@ -162,11 +161,10 @@ export default function TelaPrincipal() {
 
           <div className="topo-direita">
             <Bell className="icone-topo" />
-            <Settings className="icone-topo" />
 
-            <div className="user">
-              <img src={userImg} alt="user" />
-              <span>{nomeUsuario}</span>
+            <div className="usuario-topo">
+              <CircleUserRound className="perfilPlantonista" />
+              <span className="perfilPlantonista">{nomeUsuario}</span>
             </div>
           </div>
         </header>

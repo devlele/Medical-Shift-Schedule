@@ -3,8 +3,8 @@ import {
     AlertCircle,
     Bell,
     CheckCircle,
+    CircleUserRound,
     Search,
-    Settings,
     Trash2,
     UserPlus,
     UserRound,
@@ -159,12 +159,11 @@ export default function MedicosSetor() {
                         <p>Associe médicos cadastrados ao seu setor antes de montar plantões.</p>
                     </div>
 
-                    <div className="medicos-setor-user">
-                        <Bell size={20} />
-                        <Settings size={20} />
-                        <div className="medicos-user-pill">
-                            <UserRound size={18} />
-                            <span>{nomeUsuario}</span>
+                    <div className="topo-direita">
+                        <Bell className="icone-topo" />
+                        <div className="usuario-topo">
+                            <CircleUserRound size={18} className="perfilEscalista" />
+                            <span className="perfilEscalista">{nomeUsuario}</span>
                         </div>
                     </div>
                 </header>

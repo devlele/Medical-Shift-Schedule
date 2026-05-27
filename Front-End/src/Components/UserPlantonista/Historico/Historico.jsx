@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Bell, Settings } from "lucide-react";
+import { Bell, CircleUserRound } from "lucide-react";
 import Sidebar from "../../Sidebar/Sidebar";
-import userImg from "../../../assets/drhouse.png";
 import "./Historico.css";
 import { getMinhaAgendaMedico } from "../../../services/doctorServices";
 import {
@@ -120,10 +119,9 @@ const Historico = () => {
 
           <div className="topo-direita">
             <Bell className="icone-topo" />
-            <Settings className="icone-topo" />
-            <div className="user">
-              <img src={userImg} alt={usuario?.name || "Medico"} />
-              <span>{usuario?.name || "Medico"}</span>
+            <div className="usuario-topo">
+              <CircleUserRound className="perfilPlantonista" />
+              <span className="perfilPlantonista">{usuario?.name || "Medico"}</span>
             </div>
           </div>
         </header>

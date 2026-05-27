@@ -17,6 +17,14 @@
   --success: #28a745;
   --warning: #ffc107;
   --perfil-hospital: #e81111;
+  --perfil-escalista: #f2c94c;
+  --perfil-plantonista: #2563eb;
+  --app-bg: #edf8f2;
+  --app-surface: #f8fffb;
+  --app-panel: #dff1e8;
+  --app-input: #d8e7df;
+  --app-heading: #1e3732;
+  --app-muted: #68807a;
 
   /* Fontes */
   --font-primary: "Poppins", sans-serif;
@@ -62,7 +70,7 @@ html {
 
 body {
   margin: 0;
-  background: var(--medical-mint);
+  background: var(--app-bg);
   font-family: var(--font-primary);
   color: var(--medical-text);
   -webkit-font-smoothing: antialiased;
@@ -313,8 +321,115 @@ button:active {
   }
 }
 
+.topo-direita {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.layout,
+.layout-hospital,
+.layout-escalista,
+.agenda-container,
+.plantoes-layout,
+.historico-layout,
+.pagina-perfil,
+.cadastro-layout,
+.medicos-setor-layout {
+  min-height: 100vh;
+  background: var(--app-bg) !important;
+}
+
+.conteudo,
+.conteudo-hospital,
+.gestao-container,
+.agenda-content,
+.plantoes-content,
+.historico-content,
+.conteudo-perfil,
+.cadastro-main,
+.medicos-setor-main,
+.criar-plantao-container {
+  background: var(--app-bg) !important;
+}
+
+.topo,
+.topo-hospital,
+.topo-escalista,
+.topo-perfil,
+.medicos-setor-header,
+.cadastro-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 20px !important;
+  margin-bottom: 32px !important;
+}
+
+.topo h1,
+.topo-hospital h1,
+.topo-escalista h1,
+.topo-perfil h1,
+.medicos-setor-header h1,
+.cadastro-header h1,
+.titulo-pagina {
+  color: var(--app-heading) !important;
+  font-size: 2.2rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 6px !important;
+}
+
+.topo p,
+.topo-hospital p,
+.topo-escalista p,
+.topo-perfil p,
+.medicos-setor-header p,
+.cadastro-header p,
+.subtitulo-pagina {
+  color: var(--app-muted) !important;
+  margin: 0 !important;
+  font-size: 1rem !important;
+}
+
+.icone-topo {
+  width: 22px;
+  height: 22px;
+  color: #24443d;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.icone-topo:hover {
+  color: var(--medical-dark);
+  transform: scale(1.08);
+}
+
 .perfilHospital{
   color: var(--perfil-hospital);
+}
+
+.usuario-topo{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 12px;
+  border-left: 1px solid #c6d8cf;
+  font-weight: 600;
+  min-height: 24px;
+}
+
+.usuario-topo svg{
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.perfilEscalista{
+  color: var(--perfil-escalista);
+}
+
+.perfilPlantonista{
+  color: var(--perfil-plantonista);
 }
 @media (max-width: 480px) {
   .card {

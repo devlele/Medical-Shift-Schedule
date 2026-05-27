@@ -84,6 +84,14 @@ export const getMinhaAgenda = async () => {
     return request("/agenda/me");
 };
 
+export const getMeuDashboard = async () => {
+    return request("/dashboard/me");
+};
+
+export const getHospitalById = async (id) => {
+    return request(`/hospital/${id}`);
+};
+
 export const criarSetor = async (data) => {
     return request("/setor", {
         method: "POST",

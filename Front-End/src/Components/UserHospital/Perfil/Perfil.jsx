@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Bell, CircleUserRound  } from "lucide-react";
-import fotoPerfil from "../../../assets/drhouse.png";
+import { Bell, CircleUserRound } from "lucide-react";
 import "./Perfil.css";
 import Sidebar from "../../Sidebar/Sidebar";
-import { getMeuPerfilMedico } from "../../../services/doctorServices";
+import { getHospitalById, getMeuDashboard } from "../Setores/setorServices";
 import { getUsuarioLogado } from "../../../utils/plantaoFormatters";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const Perfil = () => {
   const usuario = getUsuarioLogado();
@@ -21,14 +18,19 @@ const Perfil = () => {
       try {
         setLoading(true);
         setErro("");
-        const data = await getMeuPerfilMedico(); // mudar para getMeuPerfilHospital
+
+        const dashboard = await getMeuDashboard();
+        const hospital = dashboard?.id
+          ? await getHospitalById(dashboard.id)
+          : null;
 
         if (ativo) {
-          setPerfil(data);
+          setPerfil({ ...dashboard, ...hospital });
         }
       } catch (error) {
         if (ativo) {
           setErro(error.message || "Nao foi possivel carregar o perfil.");
+          setPerfil(usuario);
         }
       } finally {
         if (ativo) {
@@ -44,25 +46,19 @@ const Perfil = () => {
     };
   }, []);
 
-  const nome = perfil?.name || usuario?.name || "Hospital";
+  const nome =
+    perfil?.nomeFantasia || perfil?.name || usuario?.name || "Hospital";
   const cnpj = perfil?.cnpj || "Nao informado";
-  const uf = perfil?.uf || "UF";
+  const telefone = perfil?.telefone || "Nao informado";
+  const endereco = perfil?.endereco || "Nao informado";
+  const gestor = perfil?.nomeGestor || "Nao informado";
   const email = perfil?.email || usuario?.email || "Email nao informado";
-  const foto = perfil?.fotoPerfilUrl
-    ? perfil.fotoPerfilUrl.startsWith("http")
-      ? perfil.fotoPerfilUrl
-      : `${API_URL}${perfil.fotoPerfilUrl}`
-    : fotoPerfil;
-  const endereco = perfil?.endereco || "Endereço não informado";
 
   return (
     <div className="pagina-perfil">
-      {/* MENU LATERAL */}
       <Sidebar />
 
-      {/* CONTEÚDO */}
       <main className="conteudo-perfil">
-        {/* TOPO */}
         <header className="topo-perfil">
           <div>
             <h1 className="titulo-pagina">Perfil</h1>
@@ -71,8 +67,8 @@ const Perfil = () => {
             </p>
           </div>
 
-          <div className="acoes-topo">
-            <Bell className="icone icone-click" />
+          <div className="topo-direita">
+            <Bell className="icone-topo" />
 
             <div className="usuario-topo">
               <CircleUserRound className="perfilHospital" />
@@ -83,51 +79,50 @@ const Perfil = () => {
 
         {erro && <div className="alerta-login erro">{erro}</div>}
 
-        {/* CARD PERFIL */}
         <section className="card-perfil">
           <div className="lado-foto">
-            <CircleUserRound alt="Perfil" className="foto-perfil perfilHospital" />
+            <CircleUserRound
+              aria-label="Perfil"
+              className="foto-perfil perfilHospital"
+            />
           </div>
 
           <div className="dados-perfil">
             <h2>{loading ? "Carregando..." : nome}</h2>
+            <p>Representando: {nome}</p>
           </div>
         </section>
 
-        {/* ÁREA INFERIOR */}
         <section className="area-baixo">
-          {/* INFORMAÇÕES */}
           <div className="card-info">
-            <h3>Informações Pessoais</h3>
+            <h3>Informações do Hospital</h3>
 
-            <div className="grupo-campo">
-              <label>NOME COMPLETO</label>
-              <div className="campo-fixo">{nome}</div>
-            </div>
+            <InfoCampo label="HOSPITAL REPRESENTADO" value={nome} />
+            <InfoCampo label="E-MAIL" value={email} />
 
-            <div className="grupo-campo">
-              <label>E-MAIL PROFISSIONAL</label>
-              <div className="campo-fixo">{email}</div>
+            <div className="linha-dupla">
+              <InfoCampo label="CNPJ" value={cnpj} />
+              <InfoCampo label="TELEFONE" value={telefone} />
             </div>
 
             <div className="linha-dupla">
-              <div className="grupo-campo">
-                <label>CNPJ</label>
-                <div className="campo-fixo">{cnpj}</div>
-              </div>
-
-              <div className="grupo-campo">
-                <label>UF</label>
-                <div className="campo-fixo">{uf}</div>
-              </div>
+              <InfoCampo label="GESTOR RESPONSÁVEL" value={gestor} />
+              <InfoCampo label="ENDEREÇO" value={endereco} />
             </div>
           </div>
-
-          {/* Histórico removido conforme solicitado */}
         </section>
       </main>
     </div>
   );
 };
+
+function InfoCampo({ label, value }) {
+  return (
+    <div className="grupo-campo">
+      <label>{label}</label>
+      <div className="campo-fixo">{value || "Nao informado"}</div>
+    </div>
+  );
+}
 
 export default Perfil;

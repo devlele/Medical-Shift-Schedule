@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Bell, Settings } from "lucide-react";
+import { Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../Sidebar/Sidebar";
 import "./ResolucaoConflito.css";
@@ -93,7 +93,6 @@ export default function ResolucaoConflito() {
 
           <div className="topo-direita">
             <Bell className="icone-topo" />
-            <Settings className="icone-topo" />
           </div>
         </header>
 

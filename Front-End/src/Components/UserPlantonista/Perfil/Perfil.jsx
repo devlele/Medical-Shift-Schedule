@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
-import {
-  Bell,
-  Settings,
-  ImagePlus,
-} from "lucide-react";
-import fotoPerfil from "../../../assets/drhouse.png";
+import { Bell, CircleUserRound } from "lucide-react";
 import "./Perfil.css";
 import Sidebar from "../../Sidebar/Sidebar";
 import { getMeuPerfilMedico } from "../../../services/doctorServices";
 import { getUsuarioLogado } from "../../../utils/plantaoFormatters";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 const Perfil = () => {
   const usuario = getUsuarioLogado();
@@ -33,6 +26,7 @@ const Perfil = () => {
       } catch (error) {
         if (ativo) {
           setErro(error.message || "Nao foi possivel carregar o perfil.");
+          setPerfil(usuario);
         }
       } finally {
         if (ativo) {
@@ -49,24 +43,19 @@ const Perfil = () => {
   }, []);
 
   const nome = perfil?.name || usuario?.name || "Medico";
+  const cpf = perfil?.cpf || "Nao informado";
   const especialidade = perfil?.specialty || "Especialidade nao informada";
   const crm = perfil?.crm || "Nao informado";
   const uf = perfil?.uf || perfil?.ufCrm || "UF";
+  const telefone = perfil?.telefone || "Nao informado";
   const email = perfil?.email || usuario?.email || "Email nao informado";
-  const foto = perfil?.fotoPerfilUrl
-    ? perfil.fotoPerfilUrl.startsWith("http")
-      ? perfil.fotoPerfilUrl
-      : `${API_URL}${perfil.fotoPerfilUrl}`
-    : fotoPerfil;
+  const dataNascimento = formatarData(perfil?.birthday || perfil?.birthDate);
 
   return (
     <div className="pagina-perfil">
-      {/* MENU LATERAL */}
       <Sidebar />
 
-      {/* CONTEÚDO */}
       <main className="conteudo-perfil">
-        {/* TOPO */}
         <header className="topo-perfil">
           <div>
             <h1 className="titulo-pagina">Perfil</h1>
@@ -75,30 +64,24 @@ const Perfil = () => {
             </p>
           </div>
 
-          <div className="acoes-topo">
-            <Bell className="icone icone-click" />
-            <Settings className="icone icone-click" />
+          <div className="topo-direita">
+            <Bell className="icone-topo" />
 
             <div className="usuario-topo">
-              <img
-                src={foto}
-                alt="Usuário"
-                className="foto-usuario-topo"
-              />
-              <span>{nome}</span>
+              <CircleUserRound className="perfilPlantonista" />
+              <span className="perfilPlantonista">{nome}</span>
             </div>
           </div>
         </header>
 
         {erro && <div className="alerta-login erro">{erro}</div>}
 
-        {/* CARD PERFIL */}
         <section className="card-perfil">
           <div className="lado-foto">
-            <img src={foto} alt="Perfil" className="foto-perfil" />
-            <button className="botao-foto">
-              <ImagePlus className="icone" />
-            </button>
+            <CircleUserRound
+              aria-label="Perfil"
+              className="foto-perfil perfilPlantonista"
+            />
           </div>
 
           <div className="dados-perfil">
@@ -109,45 +92,49 @@ const Perfil = () => {
           </div>
         </section>
 
-        {/* ÁREA INFERIOR */}
         <section className="area-baixo">
-          {/* INFORMAÇÕES */}
           <div className="card-info">
             <h3>Informações Pessoais</h3>
 
-            <div className="grupo-campo">
-              <label>NOME COMPLETO</label>
-              <div className="campo-fixo">{nome}</div>
-            </div>
+            <InfoCampo label="NOME COMPLETO" value={nome} />
+            <InfoCampo label="CPF" value={cpf} />
+            <InfoCampo label="DATA DE NASCIMENTO" value={dataNascimento} />
+            <InfoCampo label="E-MAIL PROFISSIONAL" value={email} />
 
-            <div className="grupo-campo">
-              <label>ESPECIALIDADE</label>
-              <div className="campo-fixo">{especialidade}</div>
-            </div>
-
-            <div className="grupo-campo">
-              <label>E-MAIL PROFISSIONAL</label>
-              <div className="campo-fixo">{email}</div>
+            <div className="linha-dupla">
+              <InfoCampo label="CRM" value={crm} />
+              <InfoCampo label="UF" value={uf} />
             </div>
 
             <div className="linha-dupla">
-              <div className="grupo-campo">
-                <label>CRM</label>
-                <div className="campo-fixo">{crm}</div>
-              </div>
-
-              <div className="grupo-campo">
-                <label>UF</label>
-                <div className="campo-fixo">{uf}</div>
-              </div>
+              <InfoCampo label="ESPECIALIDADE" value={especialidade} />
+              <InfoCampo label="TELEFONE" value={telefone} />
             </div>
           </div>
-
-          {/* Histórico removido conforme solicitado */}
         </section>
       </main>
     </div>
   );
 };
+
+function InfoCampo({ label, value }) {
+  return (
+    <div className="grupo-campo">
+      <label>{label}</label>
+      <div className="campo-fixo">{value || "Nao informado"}</div>
+    </div>
+  );
+}
+
+function formatarData(value) {
+  if (!value) {
+    return "Nao informada";
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? "Nao informada"
+    : date.toLocaleDateString("pt-BR");
+}
 
 export default Perfil;

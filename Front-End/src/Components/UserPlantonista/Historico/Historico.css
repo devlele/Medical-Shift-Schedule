@@ -29,46 +29,6 @@
   font-size: 16px;
 }
 
-.topo-direita {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.icone-topo {
-  width: 22px;
-  height: 22px;
-  color: #5f7f75;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.icone-topo:hover {
-  color: var(--medical-dark);
-  transform: scale(1.1);
-}
-
-.user {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: #ecf6f1;
-  padding: 10px 14px;
-  border-radius: 999px;
-}
-
-.user img {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.user span {
-  font-weight: 600;
-  color: var(--medical-dark);
-}
-
 .historico-panel {
   display: flex;
   flex-direction: column;

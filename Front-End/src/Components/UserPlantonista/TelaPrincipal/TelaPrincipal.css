@@ -15,37 +15,6 @@
   align-items: center;
 }
 
-.topo-direita {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.icone-topo {
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.icone-topo:hover {
-  color: var(--medical-dark);
-  transform: scale(1.1);
-}
-
-.user {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  background: var(--medical-soft);
-  padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--border-radius-xl);
-}
-
-.user img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-}
-
 /* CARDS */
 .cards {
   display: flex;

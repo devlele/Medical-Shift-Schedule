@@ -1,5 +1,5 @@
 .colaboradores-page {
-  background: #f5f7fb;
+  background: var(--app-bg);
   min-height: 100vh;
 }
 
@@ -8,6 +8,7 @@
   margin-left: 260px;
   min-height: 100vh;
   padding: 40px;
+  background: var(--app-bg);
 }
 
 /* HEADER PADRÃO (IGUAL TELA PRINCIPAL) */
@@ -28,17 +29,6 @@
 }
 
 /* LADO DIREITO HEADER */
-.topo-direita {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.icone-topo {
-  cursor: pointer;
-  color: #24443d;
-}
-
 /* AVATAR USUÁRIO */
 .avatar-default {
   width: 36px;
@@ -180,6 +170,24 @@ tbody tr:hover {
 .tag.plantonista {
   background: #dbeafe;
   color: #1e40af;
+}
+
+.filtro-tipo {
+  margin-left: auto;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #dcdcdc;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+}
+
+.table-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 12px;
 }
 
 /* RESPONSIVO */

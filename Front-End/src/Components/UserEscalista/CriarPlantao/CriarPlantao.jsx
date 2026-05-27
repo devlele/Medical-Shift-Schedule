@@ -4,10 +4,10 @@ import Sidebar from "../../Sidebar/Sidebar";
 
 import {
     Bell,
-    Settings,
     CalendarDays,
     Clock3,
     Building2,
+    CircleUserRound,
     UserRound,
     RotateCcw,
     Upload,
@@ -110,13 +110,15 @@ export default function CriarPlantao() {
         setSucesso("");
     }
 
-    function handleClear() {
+    function handleClear({ preserveFeedback = false } = {}) {
         setFormData({
             ...initialFormData,
             setorId: String(setores[0]?.id || ""),
         });
         setErro("");
-        setSucesso("");
+        if (!preserveFeedback) {
+            setSucesso("");
+        }
     }
 
     async function handleSubmit(e) {
@@ -135,13 +137,13 @@ export default function CriarPlantao() {
 
             if (formData.frequencia === "unico") {
                 await criarPlantaoAvulso(montarPayloadAvulso(formData));
-                setSucesso("Plantão avulso criado com sucesso.");
+                setSucesso("Plantão criado com sucesso.");
             } else {
                 await criarPlantaoFixo(montarPayloadFixo(formData));
-                setSucesso("Plantão fixo criado com sucesso.");
+                setSucesso("Plantão criado com sucesso.");
             }
 
-            handleClear();
+            handleClear({ preserveFeedback: true });
         } catch (error) {
             console.error(error);
             setErro(error.message || "Não foi possível criar o plantão.");
@@ -163,11 +165,10 @@ export default function CriarPlantao() {
 
                     <div className="topo-direita">
                         <Bell className="icone-topo" />
-                        <Settings className="icone-topo" />
 
-                        <div className="user">
-                            <UserRound size={18} />
-                            <span>{nomeUsuario}</span>
+                        <div className="usuario-topo">
+                            <CircleUserRound size={18} className="perfilEscalista" />
+                            <span className="perfilEscalista">{nomeUsuario}</span>
                         </div>
                     </div>
                 </header>

@@ -185,13 +185,6 @@ export default function CadastrarProfissional() {
               </div>
             )}
 
-            {mensagemSucesso && (
-              <div className="alerta-formulario sucesso">
-                <CheckCircle size={18} />
-                <span>{mensagemSucesso}</span>
-              </div>
-            )}
-
             <div className="form-group">
               <label>Nome</label>
               <input
@@ -321,6 +314,13 @@ export default function CadastrarProfissional() {
                 )}
               </div>
             </div>
+
+            {mensagemSucesso && (
+              <div className="alerta-formulario sucesso">
+                <CheckCircle size={18} />
+                <span>{mensagemSucesso}</span>
+              </div>
+            )}
 
             <button
               type="submit"

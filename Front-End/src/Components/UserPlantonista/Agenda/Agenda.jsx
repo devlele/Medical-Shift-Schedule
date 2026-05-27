@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Settings, Clock3, MapPin, Sun, Moon } from "lucide-react";
+import { Bell, CircleUserRound, Clock3, MapPin, Sun, Moon } from "lucide-react";
 
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -9,7 +9,6 @@ import interactionPlugin from "@fullcalendar/interaction";
 import ptBrLocale from "@fullcalendar/core/locales/pt-br";
 
 import Sidebar from "../../Sidebar/Sidebar";
-import userImg from "../../../assets/drhouse.png";
 import {
   getCoberturasDisponiveis,
   getMeusPedidosCobertura,
@@ -313,12 +312,10 @@ export default function Agenda() {
           <div className="topo-direita">
             <Bell className="icone-topo" />
 
-            <Settings className="icone-topo" />
+            <div className="usuario-topo">
+              <CircleUserRound className="perfilPlantonista" />
 
-            <div className="user">
-              <img src={userImg} alt="user" />
-
-              <span>{nomeUsuario}</span>
+              <span className="perfilPlantonista">{nomeUsuario}</span>
             </div>
           </div>
         </header>

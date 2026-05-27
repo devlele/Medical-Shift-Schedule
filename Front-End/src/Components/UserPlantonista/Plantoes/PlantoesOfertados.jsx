@@ -1,14 +1,13 @@
 // TELA COM OS PLANTÕES QUE ESTÃO OFERTADOS
 import React, { useEffect, useState } from "react";
-import fotoPerfil from "../../../assets/drhouse.png";
 import "./PlantoesOfertados.css";
 import Sidebar from "../../Sidebar/Sidebar";
 import { useNavigate } from "react-router-dom";
 import {
   Bell,
-  Settings,
   CalendarDays,
   Clock3,
+  CircleUserRound,
   UserRound,
   ArrowLeftRight,
 } from "lucide-react";
@@ -188,10 +187,9 @@ export default function PlantoesOfertados() {
 
           <div className="topo-direita">
             <Bell className="icone-topo" />
-            <Settings className="icone-topo" />
-            <div className="user">
-              <img src={fotoPerfil} alt={usuario?.name || "Medico"} />
-              <span>{usuario?.name || "Medico"}</span>
+            <div className="usuario-topo">
+              <CircleUserRound className="perfilPlantonista" />
+              <span className="perfilPlantonista">{usuario?.name || "Medico"}</span>
             </div>
           </div>
         </header>

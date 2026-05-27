@@ -26,32 +26,6 @@
     color: #68807a;
 }
 
-.topo-direita {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.icone-topo {
-    cursor: pointer;
-    color: #24443d;
-}
-
-.user {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    background: var(--medical-soft);
-    padding: var(--spacing-xs) var(--spacing-md);
-    border-radius: var(--border-radius-xl);
-}
-
-.user span {
-    font-size: 15px;
-    font-weight: 600;
-    color: #27463b;
-}
-
 /* CARD FORM */
 
 .plantao-card {

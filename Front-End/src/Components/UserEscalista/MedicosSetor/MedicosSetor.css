@@ -27,23 +27,6 @@
     color: #68807a;
 }
 
-.medicos-setor-user {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    color: #24443d;
-}
-
-.medicos-user-pill {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #dff0e8;
-    border-radius: 999px;
-    padding: 10px 16px;
-    font-weight: 700;
-}
-
 .medicos-alerta {
     display: flex;
     align-items: center;

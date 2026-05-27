@@ -13,6 +13,7 @@ export default function Colaboradores() {
   const nomeUsuario = usuario?.name || "Hospital";
 
   const [search, setSearch] = useState("");
+  const [tipoFiltro, setTipoFiltro] = useState("todos");
 
   // MOCK (sem backend)
   const [colaboradores] = useState([
@@ -40,10 +41,14 @@ export default function Colaboradores() {
   ]);
 
   const filtrados = useMemo(() => {
-    return colaboradores.filter((c) =>
-      c.nome.toLowerCase().includes(search.toLowerCase()),
-    );
-  }, [search, colaboradores]);
+    return colaboradores.filter((c) => {
+      const matchNome = c.nome.toLowerCase().includes(search.toLowerCase());
+
+      const matchTipo = tipoFiltro === "todos" || c.tipo === tipoFiltro;
+
+      return matchNome && matchTipo;
+    });
+  }, [search, tipoFiltro, colaboradores]);
 
   const totalEscalistas = colaboradores.filter(
     (c) => c.tipo === "escalista",
@@ -58,7 +63,7 @@ export default function Colaboradores() {
       <Sidebar />
 
       <main className="colaboradores-content">
-        {/* HEADER PADRÃO IGUAL TELA PRINCIPAL */}
+        {/* HEADER */}
         <header className="topo-hospital">
           <div>
             <h1>Colaboradores</h1>
@@ -93,7 +98,7 @@ export default function Colaboradores() {
           </div>
         </section>
 
-        {/* BOTÃO NOVO ESCALISTA (ABAIXO DOS CARDS, ESQUERDA) */}
+        {/* BOTÃO */}
         <div className="acoes-colaboradores">
           <button
             className="btn-novo-escalista"
@@ -113,6 +118,16 @@ export default function Colaboradores() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+
+            <select
+              value={tipoFiltro}
+              onChange={(e) => setTipoFiltro(e.target.value)}
+              className="filtro-tipo"
+            >
+              <option value="todos">Todos</option>
+              <option value="escalista">Escalistas</option>
+              <option value="plantonista">Plantonistas</option>
+            </select>
           </div>
 
           <table>
@@ -129,10 +144,13 @@ export default function Colaboradores() {
               {filtrados.map((c) => (
                 <tr key={c.id}>
                   <td>{c.nome}</td>
+
                   <td>{c.email}</td>
+
                   <td>
                     <span className={`tag ${c.tipo}`}>{c.tipo}</span>
                   </td>
+
                   <td>{c.setor}</td>
                 </tr>
               ))}
