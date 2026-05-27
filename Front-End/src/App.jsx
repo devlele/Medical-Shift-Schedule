@@ -24,6 +24,7 @@ import MedicosSetor from "./Components/UserEscalista/MedicosSetor/MedicosSetor.j
 import Colaboradores from "./Components/UserHospital/Colaboradores/Colaboradores.jsx";
 import PerfilHospital from "./Components/UserHospital/Perfil/Perfil.jsx";
 import PerfilEscalista from "./Components/UserEscalista/Perfil/Perfil.jsx"
+import Delegacao from "./Components/UserEscalista/Delegacao/Delegacao.jsx";
 
 function App() {
   return (
@@ -167,7 +168,14 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/UserEscalista/Delegacao"
+          element={
+            <ProtectedRoute allowedRoles={["escalista"]}>
+              <Delegacao />
+            </ProtectedRoute>
+          }
+        />
         <Route 
           path="/UserEscalista/Perfil"
           element={

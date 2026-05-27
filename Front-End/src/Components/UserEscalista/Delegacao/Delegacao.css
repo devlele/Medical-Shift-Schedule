@@ -1,0 +1,202 @@
+.pagina-delegacao {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--medical-mint);
+    margin-left: var(--sidebar-width);
+}
+
+/* CONTEÚDO */
+
+.conteudo-delegacao {
+    flex: 1;
+    padding: 35px 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* TOPO */
+
+.topo-delegacao {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.titulo-pagina {
+    font-size: 2rem;
+    color: var(--medical-text);
+    font-weight: 700;
+}
+
+.subtitulo-pagina {
+    margin-top: 5px;
+    color: #5d7771;
+    font-size: 1rem;
+}
+
+/* AÇÕES TOPO */
+
+.acoes-topo {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    background: #edf8f3;
+    padding: 10px 18px;
+    border-radius: 50px;
+}
+
+.icone {
+    width: 20px;
+    height: 20px;
+    color: var(--medical-text);
+}
+
+.icone-click {
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.icone-click:hover {
+    transform: scale(1.08);
+    opacity: 0.8;
+}
+
+.usuario-topo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding-left: 15px;
+    border-left: 1px solid #d5e6de;
+
+    font-weight: 600;
+    color: var(--medical-text);
+}
+
+
+/* PAINEL */
+
+.painel-delegacao {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* ESPAÇO CENTRAL */
+
+.espaco-vazio {
+    flex: 1;
+}
+
+/* ATIVIDADE */
+
+.atividade {
+    width: 100%;
+    max-width: 760px;
+    margin: 60px 40px;
+    /* margin: 0 auto 20px auto; */
+}
+
+.atividade h2 {
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    color: var(--medical-text);
+}
+
+/* LISTA */
+
+.lista-atividades {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* CARD */
+
+.card-atividade {
+    background: #f5f5f5;
+
+    border-radius: 22px;
+
+    padding: 22px 26px;
+
+    position: relative;
+
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+
+    overflow: hidden;
+}
+
+/* BARRA LATERAL */
+
+.card-atividade::before {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    width: 5px;
+    height: 100%;
+}
+
+/* CORES */
+
+.card-atividade.sucesso::before {
+    background: #11b6a1;
+}
+
+.card-atividade.erro::before {
+    background: #ff3b3b;
+}
+
+.card-atividade.neutro::before {
+    background: #b7a8d9;
+}
+
+/* TEXTOS */
+
+.tempo-atividade {
+    display: block;
+
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    color: #7a8b86;
+
+    margin-bottom: 8px;
+}
+
+.card-atividade h3 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    color: var(--medical-text);
+}
+
+.card-atividade.erro h3 {
+    color: #d91f1f;
+}
+
+.card-atividade p {
+    color: #64817a;
+    font-size: 1rem;
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 900px) {
+    .conteudo-delegacao {
+        padding: 25px;
+    }
+
+    .topo-delegacao {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .atividade{
+        max-width: 100%;
+    }
+}

@@ -272,6 +272,8 @@ export default function MedicosSetor() {
                                             <span>{medico.crm || medico.email || medico.specialty || "Médico vinculado"}</span>
                                         </div>
 
+                                        
+
                                         <button
                                             type="button"
                                             className="medico-remover-btn"
