@@ -1,19 +1,8 @@
-:root {
-  --medical-dark: #1f7a63;
-  --medical-teal: #2bbf9c;
-  --medical-mint: #e8f6ef;
-  --medical-soft: #d9ebe3;
-  --medical-card: #eef7f2;
-  --medical-text: #24332d;
-  --medical-muted: #6b7d75;
-  --white: #ffffff;
-}
-
 /* PÁGINA */
 .pagina-perfil {
   min-height: 100vh;
   display: flex;
-  background: var(--medical-mint);
+  background: var(--app-bg);
 }
 
 /* CONTEÚDO */
@@ -177,10 +166,11 @@
 @media (max-width: 850px) {
   .pagina-perfil {
     flex-direction: column;
+    padding-left: 0;
   }
 
-  .sidebar {
-    width: 100%;
+  .conteudo-perfil {
+    padding-top: 90px;
   }
 
   .topo-perfil,
@@ -197,11 +187,14 @@
 @media (max-width: 650px) {
   .card-perfil {
     padding: 20px;
+    gap: 20px;
   }
 
-  .foto-perfil {
-    width: 130px;
-    height: 130px;
+  .titulo-pagina {
+    font-size: 28px;
   }
 
+  .dados-perfil h2 {
+    font-size: 22px;
+  }
 }

@@ -163,37 +163,35 @@
     padding: 24px;
   }
 
-  .detalhes-conflito {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  .card-conflicto {
-    padding: 22px;
-  }
-
-  .card-subtitulo {
-    margin-bottom: 20px;
-  }
-}
-
-@media (max-width: 980px) {
-  .card-conflicto {
-    padding: 24px;
-  }
-
+  .detalhes-conflito,
   .campos {
     grid-template-columns: 1fr;
   }
+
+  .card-topo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 @media (max-width: 640px) {
   .card-conflicto {
-    padding: 22px;
+    padding: 18px;
   }
 
   .card-subtitulo {
     margin-bottom: 20px;
+  }
+
+  .card-conflicto h2 {
+    font-size: 1.5rem;
+  }
+
+  .compromisso-actions {
+    flex-direction: column;
+  }
+
+  .compromisso-actions .btn {
+    width: 100%;
   }
 }

@@ -11,7 +11,6 @@
 .agenda-content {
   flex: 1;
   padding: 32px;
-  overflow-x: hidden;
   min-width: 0;
 }
 
@@ -174,15 +173,22 @@
 }
 
 .week-calendar {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(90px, 1fr));
+  display: flex;
   gap: 10px;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: auto;
   padding-bottom: 10px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.week-calendar::-webkit-scrollbar {
+  display: none;
 }
 
 .day-card {
+  flex: 1 1 90px;
+  min-width: 80px;
   border: none;
   background: #e8f5ef;
   border-radius: 24px;
@@ -191,7 +197,6 @@
   transition: 0.25s ease;
   position: relative;
   min-height: 100px;
-  min-width: 90px;
 }
 
 .day-card:hover {
@@ -366,6 +371,8 @@
   background: #dff1e8;
   border-radius: 34px;
   padding: 28px;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .fc {
@@ -402,8 +409,8 @@
 }
 
 .fc-daygrid-day-frame {
-  min-height: 120px;
-  padding: 10px;
+  min-height: 100px;
+  padding: 8px;
 }
 
 .fc-daygrid-day-number {
@@ -443,6 +450,12 @@
 
 /* RESPONSIVO */
 
+@media (max-width: 1400px) {
+  .fc-toolbar-title {
+    font-size: 24px !important;
+  }
+}
+
 @media (max-width: 1200px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
@@ -466,9 +479,30 @@
   .shift-details {
     gap: 16px;
   }
+
+  .fc-toolbar-title {
+    font-size: 20px !important;
+  }
+
+  .fc-daygrid-day-frame {
+    min-height: 72px;
+    padding: 6px;
+  }
+
+  .fc-daygrid-day-number {
+    font-size: 14px;
+  }
 }
 
 @media (max-width: 900px) {
+  .agenda-container {
+    padding-left: 0;
+  }
+
+  .agenda-content {
+    padding: 90px 20px 32px;
+  }
+
   .shift-card {
     flex-direction: column;
     align-items: flex-start;
@@ -478,27 +512,36 @@
     width: 100%;
   }
 
-  .week-calendar {
-    display: flex;
-    overflow-x: auto;
-    padding-bottom: 10px;
-  }
-
-  .week-calendar::-webkit-scrollbar {
-    display: none;
-  }
-
   .day-card {
-    min-width: 120px;
-    flex-shrink: 0;
+    flex: 0 0 110px;
+    min-width: 110px;
+  }
+
+  .fc-toolbar-title {
+    font-size: 16px !important;
+  }
+
+  .fc-daygrid-day-frame {
+    min-height: 52px;
+    padding: 4px;
+  }
+
+  .fc-daygrid-day-number {
+    font-size: 12px;
+  }
+
+  .fc-event {
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+  }
+
+  .calendar-wrapper {
+    padding: 16px;
+    border-radius: 20px;
   }
 }
 
 @media (max-width: 600px) {
-  .agenda-content {
-    padding: 18px;
-  }
-
   .topo {
     flex-direction: column;
     align-items: flex-start;
@@ -513,16 +556,7 @@
     justify-content: space-between;
   }
 
-  .fc-toolbar {
-    flex-direction: column;
-    gap: 14px;
-  }
-
   .shift-info h3 {
     font-size: 20px;
-  }
-
-  .calendar-wrapper {
-    padding: 18px;
   }
 }

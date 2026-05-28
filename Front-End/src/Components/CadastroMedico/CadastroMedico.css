@@ -191,7 +191,7 @@
 /* RESPONSIVO */
 @media (max-width: 1024px) {
   .pagina-cadastro {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     padding: 0;
   }
 
@@ -205,10 +205,12 @@
 
   .painel-esquerdo {
     padding: 32px 24px;
+    order: 1;
   }
 
   .painel-direito {
     padding: 32px 24px;
+    order: 2;
   }
 }
 
@@ -224,5 +226,13 @@
 
   .linha-2 {
     grid-template-columns: 1fr;
+  }
+
+  .painel-esquerdo {
+    padding: 24px 16px;
+  }
+
+  .painel-direito {
+    padding: 24px 16px;
   }
 }

@@ -11,7 +11,7 @@
 
 .cadastro-main {
   flex: 1;
-  margin-left: 270px;
+  margin-left: var(--sidebar-width);
 
   display: flex;
   flex-direction: column;

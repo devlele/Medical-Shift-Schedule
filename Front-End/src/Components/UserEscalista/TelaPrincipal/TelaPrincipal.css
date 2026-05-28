@@ -6,7 +6,6 @@
   min-height: 100vh;
   width: 100%;
   padding: 40px;
-  overflow-x: hidden;
 }
 
 .escalista-dashboard-card {
@@ -164,15 +163,22 @@
 }
 
 .week-calendar {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(90px, 1fr));
+  display: flex;
   gap: 10px;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: auto;
   padding-bottom: 10px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.week-calendar::-webkit-scrollbar {
+  display: none;
 }
 
 .day-card {
+  flex: 1 1 90px;
+  min-width: 80px;
   border: none;
   background: var(--app-panel);
   border-radius: var(--border-radius-xl);
@@ -181,7 +187,6 @@
   transition: 0.25s ease;
   position: relative;
   min-height: 100px;
-  min-width: 90px;
 }
 
 .day-card:hover {
@@ -319,6 +324,8 @@
   background: var(--app-panel);
   border-radius: var(--border-radius-3xl);
   padding: 28px;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .fc-toolbar-title {
@@ -347,8 +354,8 @@
 }
 
 .fc-daygrid-day-frame {
-  min-height: 120px;
-  padding: 10px;
+  min-height: 100px;
+  padding: 8px;
 }
 
 .fc-daygrid-day-number {
@@ -392,6 +399,12 @@
   color: #b42318;
 }
 
+@media (max-width: 1400px) {
+  .fc-toolbar-title {
+    font-size: 24px !important;
+  }
+}
+
 @media (max-width: 1200px) {
   .agenda-escalista-grid {
     grid-template-columns: 1fr;
@@ -401,6 +414,19 @@
     position: relative;
     top: 0;
     width: 100%;
+  }
+
+  .fc-toolbar-title {
+    font-size: 20px !important;
+  }
+
+  .fc-daygrid-day-frame {
+    min-height: 72px;
+    padding: 6px;
+  }
+
+  .fc-daygrid-day-number {
+    font-size: 14px;
   }
 }
 
@@ -418,17 +444,31 @@
     align-items: flex-start;
   }
 
-  .week-calendar {
-    display: flex;
-    overflow-x: auto;
-  }
-
-  .week-calendar::-webkit-scrollbar {
-    display: none;
-  }
-
   .day-card {
-    min-width: 120px;
-    flex-shrink: 0;
+    flex: 0 0 110px;
+    min-width: 110px;
+  }
+
+  .fc-toolbar-title {
+    font-size: 16px !important;
+  }
+
+  .fc-daygrid-day-frame {
+    min-height: 52px;
+    padding: 4px;
+  }
+
+  .fc-daygrid-day-number {
+    font-size: 12px;
+  }
+
+  .fc-event {
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+  }
+
+  .calendar-wrapper {
+    padding: 16px;
+    border-radius: var(--border-radius-xl);
   }
 }
