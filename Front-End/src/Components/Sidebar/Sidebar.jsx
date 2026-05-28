@@ -13,6 +13,7 @@ import {
   Building2,
   BriefcaseMedical,
   UserPlus,
+  ArrowLeftRight,
 } from "lucide-react";
 
 import { clearAuthSession, getStoredRole } from "../../utils/authStorage";
@@ -104,6 +105,11 @@ export default function Sidebar() {
       to: "/UserEscalista/CriarPlantao",
       label: "Criar Plantão",
       icon: BriefcaseMedical,
+    },
+    {
+      to: "/UserEscalista/Delegacao",
+      label: "Delegação",
+      icon: ArrowLeftRight,
     },
     {
       to: "/UserEscalista/Perfil",

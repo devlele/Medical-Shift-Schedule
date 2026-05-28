@@ -2,7 +2,7 @@
   display: flex;
   flex-wrap: wrap;
   min-height: 100vh;
-  background: #e8f5ef;
+  background: var(--app-bg);
   min-width: 0;
 }
 
@@ -41,10 +41,10 @@
 
 .offer-btn {
   border: none;
-  background: #1f4739;
-  color: white;
+  background: var(--medical-dark-alt);
+  color: var(--white);
   padding: 14px 18px;
-  border-radius: 18px;
+  border-radius: var(--border-radius-lg);
   font-size: 0.9rem;
   cursor: pointer;
   display: flex;
@@ -71,7 +71,7 @@
 }
 
 .section-heading h2 {
-  color: #1f4739;
+  color: var(--medical-dark-alt);
   font-size: 1.25rem;
 }
 
@@ -196,12 +196,12 @@
 
 /* ACEITAR */
 .accept-btn {
-  background: #24443a;
-  color: white;
+  background: var(--medical-dark-alt);
+  color: var(--white);
 }
 
 .accept-btn:hover {
-  background: #1b352d;
+  background: var(--medical-dark);
   transform: translateY(-2px);
 }
 

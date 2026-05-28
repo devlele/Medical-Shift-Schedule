@@ -5,49 +5,12 @@
 
 /* LAYOUT PRINCIPAL */
 .colaboradores-content {
-  margin-left: 260px;
+  margin-left: var(--sidebar-width);
   min-height: 100vh;
   padding: 40px;
   background: var(--app-bg);
 }
 
-/* HEADER PADRÃO (IGUAL TELA PRINCIPAL) */
-.topo-hospital {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.topo-hospital h1 {
-  font-size: 2.2rem;
-  color: #1e3732;
-}
-
-.topo-hospital p {
-  color: #68807a;
-}
-
-/* LADO DIREITO HEADER */
-/* AVATAR USUÁRIO */
-.avatar-default {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #f5fbf7;
-  border: 2px solid #dff3e8;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #24443d;
-}
-
-.nome-hospital {
-  font-weight: 600;
-  color: #24443d;
-}
 
 /* CARDS */
 .cards-colaboradores {
@@ -88,11 +51,11 @@
   align-items: center;
   gap: 8px;
 
-  background: #1b725f;
-  color: white;
+  background: var(--medical-dark);
+  color: var(--white);
 
   border: none;
-  border-radius: 12px;
+  border-radius: var(--border-radius-md);
 
   padding: 10px 14px;
   font-size: 13px;
@@ -198,7 +161,7 @@ tbody tr:hover {
 
   .colaboradores-content {
     margin-left: 0;
-    padding: 20px;
+    padding: 90px 20px 32px;
   }
 
   .acoes-colaboradores {

@@ -181,7 +181,7 @@ export default function CadastroHospital() {
               <input
                 type="text"
                 name="nome"
-                placeholder="Hospital Central"
+                placeholder="Ex: Hospital Central"
                 value={formData.nome}
                 onChange={handleChange}
                 onBlur={() => handleBlur("nome")}

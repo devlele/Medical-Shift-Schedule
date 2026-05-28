@@ -5,7 +5,7 @@
 .conteudo {
   flex: 1;
   padding: var(--spacing-2xl);
-  background: var(--medical-card);
+  background: var(--app-bg);
 }
 
 /* TOPO */

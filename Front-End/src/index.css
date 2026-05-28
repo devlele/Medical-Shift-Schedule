@@ -2,6 +2,7 @@
 :root {
   /* Cores Médicas */
   --medical-dark: #1f7a63;
+  --medical-dark-alt: #255443;
   --medical-teal: #2bbf9c;
   --medical-mint: #e6faf3;
   --medical-soft: #d9ebe3;
@@ -17,7 +18,7 @@
   --success: #28a745;
   --warning: #ffc107;
   --perfil-hospital: #e81111;
-  --perfil-escalista: #f2c94c;
+  --perfil-escalista: #ff7b00;
   --perfil-plantonista: #2563eb;
   --app-bg: #edf8f2;
   --app-surface: #f8fffb;
@@ -49,6 +50,8 @@
   --border-radius-md: 12px;
   --border-radius-lg: 16px;
   --border-radius-xl: 20px;
+  --border-radius-2xl: 28px;
+  --border-radius-3xl: 34px;
 
   /* Sombras */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);

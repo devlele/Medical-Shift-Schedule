@@ -1,0 +1,188 @@
+.professional-page {
+    min-height: 100vh;
+    background: var(--app-bg);
+    padding-left: var(--sidebar-width);
+}
+
+.professional-content {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    padding: 32px;
+}
+
+.professional-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.professional-header h1 {
+    font-size: 40px;
+    color: var(--app-heading);
+    font-weight: 700;
+}
+
+.professional-header p {
+    color: var(--app-muted);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--app-bg);
+    padding: 14px 20px;
+    border-radius: var(--border-radius-xl);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-profile img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-profile span {
+    font-weight: 600;
+}
+
+.doctor-card {
+    background: var(--white);
+    border-radius: var(--border-radius-2xl);
+    padding: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.doctor-left {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.doctor-avatar {
+    position: relative;
+}
+
+.doctor-avatar img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.status-online {
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
+    width: 16px;
+    height: 16px;
+    background: #32d74b;
+    border-radius: 50%;
+    border: 3px solid white;
+}
+
+.doctor-card h2 {
+    font-size: 42px;
+    color: var(--app-heading);
+}
+
+.doctor-card h4 {
+    margin: 8px 0;
+    font-size: 22px;
+    color: var(--medical-text);
+}
+
+.doctor-card p {
+    color: var(--app-muted);
+    margin-top: 4px;
+}
+
+.doctor-right h4 {
+    font-size: 20px;
+    color: var(--medical-text);
+    margin-top: 24px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.calendar-header h2 {
+    font-size: 42px;
+    color: var(--app-heading);
+}
+
+.calendar-header p {
+    color: var(--app-muted);
+}
+
+.calendar-navigation {
+    display: flex;
+    gap: 12px;
+}
+
+.calendar-navigation button {
+    border: none;
+    background: var(--app-bg);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    color: var(--medical-dark);
+}
+
+.calendar-wrapper {
+    background: var(--white);
+    border-radius: var(--border-radius-3xl);
+    padding: 20px;
+}
+
+.fc {
+    font-family: inherit;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border: 1px solid #eef2ef;
+}
+
+.fc .fc-daygrid-day-number {
+    color: var(--medical-text);
+    font-weight: 600;
+}
+
+.fc .fc-col-header-cell-cushion {
+    color: var(--app-muted);
+    text-transform: uppercase;
+    font-size: 13px;
+}
+
+.fc-event {
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 8px !important;
+    font-size: 12px !important;
+    font-weight: 700;
+}
+
+.event-day {
+    background: #8fe6ee !important;
+    color: #11535a !important;
+}
+
+.event-night {
+    background: #bfe7d4 !important;
+    color: #27513e !important;
+}

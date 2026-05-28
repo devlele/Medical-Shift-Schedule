@@ -1,19 +1,9 @@
-:root {
-    --medical-dark: #1f7a63;
-    --medical-teal: #2bbf9c;
-    --medical-mint: #e8f6ef;
-    --medical-soft: #d9ebe3;
-    --medical-card: #eef7f2;
-    --medical-text: #24332d;
-    --medical-muted: #6b7d75;
-    --white: #ffffff;
-}
-
 /* PÁGINA */
 .pagina-perfil {
     min-height: 100vh;
     display: flex;
-    background: var(--medical-mint);
+    background: var(--app-bg);
+    padding-left: var(--sidebar-width);
 }
 
 /* CONTEÚDO */
@@ -42,8 +32,8 @@
 
 /* CARD PERFIL */
 .card-perfil {
-    background: #dff0e8;
-    border-radius: 28px;
+    background: var(--app-panel);
+    border-radius: var(--border-radius-2xl);
     padding: 30px 40px;
     display: flex;
     align-items: center;
@@ -86,7 +76,7 @@
 .dados-perfil p {
     margin-top: 8px;
     font-size: 20px;
-    color: #0f7e73;
+    color: var(--medical-dark);
 }
 
 /* ÁREA INFERIOR */
@@ -126,9 +116,9 @@
 }
 
 .campo-fixo {
-    background: #cfe2d8;
+    background: var(--app-input);
     padding: 14px;
-    border-radius: 10px;
+    border-radius: var(--border-radius-sm);
 }
 
 .linha-dupla {
@@ -139,8 +129,8 @@
 
 /* HISTÓRICO */
 .card-historico {
-    background: #dff0e8;
-    border-radius: 24px;
+    background: var(--app-panel);
+    border-radius: var(--border-radius-xl);
     padding: 25px;
 }
 
@@ -199,10 +189,11 @@
 @media (max-width: 850px) {
     .pagina-perfil {
         flex-direction: column;
+        padding-left: 0;
     }
 
-    .sidebar {
-        width: 100%;
+    .conteudo-perfil {
+        padding-top: 90px;
     }
 
     .topo-perfil,

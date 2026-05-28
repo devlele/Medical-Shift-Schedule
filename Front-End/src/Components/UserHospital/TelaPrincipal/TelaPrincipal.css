@@ -1,6 +1,6 @@
 .layout-hospital {
   min-height: 100vh;
-  background: #edf8f2;
+  background: var(--app-bg);
   padding-left: var(--sidebar-width);
 }
 
@@ -20,11 +20,11 @@
 
 .topo-hospital h1 {
   font-size: 2.2rem;
-  color: #1e3732;
+  color: var(--app-heading);
 }
 
 .topo-hospital p {
-  color: #68807a;
+  color: var(--app-muted);
 }
 
 /* ROSQUINHA HEADER */
@@ -32,19 +32,19 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #f5fbf7;
-  border: 2px solid #dff3e8;
+  background: var(--app-surface);
+  border: 2px solid var(--app-panel);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  color: #24443d;
+  color: var(--medical-dark);
 }
 
 .nome-hospital {
   font-weight: 600;
-  color: #24443d;
+  color: var(--medical-dark);
 }
 
 /* CARDS*/
@@ -58,8 +58,8 @@
 
 .card-dashboard {
   flex: 1 1 260px;
-  background: #f8fffb;
-  border-radius: 30px;
+  background: var(--app-surface);
+  border-radius: var(--border-radius-2xl);
   padding: 28px;
   min-height: 180px;
 
@@ -70,12 +70,12 @@
 }
 
 .card-dashboard span {
-  color: #68807a;
+  color: var(--app-muted);
 }
 
 .card-dashboard strong {
   font-size: 2.3rem;
-  color: #1e3732;
+  color: var(--app-heading);
 }
 
 .icone-card {
@@ -108,7 +108,7 @@
 
 .secao-profissionais h2 {
   font-size: 2rem;
-  color: #1e3732;
+  color: var(--app-heading);
 }
 
 .cabecalho-secao {
@@ -132,8 +132,8 @@
 }
 
 .card-profissional {
-  background: #eef9f2;
-  border-radius: 30px;
+  background: var(--medical-card);
+  border-radius: var(--border-radius-2xl);
   padding: 24px;
 
   display: flex;
@@ -142,39 +142,38 @@
   gap: 20px;
 }
 
-/* ROSQUINHA ESCALISTA */
 .avatar-escalista {
   width: 84px;
   height: 84px;
-  border-radius: 24px;
-  background: #f5fbf7;
-  border: 2px solid #dff3e8;
+  border-radius: var(--border-radius-xl);
+  background: var(--app-surface);
+  border: 2px solid var(--app-panel);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  color: #24443d;
+  color: var(--medical-dark);
 }
 
 /* INFO */
 .info-profissional h3 {
   font-size: 1.4rem;
-  color: #243b36;
+  color: var(--app-heading);
 }
 
 .info-profissional p {
   margin-top: 4px;
-  color: #68807a;
+  color: var(--app-muted);
   font-size: 0.95rem;
 }
 
 .estado-dashboard,
 .erro-dashboard {
-  background: #f8fffb;
-  border-radius: 18px;
+  background: var(--app-surface);
+  border-radius: var(--border-radius-lg);
   padding: 22px;
-  color: #68807a;
+  color: var(--app-muted);
   font-weight: 500;
 }
 

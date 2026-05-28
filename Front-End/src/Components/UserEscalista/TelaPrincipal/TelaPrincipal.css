@@ -13,8 +13,8 @@
   width: min(100%, 360px);
   min-height: 180px;
   background: var(--app-surface);
-  border: 1px solid #dceee5;
-  border-radius: 28px;
+  border: 1px solid var(--medical-soft);
+  border-radius: var(--border-radius-2xl);
   padding: 28px;
   margin-bottom: 28px;
   display: flex;
@@ -65,9 +65,9 @@
 
 .view-tabs {
   display: flex;
-  background: #eaf7f1;
+  background: var(--medical-mint);
   padding: 5px;
-  border-radius: 18px;
+  border-radius: var(--border-radius-lg);
   margin-bottom: 30px;
 }
 
@@ -76,17 +76,17 @@
   border: none;
   background: transparent;
   padding: 14px;
-  border-radius: 14px;
+  border-radius: var(--border-radius-md);
   cursor: pointer;
   font-size: 15px;
   font-weight: 600;
-  color: #856967;
+  color: var(--medical-muted);
   transition: 0.2s;
 }
 
 .view-tabs button.active {
-  background: white;
-  color: #0f766e;
+  background: var(--white);
+  color: var(--medical-dark);
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -94,14 +94,14 @@
   font-size: 14px;
   letter-spacing: 1px;
   margin-bottom: 18px;
-  color: #223633;
+  color: var(--app-heading);
 }
 
 .filters span {
   display: block;
   font-size: 13px;
   font-weight: 700;
-  color: #99897a;
+  color: var(--medical-muted);
   margin-bottom: 18px;
 }
 
@@ -111,7 +111,7 @@
   gap: 12px;
   margin-bottom: 16px;
   cursor: pointer;
-  color: #35524b;
+  color: var(--medical-text);
   font-weight: 500;
 }
 
@@ -120,15 +120,15 @@
   width: 18px;
   height: 18px;
   border-radius: 6px;
-  border: 2px solid #99d8c4;
-  background: white;
+  border: 2px solid var(--medical-light);
+  background: var(--white);
   cursor: pointer;
   transition: 0.2s;
 }
 
 .filters input[type="checkbox"]:checked {
-  background: #0f766e;
-  border-color: #0f766e;
+  background: var(--medical-dark);
+  border-color: var(--medical-dark);
 }
 
 .main-panel {
@@ -143,21 +143,21 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  background: #e8f5ef;
-  border-radius: 18px;
+  background: var(--app-panel);
+  border-radius: var(--border-radius-lg);
   padding: 12px 16px;
 }
 
 .week-toolbar strong {
-  color: #223633;
+  color: var(--app-heading);
   text-align: center;
 }
 
 .week-toolbar button {
   border: none;
-  background: #d9ebe2;
-  color: #24443a;
-  border-radius: 12px;
+  background: var(--medical-soft);
+  color: var(--app-heading);
+  border-radius: var(--border-radius-md);
   padding: 10px 14px;
   font-weight: 700;
   cursor: pointer;
@@ -174,8 +174,8 @@
 
 .day-card {
   border: none;
-  background: #e8f5ef;
-  border-radius: 24px;
+  background: var(--app-panel);
+  border-radius: var(--border-radius-xl);
   padding: 18px 10px;
   cursor: pointer;
   transition: 0.25s ease;
@@ -190,14 +190,14 @@
 
 .day-card span {
   font-size: 13px;
-  color: #84a39a;
+  color: var(--medical-muted);
   font-weight: 700;
 }
 
 .day-card h2 {
   margin-top: 10px;
   font-size: 30px;
-  color: #223633;
+  color: var(--app-heading);
 }
 
 .day-card.active {
@@ -226,11 +226,11 @@
 }
 
 .day-dot-dia {
-  background: #1f7a63;
+  background: var(--medical-dark);
 }
 
 .day-dot-noite {
-  background: #3c8f75;
+  background: var(--medical-dark-alt);
 }
 
 .shifts-list {
@@ -241,13 +241,13 @@
 
 .shift-card {
   background: var(--app-surface);
-  border-radius: 28px;
+  border-radius: var(--border-radius-2xl);
   padding: 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-md);
   min-width: 0;
   width: 100%;
   flex-wrap: wrap;
@@ -282,14 +282,14 @@
 }
 
 .shift-info small {
-  color: #0f766e;
+  color: var(--medical-dark);
   font-weight: 700;
 }
 
 .shift-info h3 {
   margin: 10px 0;
   font-size: 24px;
-  color: #1f2d2b;
+  color: var(--medical-text);
 }
 
 .shift-details {
@@ -303,13 +303,13 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #6d8b84;
+  color: var(--app-muted);
   font-size: 13px;
 }
 
 .shift-details .recurrence-badge {
-  background: #d9ebe2;
-  color: #1f4739;
+  background: var(--medical-soft);
+  color: var(--medical-dark-alt);
   border-radius: 999px;
   padding: 4px 10px;
   font-weight: 700;
@@ -317,20 +317,20 @@
 
 .calendar-wrapper {
   background: var(--app-panel);
-  border-radius: 34px;
+  border-radius: var(--border-radius-3xl);
   padding: 28px;
 }
 
 .fc-toolbar-title {
   font-size: 32px !important;
   font-weight: 700 !important;
-  color: #223633 !important;
+  color: var(--app-heading) !important;
 }
 
 .fc-button {
   background: transparent !important;
   border: none !important;
-  color: #28443f !important;
+  color: var(--medical-dark) !important;
   box-shadow: none !important;
 }
 
@@ -341,8 +341,8 @@
 }
 
 .fc-daygrid-day {
-  background: #f7fbf9;
-  border-radius: 18px;
+  background: var(--app-surface);
+  border-radius: var(--border-radius-lg);
   overflow: hidden;
 }
 
@@ -355,7 +355,7 @@
   text-decoration: none !important;
   font-size: 18px;
   font-weight: 700;
-  color: #1f2d2b !important;
+  color: var(--medical-text) !important;
 }
 
 .fc-day-today {

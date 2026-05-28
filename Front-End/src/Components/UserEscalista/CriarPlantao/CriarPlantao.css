@@ -1,11 +1,11 @@
 .layout-escalista {
-  padding: 40px;
-  margin-left: var(--sidebar-width);
+  padding-left: var(--sidebar-width);
 }
 
 .criar-plantao-container {
   min-height: 100vh;
-  background: #edf8f2;
+  padding: 40px;
+  background: var(--app-bg);
 }
 
 /* HEADER */
@@ -19,11 +19,11 @@
 
 .topo-escalista h1 {
   font-size: 2.2rem;
-  color: #1e3732;
+  color: var(--app-heading);
 }
 
 .topo-escalista p {
-  color: #68807a;
+  color: var(--app-muted);
 }
 
 /* CARD */
@@ -52,14 +52,14 @@
   display: block;
   font-size: 15px;
   font-weight: 700;
-  color: #31594d;
+  color: var(--medical-text);
   margin-bottom: 10px;
 }
 
 /* INPUT BOX */
 .input-box {
-  background: #d8e7df;
-  border-radius: 18px;
+  background: var(--app-input);
+  border-radius: var(--border-radius-lg);
   height: 62px;
   padding: 0 18px;
 
@@ -72,11 +72,11 @@
 }
 
 .input-box:focus-within {
-  border: 2px solid #7bb89d;
+  border: 2px solid var(--medical-light);
 }
 
 .input-box svg {
-  color: #42695c;
+  color: var(--medical-dark);
   flex-shrink: 0;
 }
 
@@ -89,7 +89,7 @@
   outline: none;
 
   font-size: 16px;
-  color: #31594d;
+  color: var(--medical-text);
 }
 
 /* FREQUÊNCIA */
@@ -100,27 +100,27 @@
 }
 
 .freq-btn {
-  border: 2px solid #d8e7df;
-  background: white;
-  border-radius: 16px;
+  border: 2px solid var(--app-input);
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
   padding: 14px 22px;
 
   font-size: 15px;
   font-weight: 500;
-  color: #64748b;
+  color: var(--gray-dark);
 
   cursor: pointer;
   transition: 0.2s;
 }
 
 .freq-btn:hover {
-  border-color: #bfd8cb;
+  border-color: var(--medical-light);
 }
 
 .freq-btn.active {
-  background: #d8e7df;
-  border-color: #d8e7df;
-  color: #31594d;
+  background: var(--app-input);
+  border-color: var(--app-input);
+  color: var(--medical-text);
   font-weight: 600;
 }
 
@@ -154,10 +154,10 @@
 
 .criar-btn {
   border: none;
-  background: #255443;
-  color: white;
+  background: var(--medical-dark-alt);
+  color: var(--white);
 
-  border-radius: 18px;
+  border-radius: var(--border-radius-lg);
   padding: 18px 28px;
 
   display: flex;
@@ -242,10 +242,9 @@
 }
 
 .dropdown-item:hover {
-  background: #edf8f2;
+  background: var(--app-bg);
 }
 
-/* 🔥 CHECKBOX PERFEITO */
 .dropdown-item input[type="checkbox"] {
   margin: 10px;
   width: 16px;
@@ -253,14 +252,17 @@
 
   flex-shrink: 0;
 
-  accent-color: #255443;
+  accent-color: var(--medical-dark-alt);
   cursor: pointer;
 }
 
 /* RESPONSIVO */
 @media (max-width: 900px) {
+  .layout-escalista {
+    padding-left: 0;
+  }
+
   .criar-plantao-container {
-    margin-left: 0;
     padding: 90px 20px 32px;
   }
 
