@@ -25,6 +25,7 @@ import Colaboradores from "./Components/UserHospital/Colaboradores/Colaboradores
 import PerfilHospital from "./Components/UserHospital/Perfil/Perfil.jsx";
 import PerfilEscalista from "./Components/UserEscalista/Perfil/Perfil.jsx"
 import Delegacao from "./Components/UserEscalista/Delegacao/Delegacao.jsx";
+import DetalhePlantonista from "./Components/UserEscalista/DetalhePlantonista/DetalhePlantonista.jsx"
 
 function App() {
   return (
@@ -160,6 +161,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/detalhePlantonista"
+          element={
+            <ProtectedRoute allowedRoles={["escalista"]}>
+              <DetalhePlantonista />
+            </ProtectedRoute>
+          }
+        />
+
+        
         <Route
           path="/UserEscalista/CriarPlantao"
           element={

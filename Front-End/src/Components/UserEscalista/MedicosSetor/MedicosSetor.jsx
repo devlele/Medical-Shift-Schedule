@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { NavLink } from "react-router-dom";
 import {
     AlertCircle,
     Bell,
@@ -8,6 +9,7 @@ import {
     Trash2,
     UserPlus,
     UserRound,
+    Info,
 } from "lucide-react";
 
 import Sidebar from "../../Sidebar/Sidebar";
@@ -272,7 +274,12 @@ export default function MedicosSetor() {
                                             <span>{medico.crm || medico.email || medico.specialty || "Médico vinculado"}</span>
                                         </div>
 
-                                        
+                                        <NavLink
+                                            to="/detalhePlantonista"
+                                            className="medico-info-btn"
+                                        >
+                                            <Info size={18} />
+                                        </NavLink>
 
                                         <button
                                             type="button"

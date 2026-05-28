@@ -163,9 +163,9 @@
 
 .medico-row {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
     background: #e3f5ec;
     border-radius: 20px;
     padding: 16px;
@@ -177,7 +177,6 @@
     border-radius: 16px;
     background: #f5fbf7;
     color: #24443d;
-
     display: flex;
     align-items: center;
     justify-content: center;
@@ -205,6 +204,13 @@
     white-space: nowrap;
 }
 
+.medico-info-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
 .medico-associar-btn,
 .medico-remover-btn {
     border: none;
@@ -224,9 +230,9 @@
 }
 
 .medico-remover-btn {
-    /* width: 44px; */
     background: #cfe6da;
     color: #b42318;
+    padding: 14px;
 }
 
 .medico-associar-btn:disabled,
