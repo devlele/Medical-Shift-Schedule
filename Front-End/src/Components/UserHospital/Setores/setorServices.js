@@ -147,6 +147,12 @@ export const editarSetor = async (id, data) => {
     });
 };
 
+export const excluirSetor = async (id) => {
+    return request(`/setor/${id}`, {
+        method: "DELETE",
+    });
+};
+
 export const excluirEscalista = async (id) => {
     return request(`/manager/${id}`, {
         method: "DELETE",
@@ -155,4 +161,8 @@ export const excluirEscalista = async (id) => {
 
 export const getEscalistaById = async (id) => {
     return request(`/manager/${id}`);
+};
+
+export const getSetoresByEscalista = async (id) => {
+    return request(`/manager/${id}/setores`);
 };

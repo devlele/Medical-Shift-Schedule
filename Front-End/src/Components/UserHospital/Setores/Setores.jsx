@@ -1,14 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
+import { NavLink } from "react-router-dom";
 import "./Setores.css";
 import Sidebar from "../../Sidebar/Sidebar";
-import { User, Bell, CircleUserRound } from "lucide-react";
+import { User, Bell, CircleUserRound, AlertCircle, Trash2 } from "lucide-react";
 import { getStoredUser } from "../../../utils/authStorage";
 
 import {
   getDoctors,
+  getEscalistas,
   getSetores,
   criarSetor,
   editarSetor,
+  excluirSetor as excluirSetorService,
 } from "./setorServices.js";
 
 const ITEMS_PER_PAGE = 4;
@@ -21,33 +24,45 @@ export default function Setores() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingSetor, setEditingSetor] = useState(null);
+  const [salvando, setSalvando] = useState(false);
+  const [excluindo, setExcluindo] = useState(false);
 
-  const [form, setForm] = useState({
-    nome: "",
-    descricao: "",
-  });
+  const [form, setForm] = useState({ nome: "", descricao: "" });
 
   const carregarDados = async () => {
     try {
       setLoading(true);
 
-      const [setoresData, doctorsData] = await Promise.all([
+      const [setoresData, doctorsData, escalistasData] = await Promise.all([
         getSetores(),
         getDoctors(),
+        getEscalistas(),
       ]);
 
-      const setoresComMedicos = setoresData.map((setor) => {
+      const setorIdsComEscalista = new Set(
+        escalistasData
+          .filter((e) => e.ativo !== false && e.setorId != null)
+          .map((e) => e.setorId),
+      );
+      const setorNomesComEscalista = new Set(
+        escalistasData
+          .filter((e) => e.ativo !== false && e.setorNome)
+          .map((e) => e.setorNome),
+      );
+
+      const setoresComDados = setoresData.map((setor) => {
         const quantidadeMedicos = doctorsData.filter(
           (doctor) => doctor.setorId === setor.id,
         ).length;
 
-        return {
-          ...setor,
-          quantidadeMedicos,
-        };
+        const temEscalista =
+          setorIdsComEscalista.has(setor.id) ||
+          setorNomesComEscalista.has(setor.nome);
+
+        return { ...setor, quantidadeMedicos, temEscalista };
       });
 
-      setSetores(setoresComMedicos);
+      setSetores(setoresComDados);
     } catch (error) {
       console.error(error);
       alert("Erro ao carregar setores");
@@ -60,11 +75,13 @@ export default function Setores() {
     carregarDados();
   }, []);
 
-  const setoresFiltrados = useMemo(() => {
-    return setores.filter((setor) =>
-      setor.nome?.toLowerCase().includes(search.toLowerCase()),
-    );
-  }, [setores, search]);
+  const setoresFiltrados = useMemo(
+    () =>
+      setores.filter((setor) =>
+        setor.nome?.toLowerCase().includes(search.toLowerCase()),
+      ),
+    [setores, search],
+  );
 
   const totalPages = Math.ceil(setoresFiltrados.length / ITEMS_PER_PAGE);
 
@@ -78,51 +95,66 @@ export default function Setores() {
     0,
   );
 
+  const setoresSemEscalista = useMemo(
+    () => setores.filter((s) => s.ativo !== false && !s.temEscalista),
+    [setores],
+  );
+
   const abrirCriacao = () => {
     setEditingSetor(null);
-
-    setForm({
-      nome: "",
-      descricao: "",
-    });
-
+    setForm({ nome: "", descricao: "" });
     setModalOpen(true);
   };
 
   const abrirEdicao = (setor) => {
     setEditingSetor(setor);
-
-    setForm({
-      nome: setor.nome,
-      descricao: setor.descricao,
-    });
-
+    setForm({ nome: setor.nome, descricao: setor.descricao });
     setModalOpen(true);
   };
 
   const salvarSetor = async () => {
+    if (!form.nome.trim()) {
+      alert("Nome obrigatório");
+      return;
+    }
     try {
-      if (!form.nome.trim()) {
-        alert("Nome obrigatório");
-        return;
-      }
-
+      setSalvando(true);
       if (editingSetor) {
         await editarSetor(editingSetor.id, form);
       } else {
         await criarSetor(form);
       }
-
       setModalOpen(false);
       carregarDados();
     } catch (error) {
       console.error(error);
       alert("Erro ao salvar setor");
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  const excluirSetorAtual = async () => {
+    if (
+      !window.confirm(
+        `Deseja realmente excluir o setor "${editingSetor.nome}"? Esta ação não pode ser desfeita.`,
+      )
+    )
+      return;
+    try {
+      setExcluindo(true);
+      await excluirSetorService(editingSetor.id);
+      setModalOpen(false);
+      carregarDados();
+    } catch (error) {
+      console.error(error);
+      alert("Erro ao excluir setor");
+    } finally {
+      setExcluindo(false);
     }
   };
 
   const usuario = getStoredUser();
-
   const nomeUsuario =
     usuario?.nomeFantasia || usuario?.hospitalNome || "Hospital";
 
@@ -132,7 +164,6 @@ export default function Setores() {
 
       <main className="setores-content">
         <div className="setores-header">
-          {/* HEADER */}
           <header className="topo">
             <div>
               <h1>Gestão de Setores</h1>
@@ -141,8 +172,6 @@ export default function Setores() {
 
             <div className="topo-direita">
               <Bell className="icone-topo" />
-
-              {/* ROSQUINHA DO USUÁRIO */}
               <div className="usuario-topo">
                 <CircleUserRound className="perfilHospital" />
                 <span className="perfilHospital">{nomeUsuario}</span>
@@ -154,6 +183,18 @@ export default function Setores() {
             + Criar Novo Setor
           </button>
         </div>
+
+        {/* ALERTA GERAL */}
+        {!loading && setoresSemEscalista.length > 0 && (
+          <div className="alerta-setores-sem-escalista">
+            <AlertCircle size={18} />
+            <span>
+              {setoresSemEscalista.length === 1
+                ? `O setor "${setoresSemEscalista[0].nome}" está sem escalista responsável.`
+                : `${setoresSemEscalista.length} setores estão sem escalista responsável.`}
+            </span>
+          </div>
+        )}
 
         <div className="cards-container">
           <div className="card-info">
@@ -193,7 +234,18 @@ export default function Setores() {
                 <tbody>
                   {setoresPaginados.map((setor) => (
                     <tr key={setor.id}>
-                      <td>{setor.nome}</td>
+                      <td>
+                        <span>{setor.nome}</span>
+                        {!setor.temEscalista && (
+                          <div className="aviso-sem-escalista">
+                            <AlertCircle size={13} />
+                            <span>Sem escalista responsável.</span>
+                            <NavLink to="/UserHospital/CadastrarProfissional">
+                              Cadastrar escalista
+                            </NavLink>
+                          </div>
+                        )}
+                      </td>
 
                       <td>{setor.quantidadeMedicos}</td>
 
@@ -249,31 +301,13 @@ export default function Setores() {
 
             <div className="form-group">
               <label>NOME DO SETOR</label>
-
               <input
                 type="text"
                 placeholder="Ex: Oncologia, Ortopedia..."
                 value={form.nome}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    nome: e.target.value,
-                  })
-                }
+                onChange={(e) => setForm({ ...form, nome: e.target.value })}
               />
             </div>
-
-            {/* RESPOSÁVEL TECNICO TIRADO */}
-            {/* <div className="form-group">
-                            <label>
-                                RESPONSÁVEL TÉCNICO
-                            </label>
-
-                            <input
-                                type="text"
-                                placeholder="Buscar escalista..."
-                            />
-                        </div> */}
 
             <div className="modal-actions">
               <button
@@ -283,10 +317,27 @@ export default function Setores() {
                 Cancelar
               </button>
 
-              <button className="save-btn" onClick={salvarSetor}>
-                Salvar Setor
+              <button
+                className="save-btn"
+                onClick={salvarSetor}
+                disabled={salvando}
+              >
+                {salvando ? "Salvando..." : "Salvar Setor"}
               </button>
             </div>
+
+            {editingSetor && (
+              <div className="modal-excluir-area">
+                <button
+                  className="excluir-setor-btn"
+                  onClick={excluirSetorAtual}
+                  disabled={excluindo}
+                >
+                  <Trash2 size={16} />
+                  {excluindo ? "Excluindo..." : "Excluir Setor"}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

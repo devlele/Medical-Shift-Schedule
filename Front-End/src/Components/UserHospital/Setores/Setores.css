@@ -105,6 +105,71 @@
   color: #0f172a;
 }
 
+/* ALERTA GERAL SEM ESCALISTA */
+
+.alerta-setores-sem-escalista {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff5f5;
+  color: #b42318;
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+/* AVISO INLINE NA TABELA */
+
+.aviso-sem-escalista {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+  color: #b42318;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.aviso-sem-escalista a {
+  color: #b42318;
+  font-weight: 700;
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
+/* ÁREA DE EXCLUSÃO NO MODAL */
+
+.modal-excluir-area {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: center;
+}
+
+.excluir-setor-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #b42318;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.excluir-setor-btn:hover {
+  text-decoration: underline;
+}
+
+.excluir-setor-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* TABELA */
 
 .table-container {

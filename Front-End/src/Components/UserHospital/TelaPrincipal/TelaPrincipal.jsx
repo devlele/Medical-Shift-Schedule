@@ -18,6 +18,7 @@ import {
   getEscalistas,
   getSetores,
   getMeuDashboard,
+  getSetoresByEscalista,
   excluirEscalista as excluirEscalistaService,
 } from "../Setores/setorServices.js";
 
@@ -68,7 +69,26 @@ export default function TelaPrincipal() {
 
       setSetores(Array.isArray(setoresData) ? setoresData : []);
       setMedicos(Array.isArray(medicosData) ? medicosData : []);
-      setEscalistas(Array.isArray(escalistasData) ? escalistasData : []);
+
+      const lista = Array.isArray(escalistasData) ? escalistasData : [];
+      const comSetores = await Promise.all(
+        lista.map(async (e) => {
+          try {
+            const setoresE = await getSetoresByEscalista(e.id);
+            const nomes = Array.isArray(setoresE)
+              ? setoresE
+                  .filter((s) => s.ativo !== false)
+                  .map((s) => s.setorNome || s.nome || s.name)
+                  .filter(Boolean)
+                  .join(", ")
+              : "";
+            return { ...e, setoresNomes: nomes };
+          } catch {
+            return { ...e, setoresNomes: e.setorNome || "" };
+          }
+        }),
+      );
+      setEscalistas(comSetores);
     } catch (error) {
       console.error(error);
 
@@ -198,8 +218,7 @@ export default function TelaPrincipal() {
 
                   <div className="info-profissional">
                     <h3>{profissional.name}</h3>
-
-                    <p>{profissional.email || profissional.setorNome || "Sem setor vinculado"}</p>
+                    <p>{profissional.setoresNomes || "Sem setor vinculado"}</p>
                   </div>
 
                   <NavLink

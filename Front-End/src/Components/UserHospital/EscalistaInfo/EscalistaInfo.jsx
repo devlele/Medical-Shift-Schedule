@@ -64,7 +64,7 @@ export default function EscalistaInfo() {
   const cpf     = perfil?.cpf   || "Não disponível";
   const email   = perfil?.email || "Não informado";
   const cargo   = perfil?.department || perfil?.cargo || "Escalista";
-  const setor   = perfil?.setorNome  || "Sem setor vinculado";
+  const setor   = perfil?.setoresNomes || perfil?.setorNome || "Sem setor vinculado";
 
   return (
     <div className="ei-pagina">

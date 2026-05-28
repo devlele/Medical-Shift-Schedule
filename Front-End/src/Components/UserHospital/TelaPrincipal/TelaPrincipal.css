@@ -141,21 +141,21 @@
 .card-profissional {
   background: var(--app-bg);
   border-radius: var(--border-radius-xl);
-  padding: 14px 16px;
+  padding: 12px 16px;
 
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 12px;
 }
 
 .avatar-escalista {
+  flex-shrink: 0;
   width: 44px;
   height: 44px;
   border-radius: var(--border-radius-lg);
   background: var(--app-surface);
   border: 2px solid var(--app-panel);
-  flex-shrink: 0;
 
   display: flex;
   align-items: center;
@@ -168,10 +168,15 @@
 .info-profissional {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .info-profissional h3 {
+  margin: 0;
   font-size: 1rem;
+  font-weight: 600;
   color: var(--app-heading);
   white-space: nowrap;
   overflow: hidden;
@@ -179,7 +184,7 @@
 }
 
 .info-profissional p {
-  margin-top: 2px;
+  margin: 0;
   color: var(--app-muted);
   font-size: 0.82rem;
   white-space: nowrap;
@@ -212,8 +217,10 @@
 
 .escalista-excluir-btn {
   border: none;
-  min-height: 44px;
-  padding: 14px;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
   border-radius: 14px;
   background: #cfe6da;
   color: #b42318;
@@ -260,6 +267,12 @@
   }
 }
 
+@media (max-width: 768px) {
+  .grid-profissionais {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 600px) {
   .topo-hospital h1 {
     font-size: 1.8rem;
@@ -267,9 +280,5 @@
 
   .card-dashboard strong {
     font-size: 1.8rem;
-  }
-
-  .grid-profissionais {
-    grid-template-columns: 1fr;
   }
 }
