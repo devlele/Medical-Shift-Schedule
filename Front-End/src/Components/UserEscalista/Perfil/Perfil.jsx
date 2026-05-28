@@ -3,9 +3,9 @@ import { Bell, CircleUserRound } from "lucide-react";
 import "./Perfil.css";
 import Sidebar from "../../Sidebar/Sidebar";
 import {
-  getHospitalById,
   getMeuDashboard,
   getMeusSetoresEscalista,
+  getManagerMe,
 } from "../../UserHospital/Setores/setorServices";
 import { getUsuarioLogado } from "../../../utils/plantaoFormatters";
 
@@ -14,7 +14,8 @@ const Perfil = () => {
 
   const [perfil, setPerfil] = useState(null);
   const [setores, setSetores] = useState([]);
-  const [hospital, setHospital] = useState(null);
+  const [hospitalNomeState, setHospitalNomeState] = useState("");
+  // hospital state removido — nome extraído diretamente dos setores
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
 
@@ -26,23 +27,29 @@ const Perfil = () => {
         setLoading(true);
         setErro("");
 
-        const [dashboard, setoresData] = await Promise.all([
-          getMeuDashboard(),
+        // Tenta /manager/me para dados do escalista; fallback para /dashboard/me
+        const [managerData, setoresData] = await Promise.all([
+          getManagerMe().catch(() => getMeuDashboard()),
           getMeusSetoresEscalista(),
         ]);
 
         const setoresAtivos = Array.isArray(setoresData)
           ? setoresData.filter((setor) => setor.ativo !== false)
           : [];
-        const hospitalId = setoresAtivos[0]?.hospitalId;
-        const hospitalData = hospitalId
-          ? await getHospitalById(hospitalId)
-          : null;
+
+        // Tenta extrair nome do hospital dos dados do setor
+        const primeiroSetor = setoresAtivos[0];
+        const nomeHospital =
+          primeiroSetor?.hospitalNome ||
+          primeiroSetor?.hospital?.nomeFantasia ||
+          primeiroSetor?.nomeHospital ||
+          primeiroSetor?.hospital?.nome ||
+          "";
 
         if (ativo) {
-          setPerfil(dashboard);
+          setPerfil(managerData);
           setSetores(setoresAtivos);
-          setHospital(hospitalData);
+          setHospitalNomeState(nomeHospital);
         }
       } catch (error) {
         if (ativo) {
@@ -50,34 +57,24 @@ const Perfil = () => {
           setPerfil(usuario);
         }
       } finally {
-        if (ativo) {
-          setLoading(false);
-        }
+        if (ativo) setLoading(false);
       }
     }
 
     carregarPerfil();
-
-    return () => {
-      ativo = false;
-    };
+    return () => { ativo = false; };
   }, []);
 
-  const nome =
-    perfil?.name || setores[0]?.escalistaNome || usuario?.name || "Escalista";
-  const cpf = perfil?.cpf || "Nao informado";
-  const email =
-    perfil?.email ||
-    setores[0]?.escalistaEmail ||
-    usuario?.email ||
-    "Email não informado";
-  const cargo = perfil?.cargo || "Escalista";
-  const hospitalNome = hospital?.nomeFantasia || "Não informado";
+  const nome = perfil?.name || perfil?.nome || usuario?.name || "Escalista";
+  const cpf = perfil?.cpf || "Não disponível";
+  const email = perfil?.email || usuario?.email || "Não informado";
+  const cargo = perfil?.department || perfil?.cargo || "Escalista";
+  const hospitalNome = hospitalNomeState || "Não disponível";
   const setoresTexto =
     setores
-      .map((setor) => setor.setorNome)
+      .map((s) => s.nome || s.setorNome || s.name)
       .filter(Boolean)
-      .join(", ") || "Não informado";
+      .join(", ") || "Não disponível";
 
   return (
     <div className="pagina-perfil">

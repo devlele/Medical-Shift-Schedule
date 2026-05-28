@@ -88,6 +88,10 @@ export const getMeuDashboard = async () => {
     return request("/dashboard/me");
 };
 
+export const getManagerMe = async () => {
+    return request("/manager/me");
+};
+
 export const getHospitalById = async (id) => {
     return request(`/hospital/${id}`);
 };

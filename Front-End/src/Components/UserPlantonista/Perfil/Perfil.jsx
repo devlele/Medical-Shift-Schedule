@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Bell, CircleUserRound } from "lucide-react";
 import "./Perfil.css";
 import Sidebar from "../../Sidebar/Sidebar";
-import { getMeuPerfilMedico } from "../../../services/doctorServices";
+import { getMeuPerfilMedico, getDoctorMe } from "../../../services/doctorServices";
 import { getUsuarioLogado } from "../../../utils/plantaoFormatters";
 
 const Perfil = () => {
@@ -18,38 +18,38 @@ const Perfil = () => {
       try {
         setLoading(true);
         setErro("");
-        const data = await getMeuPerfilMedico();
 
-        if (ativo) {
-          setPerfil(data);
+        // Tenta /doctor/me/profile primeiro; se falhar, usa /doctor/me
+        let data;
+        try {
+          data = await getMeuPerfilMedico();
+        } catch {
+          data = await getDoctorMe();
         }
+
+        if (ativo) setPerfil(data);
       } catch (error) {
         if (ativo) {
-          setErro(error.message || "Nao foi possivel carregar o perfil.");
+          setErro(error.message || "Não foi possível carregar o perfil.");
           setPerfil(usuario);
         }
       } finally {
-        if (ativo) {
-          setLoading(false);
-        }
+        if (ativo) setLoading(false);
       }
     }
 
     carregarPerfil();
-
-    return () => {
-      ativo = false;
-    };
+    return () => { ativo = false; };
   }, []);
 
-  const nome = perfil?.name || usuario?.name || "Medico";
-  const cpf = perfil?.cpf || "Nao informado";
-  const especialidade = perfil?.specialty || "Especialidade nao informada";
-  const crm = perfil?.crm || "Nao informado";
-  const uf = perfil?.uf || perfil?.ufCrm || "UF";
-  const telefone = perfil?.telefone || "Nao informado";
-  const email = perfil?.email || usuario?.email || "Email nao informado";
-  const dataNascimento = formatarData(perfil?.birthday || perfil?.birthDate);
+  const nome = perfil?.name || perfil?.nome || usuario?.name || "Médico";
+  const cpf = perfil?.cpf || "Não informado";
+  const especialidade = perfil?.specialty || perfil?.especialidade || "Não informada";
+  const crm = perfil?.crm || "Não informado";
+  const uf = perfil?.uf || perfil?.ufCrm || perfil?.estadoCrm || "";
+  const telefone = perfil?.telefone || perfil?.phone || "Não informado";
+  const email = perfil?.email || usuario?.email || "Não informado";
+  const dataNascimento = formatarData(perfil?.birthday || perfil?.birthDate || perfil?.dataNascimento);
 
   return (
     <div className="pagina-perfil">

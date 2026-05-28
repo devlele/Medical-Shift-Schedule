@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Bell, CircleUserRound } from "lucide-react";
 import "./Perfil.css";
 import Sidebar from "../../Sidebar/Sidebar";
-import { getHospitalById, getMeuDashboard } from "../Setores/setorServices";
+import { getMeuDashboard } from "../Setores/setorServices";
 import { getUsuarioLogado } from "../../../utils/plantaoFormatters";
 
 const Perfil = () => {
@@ -19,40 +19,31 @@ const Perfil = () => {
         setLoading(true);
         setErro("");
 
+        // GET /hospital/{id} exige ROLE_ADMIN; usamos apenas /dashboard/me
+        // que retorna os dados do hospital autenticado pelo token
         const dashboard = await getMeuDashboard();
-        const hospital = dashboard?.id
-          ? await getHospitalById(dashboard.id)
-          : null;
 
-        if (ativo) {
-          setPerfil({ ...dashboard, ...hospital });
-        }
+        if (ativo) setPerfil(dashboard);
       } catch (error) {
         if (ativo) {
-          setErro(error.message || "Nao foi possivel carregar o perfil.");
+          setErro(error.message || "Não foi possível carregar o perfil.");
           setPerfil(usuario);
         }
       } finally {
-        if (ativo) {
-          setLoading(false);
-        }
+        if (ativo) setLoading(false);
       }
     }
 
     carregarPerfil();
-
-    return () => {
-      ativo = false;
-    };
+    return () => { ativo = false; };
   }, []);
 
-  const nome =
-    perfil?.nomeFantasia || perfil?.name || usuario?.name || "Hospital";
-  const cnpj = perfil?.cnpj || "Nao informado";
-  const telefone = perfil?.telefone || "Nao informado";
-  const endereco = perfil?.endereco || "Nao informado";
-  const gestor = usuario?.name || perfil?.nomeGestor || "Nao informado";
-  const email = perfil?.email || usuario?.email || "Email nao informado";
+  const nome = perfil?.nomeFantasia || perfil?.nome || perfil?.name || usuario?.name || "Hospital";
+  const cnpj = perfil?.cnpj || "Não disponível";
+  const telefone = perfil?.telefone || perfil?.phone || "Não disponível";
+  const endereco = perfil?.endereco || perfil?.address || "Não disponível";
+  const gestor = perfil?.nomeGestor || usuario?.name || "Não informado";
+  const email = perfil?.email || usuario?.email || "Não informado";
 
   return (
     <div className="pagina-perfil">

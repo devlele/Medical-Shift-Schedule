@@ -94,3 +94,7 @@ export const cancelarPedidoCobertura = async (pedidoId) => {
 export const getMeuPerfilMedico = async () => {
   return request("/doctor/me/profile");
 };
+
+export const getDoctorMe = async () => {
+  return request("/doctor/me");
+};
