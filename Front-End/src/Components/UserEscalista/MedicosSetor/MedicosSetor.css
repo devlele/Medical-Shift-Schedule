@@ -1,279 +1,313 @@
 .medicos-setor-layout {
-    min-height: 100vh;
-    background: #edf8f2;
+  min-height: 100vh;
+  background: #edf8f2;
 }
 
 .medicos-setor-main {
-    min-height: 100vh;
-    margin-left: var(--sidebar-width);
-    padding: 40px;
-    background: #edf8f2;
+  min-height: 100vh;
+  margin-left: var(--sidebar-width);
+  padding: 40px;
+  background: #edf8f2;
 }
 
 .medicos-setor-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 24px;
-    margin-bottom: 34px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 34px;
 }
 
 .medicos-setor-header h1 {
-    color: #1e3732;
-    font-size: 2.2rem;
+  color: #1e3732;
+  font-size: 2.2rem;
 }
 
 .medicos-setor-header p {
-    color: #68807a;
+  color: #68807a;
 }
 
 .medicos-alerta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border-radius: 14px;
-    padding: 14px 16px;
-    margin-bottom: 22px;
-    font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  font-weight: 500;
 }
 
 .medicos-alerta.erro {
-    background: #fff5f5;
-    color: #b42318;
+  background: #fff5f5;
+  color: #b42318;
 }
 
 .medicos-alerta.sucesso {
-    background: #e8f7f1;
-    color: #166534;
+  background: #e8f7f1;
+  color: #166534;
 }
 
 .medicos-info-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 24px;
-    background: #f7f7f7;
-    border-radius: 28px;
-    padding: 28px 32px;
-    margin-bottom: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  background: #f7f7f7;
+  border-radius: 28px;
+  padding: 28px 32px;
+  margin-bottom: 28px;
 }
 
 .medicos-info-card div {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .medicos-label {
-    color: #0b7180;
-    font-size: 0.85rem;
-    font-weight: 800;
-    text-transform: uppercase;
+  color: #0b7180;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
 }
 
 .medicos-info-card strong {
-    color: #1e3732;
-    font-size: 1.5rem;
+  color: #1e3732;
+  font-size: 1.5rem;
 }
 
 .medicos-info-card select {
-    min-width: 260px;
-    height: 52px;
-    border: none;
-    border-radius: 16px;
-    background: #d8e7df;
-    color: #31594d;
-    padding: 0 16px;
-    font-weight: 700;
-    outline: none;
+  min-width: 260px;
+  height: 52px;
+  border: none;
+  border-radius: 16px;
+  background: #d8e7df;
+  color: #31594d;
+  padding: 0 16px;
+  font-weight: 700;
+  outline: none;
 }
 
 .medicos-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 24px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
 }
 
 .medicos-panel {
-    background: #f7f7f7;
-    border-radius: 28px;
-    padding: 28px;
-    min-height: 420px;
+  background: #f7f7f7;
+  border-radius: 28px;
+  padding: 28px;
+  min-height: 420px;
 }
 
 .medicos-panel-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .medicos-panel-header h2 {
-    color: #1e3732;
-    font-size: 1.4rem;
+  color: #1e3732;
+  font-size: 1.4rem;
 }
 
 .medicos-panel-header p {
-    color: #68807a;
-    margin-top: 4px;
+  color: #68807a;
+  margin-top: 4px;
 }
 
 .medicos-search {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 12px;
-    background: #d8e7df;
-    border-radius: 18px;
-    padding: 0 14px;
-    min-height: 60px;
-    margin-bottom: 18px;
-    color: #42695c;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  background: #d8e7df;
+  border-radius: 18px;
+  padding: 0 14px;
+  min-height: 60px;
+  margin-bottom: 18px;
+  color: #42695c;
 }
 
 .medicos-search input {
-    border: none;
-    background: transparent;
-    outline: none;
-    color: #31594d;
-    font-size: 1rem;
-    min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: #31594d;
+  font-size: 1rem;
+  min-width: 0;
 }
 
 .medicos-search button {
-    border: none;
-    border-radius: 14px;
-    background: #255443;
-    color: white;
-    font-weight: 700;
-    padding: 12px 18px;
-    cursor: pointer;
+  border: none;
+  border-radius: 14px;
+  background: #255443;
+  color: white;
+  font-weight: 700;
+  padding: 12px 18px;
+  cursor: pointer;
 }
 
 .medicos-search button:disabled {
-    cursor: not-allowed;
-    opacity: 0.65;
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .medicos-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .medico-row {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 14px;
-    background: #e3f5ec;
-    border-radius: 20px;
-    padding: 16px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  background: #e3f5ec;
+  border-radius: 20px;
+  padding: 16px;
 }
 
 .medico-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 16px;
-    background: #f5fbf7;
-    color: #24443d;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: #f5fbf7;
+  color: #24443d;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .medico-info {
-    min-width: 0;
+  min-width: 0;
 }
 
 .medico-info strong {
-    display: block;
-    color: #243b36;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  display: block;
+  color: #243b36;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .medico-info span {
-    display: block;
-    color: #68807a;
-    font-size: 0.9rem;
-    margin-top: 4px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  display: block;
+  color: #68807a;
+  font-size: 0.9rem;
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.medico-associar-btn,
+.medico-acoes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.medico-info-btn,
 .medico-remover-btn {
-    border: none;
-    min-height: 44px;
-    border-radius: 14px;
-    font-weight: 700;
-    cursor: pointer;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+
+  border: none;
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #255443;
+  color: white;
+
+  cursor: pointer;
+}
+
+.medico-info-btn svg,
+.medico-remover-btn svg {
+  width: 18px;
+  height: 18px;
+  color: white;
+  stroke: currentColor;
+  flex-shrink: 0;
 }
 
 .medico-associar-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #255443;
-    color: white;
-    padding: 0 16px;
-}
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
-.medico-remover-btn {
-    /* width: 44px; */
-    background: #cfe6da;
-    color: #b42318;
+  border: none;
+  min-height: 44px;
+  border-radius: 14px;
+
+  background: #255443;
+  color: white;
+
+  padding: 0 16px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .medico-associar-btn:disabled,
-.medico-remover-btn:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
+.medico-remover-btn:disabled,
+.medico-info-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .medicos-empty {
-    background: #e3f5ec;
-    border-radius: 18px;
-    color: #68807a;
-    font-weight: 600;
-    padding: 20px;
+  background: #e3f5ec;
+  border-radius: 18px;
+  color: #68807a;
+  font-weight: 600;
+  padding: 20px;
 }
 
 @media (max-width: 1100px) {
-    .medicos-grid {
-        grid-template-columns: 1fr;
-    }
+  .medicos-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 900px) {
-    .medicos-setor-main {
-        margin-left: 0;
-        padding: 90px 20px 32px;
-    }
+  .medicos-setor-main {
+    margin-left: 0;
+    padding: 90px 20px 32px;
+  }
 
-    .medicos-setor-header,
-    .medicos-info-card {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+  .medicos-setor-header,
+  .medicos-info-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-    .medicos-info-card select {
-        width: 100%;
-        min-width: 0;
-    }
+  .medicos-info-card select {
+    width: 100%;
+    min-width: 0;
+  }
 
-    .medicos-search,
-    .medico-row {
-        grid-template-columns: 1fr;
-    }
+  .medicos-search,
+  .medico-row {
+    grid-template-columns: 1fr;
+  }
 
-    .medico-associar-btn,
-    .medico-remover-btn {
-        width: 100%;
-        justify-content: center;
-    }
+  .medico-acoes {
+    width: 100%;
+  }
+
+  .medico-associar-btn,
+  .medico-remover-btn,
+  .medico-info-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }

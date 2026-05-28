@@ -65,7 +65,7 @@ const Perfil = () => {
 
   const nome =
     perfil?.name || setores[0]?.escalistaNome || usuario?.name || "Escalista";
-  const cpf = perfil?.cpf || "Não informado";
+  const cpf = perfil?.cpf || "Nao informado";
   const email =
     perfil?.email ||
     setores[0]?.escalistaEmail ||

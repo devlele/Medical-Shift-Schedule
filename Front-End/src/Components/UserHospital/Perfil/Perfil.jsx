@@ -51,7 +51,7 @@ const Perfil = () => {
   const cnpj = perfil?.cnpj || "Nao informado";
   const telefone = perfil?.telefone || "Nao informado";
   const endereco = perfil?.endereco || "Nao informado";
-  const gestor = perfil?.nomeGestor || "Nao informado";
+  const gestor = usuario?.name || perfil?.nomeGestor || "Nao informado";
   const email = perfil?.email || usuario?.email || "Email nao informado";
 
   return (

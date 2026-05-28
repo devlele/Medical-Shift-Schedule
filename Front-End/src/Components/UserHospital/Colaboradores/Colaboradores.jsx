@@ -10,7 +10,8 @@ export default function Colaboradores() {
   const navigate = useNavigate();
   const usuario = getStoredUser();
 
-  const nomeUsuario = usuario?.name || "Hospital";
+  const nomeUsuario =
+    usuario?.nomeFantasia || usuario?.hospitalNome || "Hospital";
 
   const [search, setSearch] = useState("");
   const [tipoFiltro, setTipoFiltro] = useState("todos");

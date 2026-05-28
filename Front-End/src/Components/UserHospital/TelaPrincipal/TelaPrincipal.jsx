@@ -10,18 +10,22 @@ import {
 } from "lucide-react";
 
 import Sidebar from "../../Sidebar/Sidebar";
+
 import {
   getDoctors,
   getEscalistas,
   getSetores,
+  getMeuDashboard,
 } from "../Setores/setorServices.js";
+
 import { getStoredUser } from "../../../utils/authStorage";
 
 import "./TelaPrincipal.css";
 
 export default function TelaPrincipal() {
   const usuario = obterUsuarioLogado();
-  const nomeUsuario = usuario?.name || "Usuário Hospital";
+
+  const [nomeHospital, setNomeHospital] = useState("Hospital");
   const [setores, setSetores] = useState([]);
   const [medicos, setMedicos] = useState([]);
   const [escalistas, setEscalistas] = useState([]);
@@ -37,20 +41,37 @@ export default function TelaPrincipal() {
       setLoading(true);
       setErro("");
 
-      const [setoresData, medicosData, escalistasData] = await Promise.all([
-        getSetores(),
-        getDoctors(),
-        getEscalistas(),
-      ]);
+      const [setoresData, medicosData, escalistasData, dashboardData] =
+        await Promise.all([
+          getSetores(),
+          getDoctors(),
+          getEscalistas(),
+          getMeuDashboard(),
+        ]);
+
+      console.log("DADOS DASHBOARD:", dashboardData);
+
+      // PEGA O NOME DO HOSPITAL
+      setNomeHospital(
+        dashboardData?.hospital?.nomeFantasia ||
+          dashboardData?.nomeFantasia ||
+          dashboardData?.hospitalNome ||
+          dashboardData?.nome ||
+          dashboardData?.name ||
+          usuario?.hospitalNome ||
+          "Hospital",
+      );
 
       setSetores(Array.isArray(setoresData) ? setoresData : []);
       setMedicos(Array.isArray(medicosData) ? medicosData : []);
       setEscalistas(Array.isArray(escalistasData) ? escalistasData : []);
     } catch (error) {
       console.error(error);
+
       setSetores([]);
       setMedicos([]);
       setEscalistas([]);
+
       setErro("Não foi possível carregar os dados do painel.");
     } finally {
       setLoading(false);
@@ -63,12 +84,16 @@ export default function TelaPrincipal() {
     );
 
     const medicosAtivos = medicos.filter((medico) => medico.ativo !== false);
+
     const setoresAtivos = setores.filter((setor) => setor.ativo !== false);
 
     return {
       colaboradores: escalistasAtivos.length + medicosAtivos.length,
+
       escalistas: escalistasAtivos.length,
+
       setores: setoresAtivos.length,
+
       escalistasAtivos,
     };
   }, [escalistas, medicos, setores]);
@@ -82,16 +107,19 @@ export default function TelaPrincipal() {
         <header className="topo-hospital">
           <div>
             <h1>Painel Hospitalar</h1>
-            <p>Bem-vindo de volta, {nomeUsuario}.</p>
+
+            <p>Bem-vindo de volta, {loading ? "..." : nomeHospital}.</p>
           </div>
 
           <div className="topo-direita">
             <Bell className="icone-topo" />
 
-            {/* ROSQUINHA DO USUÁRIO */}
             <div className="usuario-topo">
               <CircleUserRound className="perfilHospital" />
-              <span className="perfilHospital">{nomeUsuario}</span>
+
+              <span className="perfilHospital">
+                {loading ? "..." : nomeHospital}
+              </span>
             </div>
           </div>
         </header>
@@ -104,7 +132,9 @@ export default function TelaPrincipal() {
             <div className="icone-card azul">
               <Users size={22} />
             </div>
+
             <span>Colaboradores</span>
+
             <strong>{loading ? "..." : dadosDashboard.colaboradores}</strong>
           </article>
 
@@ -112,7 +142,9 @@ export default function TelaPrincipal() {
             <div className="icone-card verde">
               <CalendarCheck size={22} />
             </div>
+
             <span>Escalistas Disponíveis</span>
+
             <strong>{loading ? "..." : dadosDashboard.escalistas}</strong>
           </article>
 
@@ -120,7 +152,9 @@ export default function TelaPrincipal() {
             <div className="icone-card escuro">
               <Building2 size={22} />
             </div>
+
             <span>Setores Ativos</span>
+
             <strong>{loading ? "..." : dadosDashboard.setores}</strong>
           </article>
         </section>
@@ -145,6 +179,7 @@ export default function TelaPrincipal() {
 
                   <div className="info-profissional">
                     <h3>{profissional.name}</h3>
+
                     <p>{profissional.setorNome || "Sem setor vinculado"}</p>
                   </div>
 

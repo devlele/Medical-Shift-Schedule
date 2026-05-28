@@ -3,436 +3,381 @@ import "./CriarPlantao.css";
 import Sidebar from "../../Sidebar/Sidebar";
 
 import {
-    Bell,
-    CalendarDays,
-    Clock3,
-    Building2,
-    CircleUserRound,
-    UserRound,
-    RotateCcw,
-    Upload,
-    AlertCircle,
-    CheckCircle,
+  Bell,
+  CalendarDays,
+  Clock3,
+  Building2,
+  CircleUserRound,
+  UserRound,
+  RotateCcw,
+  Upload,
+  AlertCircle,
+  CheckCircle,
 } from "lucide-react";
 
 import {
-    criarPlantaoAvulso,
-    criarPlantaoFixo,
-    getDoctors,
-    getMeusSetoresEscalista,
+  criarPlantaoAvulso,
+  criarPlantaoFixo,
+  getDoctors,
+  getMeusSetoresEscalista,
 } from "../../UserHospital/Setores/setorServices.js";
+
 import { getStoredUser } from "../../../utils/authStorage";
 
 const initialFormData = {
-    dataPlantao: "",
-    horaInicio: "07:00",
-    horaFim: "19:00",
-    setorId: "",
-    medicoId: "",
-    frequencia: "unico",
+  dataPlantao: "",
+  horaInicio: "07:00",
+  horaFim: "19:00",
+  setorId: "",
+  medicoIds: [],
+  openMedico: false,
+  frequencia: "unico",
 };
 
 export default function CriarPlantao() {
-    const usuario = obterUsuarioLogado();
-    const nomeUsuario = usuario?.name || "Escalista";
-    const [formData, setFormData] = useState(initialFormData);
-    const [setores, setSetores] = useState([]);
-    const [medicos, setMedicos] = useState([]);
-    const [loadingDados, setLoadingDados] = useState(true);
-    const [submitting, setSubmitting] = useState(false);
-    const [erro, setErro] = useState("");
-    const [sucesso, setSucesso] = useState("");
+  const usuario = obterUsuarioLogado();
+  const nomeUsuario = usuario?.name || "Escalista";
 
-    useEffect(() => {
-        carregarDados();
-    }, []);
+  const [formData, setFormData] = useState(initialFormData);
+  const [setores, setSetores] = useState([]);
+  const [medicos, setMedicos] = useState([]);
+  const [loadingDados, setLoadingDados] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [erro, setErro] = useState("");
+  const [sucesso, setSucesso] = useState("");
 
-    const medicosDisponiveis = useMemo(() => {
-        return medicos;
-    }, [medicos]);
+  useEffect(() => {
+    carregarDados();
+  }, []);
 
-    async function carregarDados() {
-        try {
-            setLoadingDados(true);
-            setErro("");
+  const medicosDisponiveis = useMemo(() => medicos, [medicos]);
 
-            const [setoresData, medicosData] = await Promise.all([
-                getMeusSetoresEscalista(),
-                getDoctors(),
-            ]);
+  async function carregarDados() {
+    try {
+      setLoadingDados(true);
+      setErro("");
 
-            const setoresNormalizados = Array.isArray(setoresData)
-                ? setoresData
-                    .filter((vinculo) => vinculo.ativo !== false)
-                    .map((vinculo) => ({
-                        id: vinculo.setorId,
-                        nome: vinculo.setorNome,
-                    }))
-                    .filter((setor) => setor.id)
-                : [];
+      const [setoresData, medicosData] = await Promise.all([
+        getMeusSetoresEscalista(),
+        getDoctors(),
+      ]);
 
-            const medicosNormalizados = Array.isArray(medicosData)
-                ? medicosData.filter((medico) => medico.ativo !== false)
-                : [];
+      const setoresNormalizados = Array.isArray(setoresData)
+        ? setoresData
+            .filter((v) => v.ativo !== false)
+            .map((v) => ({
+              id: v.setorId,
+              nome: v.setorNome,
+            }))
+        : [];
 
-            setSetores(setoresNormalizados);
-            setMedicos(medicosNormalizados);
+      const medicosNormalizados = Array.isArray(medicosData)
+        ? medicosData.filter((m) => m.ativo !== false)
+        : [];
 
-            setFormData((prev) => ({
-                ...prev,
-                setorId: prev.setorId || String(setoresNormalizados[0]?.id || ""),
-            }));
-        } catch (error) {
-            console.error(error);
-            setErro(error.message || "Não foi possível carregar os dados do escalista.");
-        } finally {
-            setLoadingDados(false);
-        }
+      setSetores(setoresNormalizados);
+      setMedicos(medicosNormalizados);
+
+      setFormData((prev) => ({
+        ...prev,
+        setorId: String(setoresNormalizados[0]?.id || ""),
+      }));
+    } catch (error) {
+      setErro(error.message || "Erro ao carregar dados");
+    } finally {
+      setLoadingDados(false);
     }
+  }
 
-    function handleChange(e) {
-        const { name, value } = e.target;
+  function handleChange(e) {
+    const { name, value } = e.target;
 
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-        setErro("");
-        setSucesso("");
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
 
-    function handleFrequencia(tipo) {
-        setFormData((prev) => ({
-            ...prev,
-            frequencia: tipo,
-        }));
-        setErro("");
-        setSucesso("");
-    }
+    setErro("");
+    setSucesso("");
+  }
 
-    function handleClear({ preserveFeedback = false } = {}) {
-        setFormData({
-            ...initialFormData,
-            setorId: String(setores[0]?.id || ""),
+  function toggleMedico(id) {
+    setFormData((prev) => {
+      const exists = prev.medicoIds.includes(id);
+
+      return {
+        ...prev,
+        medicoIds: exists
+          ? prev.medicoIds.filter((m) => m !== id)
+          : [...prev.medicoIds, id],
+      };
+    });
+  }
+
+  function handleFrequencia(tipo) {
+    setFormData((prev) => ({
+      ...prev,
+      frequencia: tipo,
+    }));
+  }
+
+  function handleClear() {
+    setFormData({
+      ...initialFormData,
+      setorId: String(setores[0]?.id || ""),
+    });
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    if (!formData.dataPlantao) return setErro("Data do plantão é obrigatória");
+    if (!formData.horaInicio || !formData.horaFim)
+      return setErro("Horário obrigatório");
+    if (!formData.setorId) return setErro("Setor obrigatório");
+    if (!formData.medicoIds.length)
+      return setErro("Selecione pelo menos um médico");
+
+    try {
+      setSubmitting(true);
+
+      if (formData.frequencia === "unico") {
+        await criarPlantaoAvulso({
+          setorId: Number(formData.setorId),
+          medicoIds: formData.medicoIds.map(Number),
+          data: formData.dataPlantao,
+          horaInicio: formData.horaInicio,
+          horaFim: formData.horaFim,
         });
-        setErro("");
-        if (!preserveFeedback) {
-            setSucesso("");
-        }
+      } else {
+        await criarPlantaoFixo({
+          setorId: Number(formData.setorId),
+          medicoIds: formData.medicoIds.map(Number),
+          frequencia: formData.frequencia,
+          dataInicioVigencia: formData.dataPlantao,
+        });
+      }
+
+      setSucesso("Plantão criado com sucesso!");
+      handleClear();
+    } catch (error) {
+      setErro(error.message || "Erro ao criar plantão");
+    } finally {
+      setSubmitting(false);
     }
+  }
 
-    async function handleSubmit(e) {
-        e.preventDefault();
-        setErro("");
-        setSucesso("");
+  return (
+    <div className="layout-escalista">
+      <Sidebar />
 
-        const erroValidacao = validarFormulario(formData);
-        if (erroValidacao) {
-            setErro(erroValidacao);
-            return;
-        }
+      <main className="criar-plantao-container">
+        <header className="topo-escalista">
+          <div>
+            <h1>Criar Plantão</h1>
+            <p>Crie um plantão e associe médicos ao setor</p>
+          </div>
 
-        try {
-            setSubmitting(true);
+          <div className="topo-direita">
+            <Bell />
+            <div className="usuario-topo">
+              <CircleUserRound size={18} />
+              <span>{nomeUsuario}</span>
+            </div>
+          </div>
+        </header>
 
-            if (formData.frequencia === "unico") {
-                await criarPlantaoAvulso(montarPayloadAvulso(formData));
-                setSucesso("Plantão criado com sucesso.");
-            } else {
-                await criarPlantaoFixo(montarPayloadFixo(formData));
-                setSucesso("Plantão criado com sucesso.");
-            }
+        <form className="plantao-card" onSubmit={handleSubmit}>
+          {erro && (
+            <div className="alerta-plantao erro">
+              <AlertCircle size={18} />
+              <span>{erro}</span>
+            </div>
+          )}
 
-            handleClear({ preserveFeedback: true });
-        } catch (error) {
-            console.error(error);
-            setErro(error.message || "Não foi possível criar o plantão.");
-        } finally {
-            setSubmitting(false);
-        }
-    }
+          {sucesso && (
+            <div className="alerta-plantao sucesso">
+              <CheckCircle size={18} />
+              <span>{sucesso}</span>
+            </div>
+          )}
 
-    return (
-        <div className="layout-escalista">
-            <Sidebar />
+          {/* DATA + HORAS */}
+          <div className="linha-tripla">
+            <div className="campo">
+              <label>Data do Plantão</label>
+              <div className="input-box">
+                <CalendarDays size={18} />
+                <input
+                  type="date"
+                  name="dataPlantao"
+                  value={formData.dataPlantao}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
 
-            <main className="criar-plantao-container">
-                <header className="topo-escalista">
-                    <div>
-                        <h1>Criar Plantão</h1>
-                        <p>Crie um plantão e associe a um médico do setor</p>
-                    </div>
+            <div className="campo">
+              <label>Hora Início</label>
+              <div className="input-box">
+                <Clock3 size={18} />
+                <input
+                  type="time"
+                  name="horaInicio"
+                  value={formData.horaInicio}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
 
-                    <div className="topo-direita">
-                        <Bell className="icone-topo" />
+            <div className="campo">
+              <label>Hora Fim</label>
+              <div className="input-box">
+                <Clock3 size={18} />
+                <input
+                  type="time"
+                  name="horaFim"
+                  value={formData.horaFim}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          </div>
 
-                        <div className="usuario-topo">
-                            <CircleUserRound size={18} className="perfilEscalista" />
-                            <span className="perfilEscalista">{nomeUsuario}</span>
-                        </div>
-                    </div>
-                </header>
+          {/* SETOR */}
+          <div className="campo">
+            <label>Setor</label>
+            <div className="input-box">
+              <Building2 size={18} />
+              <input
+                type="text"
+                value={
+                  loadingDados
+                    ? "Carregando setor..."
+                    : setores.find((s) => s.id == formData.setorId)?.nome || ""
+                }
+                readOnly
+                disabled
+              />
+            </div>
+          </div>
 
-                <form className="plantao-card" onSubmit={handleSubmit}>
-                    {erro && (
-                        <div className="alerta-plantao erro">
-                            <AlertCircle size={18} />
-                            <span>{erro}</span>
-                        </div>
-                    )}
+          {/* MÉDICOS DROPDOWN MULTISELECT */}
+          <div className="campo">
+            <label>Médicos responsáveis</label>
 
-                    {sucesso && (
-                        <div className="alerta-plantao sucesso">
-                            <CheckCircle size={18} />
-                            <span>{sucesso}</span>
-                        </div>
-                    )}
+            <div
+              className="input-box"
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  openMedico: !prev.openMedico,
+                }))
+              }
+              style={{ cursor: "pointer" }}
+            >
+              <UserRound size={18} />
+              <span>
+                {formData.medicoIds.length > 0
+                  ? `${formData.medicoIds.length} selecionado(s)`
+                  : loadingDados
+                    ? "Carregando médicos..."
+                    : "Selecione médicos"}
+              </span>
+            </div>
 
-                    <div className="linha-tripla">
-                        <div className="campo">
-                            <label>Data do Plantão</label>
+            {formData.openMedico && (
+              <div className="dropdown-medicos">
+                {medicosDisponiveis.map((m) => {
+                  const selected = formData.medicoIds.includes(String(m.id));
 
-                            <div className="input-box">
-                                <CalendarDays size={18} />
+                  return (
+                    <label key={m.id} className="dropdown-item">
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => toggleMedico(String(m.id))}
+                      />
+                      {m.name}
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
-                                <input
-                                    type="date"
-                                    name="dataPlantao"
-                                    value={formData.dataPlantao}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
+          {/* FREQUÊNCIA */}
+          <div className="campo">
+            <label>Frequência</label>
 
-                        <div className="campo">
-                            <label>Hora Início</label>
+            <div className="frequencia-buttons">
+              <button
+                type="button"
+                className={`freq-btn ${
+                  formData.frequencia === "unico" ? "active" : ""
+                }`}
+                onClick={() => handleFrequencia("unico")}
+              >
+                Plantão Único
+              </button>
 
-                            <div className="input-box">
-                                <Clock3 size={18} />
+              <button
+                type="button"
+                className={`freq-btn ${
+                  formData.frequencia === "semanal" ? "active" : ""
+                }`}
+                onClick={() => handleFrequencia("semanal")}
+              >
+                Toda semana
+              </button>
 
-                                <input
-                                    type="time"
-                                    name="horaInicio"
-                                    value={formData.horaInicio}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
+              <button
+                type="button"
+                className={`freq-btn ${
+                  formData.frequencia === "mensal" ? "active" : ""
+                }`}
+                onClick={() => handleFrequencia("mensal")}
+              >
+                Todo Mês
+              </button>
 
-                        <div className="campo">
-                            <label>Hora Fim</label>
+              {/* INTEGRAR */}
+              <button
+                type="button"
+                className={`freq-btn ${
+                  formData.frequencia === "semanal" ? "active" : ""
+                }`}
+                onClick={() => handleFrequencia("semanal")}
+              >
+                Toda dia
+              </button>
+            </div>
+          </div>
 
-                            <div className="input-box">
-                                <Clock3 size={18} />
+          <div className="divider" />
 
-                                <input
-                                    type="time"
-                                    name="horaFim"
-                                    value={formData.horaFim}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
-                    </div>
+          {/* FOOTER */}
+          <div className="footer-form">
+            <button type="button" className="limpar-btn" onClick={handleClear}>
+              <RotateCcw size={18} />
+              Limpar Campos
+            </button>
 
-                    <div className="campo">
-                        <label>Setor</label>
-
-                        <div className="input-box">
-                            <Building2 size={18} />
-
-                            {/* ALTERAÇÃO SETOR FIXO */}
-                            <input
-                                type="hidden"
-                                name="setorId"
-                                value={formData.setorId}
-                            /> 
-
-                            <input
-                                type="text"
-                                value={loadingDados ? "Carregando setor..." : setores.find(s => s.id == formData.setorId)?.nome || ""}
-                                readOnly
-                                disabled
-                            />
-
-                        </div>
-                    </div>
-
-                    <div className="campo">
-                        <label>Médico responsável</label>
-
-                        <div className="input-box">
-                            <UserRound size={18} />
-
-                            <select
-                                name="medicoId"
-                                value={formData.medicoId}
-                                onChange={handleChange}
-                                disabled={loadingDados || medicosDisponiveis.length === 0}
-                            >
-                                <option value="">
-                                    {loadingDados ? "Carregando médicos..." : "Selecione um médico vinculado"}
-                                </option>
-
-                                {medicosDisponiveis.map((medico) => (
-                                    <option key={medico.id} value={medico.id}>
-                                        {medico.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="campo">
-                        <label>Frequência</label>
-
-                        <div className="frequencia-buttons">
-                            <button
-                                type="button"
-                                className={`freq-btn ${formData.frequencia === "unico" ? "active" : ""}`}
-                                onClick={() => handleFrequencia("unico")}
-                            >
-                                Plantão Único
-                            </button>
-
-                            <button
-                                type="button"
-                                className={`freq-btn ${formData.frequencia === "semanal" ? "active" : ""}`}
-                                onClick={() => handleFrequencia("semanal")}
-                            >
-                                Toda semana
-                            </button>
-
-                            <button
-                                type="button"
-                                className={`freq-btn ${formData.frequencia === "mensal" ? "active" : ""}`}
-                                onClick={() => handleFrequencia("mensal")}
-                            >
-                                Todo Mês
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="divider" />
-
-                    <div className="footer-form">
-                        <button
-                            type="button"
-                            className="limpar-btn"
-                            onClick={handleClear}
-                        >
-                            <RotateCcw size={18} />
-                            Limpar Campos
-                        </button>
-
-                        <button
-                            type="submit"
-                            className="criar-btn"
-                            disabled={submitting || loadingDados}
-                        >
-                            <Upload size={18} />
-                            {submitting ? "Criando..." : "Criar Plantão"}
-                        </button>
-                    </div>
-                </form>
-            </main>
-        </div>
-    );
+            <button
+              type="submit"
+              className="criar-btn"
+              disabled={submitting || loadingDados}
+            >
+              <Upload size={18} />
+              {submitting ? "Criando..." : "Criar Plantão"}
+            </button>
+          </div>
+        </form>
+      </main>
+    </div>
+  );
 }
 
 function obterUsuarioLogado() {
-    return getStoredUser();
-}
-
-function validarFormulario(dados) {
-    if (!dados.dataPlantao) {
-        return "Data do plantão é obrigatória.";
-    }
-
-    if (!dados.horaInicio || !dados.horaFim) {
-        return "Hora início e hora fim são obrigatórias.";
-    }
-
-    if (dados.horaInicio === dados.horaFim) {
-        return "Hora início e hora fim não podem ser iguais.";
-    }
-
-    if (!dados.setorId) {
-        return "Setor é obrigatório.";
-    }
-
-    if (!dados.medicoId) {
-        return "Médico responsável é obrigatório.";
-    }
-
-    return "";
-}
-
-function montarPayloadAvulso(dados) {
-    const turno = resolverTurno(dados.horaInicio, dados.horaFim);
-
-    return {
-        setorId: Number(dados.setorId),
-        medicoId: Number(dados.medicoId),
-        data: dados.dataPlantao,
-        turno,
-        dataInicio: turno === "PERSONALIZADO"
-            ? montarDataHora(dados.dataPlantao, dados.horaInicio)
-            : null,
-        dataFim: turno === "PERSONALIZADO"
-            ? montarDataHora(dados.dataPlantao, dados.horaFim, dados.horaFim <= dados.horaInicio)
-            : null,
-    };
-}
-
-function montarPayloadFixo(dados) {
-    const turno = resolverTurno(dados.horaInicio, dados.horaFim);
-
-    return {
-        setorId: Number(dados.setorId),
-        medicoId: Number(dados.medicoId),
-        tipoRecorrencia: dados.frequencia === "semanal"
-            ? "SEMANAL"
-            : "MENSAL_DIA_FIXO",
-        diaSemana: dados.frequencia === "semanal"
-            ? diaSemanaBackend(dados.dataPlantao)
-            : null,
-        diaDoMes: dados.frequencia === "mensal"
-            ? Number(dados.dataPlantao.split("-")[2])
-            : null,
-        turno,
-        horaInicio: turno === "PERSONALIZADO" ? dados.horaInicio : null,
-        horaFim: turno === "PERSONALIZADO" ? dados.horaFim : null,
-        dataInicioVigencia: dados.dataPlantao,
-        dataFimVigencia: null,
-    };
-}
-
-function resolverTurno(horaInicio, horaFim) {
-    if (horaInicio === "07:00" && horaFim === "19:00") {
-        return "DIURNO";
-    }
-
-    if (horaInicio === "19:00" && horaFim === "07:00") {
-        return "NOTURNO";
-    }
-
-    return "PERSONALIZADO";
-}
-
-function montarDataHora(data, hora, proximoDia = false) {
-    const [ano, mes, dia] = data.split("-").map(Number);
-    const [horaValor, minutoValor] = hora.split(":").map(Number);
-    const dataHora = new Date(ano, mes - 1, dia + (proximoDia ? 1 : 0), horaValor, minutoValor);
-
-    return `${dataHora.getFullYear()}-${pad(dataHora.getMonth() + 1)}-${pad(dataHora.getDate())}T${pad(dataHora.getHours())}:${pad(dataHora.getMinutes())}:00`;
-}
-
-function diaSemanaBackend(data) {
-    const jsDay = new Date(`${data}T00:00:00`).getDay();
-    return String(jsDay === 0 ? 7 : jsDay);
-}
-
-function pad(value) {
-    return String(value).padStart(2, "0");
+  return getStoredUser();
 }

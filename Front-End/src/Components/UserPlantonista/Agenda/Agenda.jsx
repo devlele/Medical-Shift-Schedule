@@ -16,7 +16,6 @@ import {
 } from "../../../services/doctorServices";
 import {
   formatDateLong,
-  formatPlantaoTime,
   getPlantaoType,
   getUsuarioLogado,
   normalizePedidoCobertura,
@@ -47,11 +46,13 @@ export default function Agenda() {
         setLoading(true);
         setErro("");
 
-        const [agendaData, coberturasData, meusPedidosData] = await Promise.all([
-          getMinhaAgendaMedico(),
-          getCoberturasDisponiveis(),
-          getMeusPedidosCobertura(),
-        ]);
+        const [agendaData, coberturasData, meusPedidosData] = await Promise.all(
+          [
+            getMinhaAgendaMedico(),
+            getCoberturasDisponiveis(),
+            getMeusPedidosCobertura(),
+          ],
+        );
 
         if (!ativo) {
           return;
@@ -204,7 +205,7 @@ export default function Agenda() {
             ? `Oferta: ${shift.setor}`
             : shift.kind === "pedido-proprio"
               ? `Meu pedido: ${shift.setor}`
-            : shift.setor,
+              : shift.setor,
         start: shift.date,
         allDay: true,
         extendedProps: {
@@ -228,9 +229,9 @@ export default function Agenda() {
             ? "event-coverage"
             : shift.kind === "pedido-proprio"
               ? "event-own-coverage"
-            : getPlantaoType(shift).includes("noite")
-              ? "event-night"
-              : "event-day",
+              : getPlantaoType(shift).includes("noite")
+                ? "event-night"
+                : "event-day",
       }));
   }, [selectedHospitals, shifts]);
 
@@ -365,11 +366,6 @@ export default function Agenda() {
                 </label>
               ))}
             </div>
-
-            <div className="sync-info">
-              Sua agenda é sincronizada automaticamente com o RH das unidades
-              selecionadas.
-            </div>
           </aside>
 
           {/* CONTEÚDO */}
@@ -378,12 +374,16 @@ export default function Agenda() {
             {view === "week" && (
               <>
                 <div className="week-toolbar">
-                  <button type="button" onClick={() => handleWeekNavigation(-1)}>
+                  <button
+                    type="button"
+                    onClick={() => handleWeekNavigation(-1)}
+                  >
                     Anterior
                   </button>
 
                   <strong>
-                    {formatDateLong(weekStartStr)} - {formatDateLong(weekEndStr)}
+                    {formatDateLong(weekStartStr)} -{" "}
+                    {formatDateLong(weekEndStr)}
                   </strong>
 
                   <button type="button" onClick={() => handleWeekNavigation(1)}>
@@ -445,7 +445,7 @@ export default function Agenda() {
                               ? "cobertura"
                               : shift.kind === "pedido-proprio"
                                 ? "pedido-proprio"
-                              : shift.type
+                                : shift.type
                           }`}
                         >
                           {getPlantaoType(shift).includes("noite") ? (
@@ -459,9 +459,9 @@ export default function Agenda() {
                               ? "OFERTA"
                               : shift.kind === "pedido-proprio"
                                 ? "PEDIDO"
-                              : getPlantaoType(shift).includes("noite")
-                                ? "NOITE"
-                                : "DIA"}
+                                : getPlantaoType(shift).includes("noite")
+                                  ? "NOITE"
+                                  : "DIA"}
                           </span>
                         </div>
 
@@ -471,16 +471,14 @@ export default function Agenda() {
                           <h3>{shift.hospital}</h3>
 
                           <div className="shift-details">
-                            <span>
-                              {formatDateLong(shift.date)}
-                            </span>
+                            <span>{formatDateLong(shift.date)}</span>
 
                             <span className="recurrence-badge">
                               {shift.kind === "cobertura"
                                 ? "Cobertura"
                                 : shift.kind === "pedido-proprio"
                                   ? "Meu pedido"
-                                : shift.recorrencia}
+                                  : shift.recorrencia}
                             </span>
 
                             <span>
@@ -496,7 +494,9 @@ export default function Agenda() {
                               <span>Ofertado por: {shift.doctor}</span>
                             )}
                             {shift.kind === "pedido-proprio" && (
-                              <span>Status: {shift.pedidoStatus || "ABERTO"}</span>
+                              <span>
+                                Status: {shift.pedidoStatus || "ABERTO"}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -506,7 +506,10 @@ export default function Agenda() {
                           onClick={() => {
                             if (shift.kind === "cobertura") {
                               navigate("/UserPlantonista/DetalhesOferta", {
-                                state: { pedido: shift.raw, modo: "disponivel" },
+                                state: {
+                                  pedido: shift.raw,
+                                  modo: "disponivel",
+                                },
                               });
                               return;
                             }

@@ -129,7 +129,6 @@ export default function TelaPrincipal() {
   }, [plantoes, coberturas, meusPedidosCobertura]);
 
   const plantoesNoMes = dashboard?.plantoesNoMes ?? plantoes.length;
-  const alertasConflito = dashboard?.alertasConflito ?? 0;
 
   function getDateParts(dateValue) {
     const date = new Date(`${dateValue}T00:00:00`);
@@ -173,15 +172,6 @@ export default function TelaPrincipal() {
 
         {/* CARDS */}
         <section className="cards">
-          <NavLink
-            to="/UserPlantonista/ResolucaoConflito"
-            className="card alerta"
-          >
-            <span className="badge">CRITICO</span>
-            <p>ALERTAS DE CONFLITO</p>
-            <h2>{alertasConflito}</h2>
-          </NavLink>
-
           <div className="card">
             <p>PLANTOES NO MES</p>
             <h2>{plantoesNoMes}</h2>
