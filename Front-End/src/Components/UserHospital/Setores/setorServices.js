@@ -146,3 +146,13 @@ export const editarSetor = async (id, data) => {
         body: JSON.stringify(data),
     });
 };
+
+export const excluirEscalista = async (id) => {
+    return request(`/manager/${id}`, {
+        method: "DELETE",
+    });
+};
+
+export const getEscalistaById = async (id) => {
+    return request(`/manager/${id}`);
+};

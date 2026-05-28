@@ -23,6 +23,7 @@ import CriarPlantao from "./Components/UserEscalista/CriarPlantao/CriarPlantao.j
 import MedicosSetor from "./Components/UserEscalista/MedicosSetor/MedicosSetor.jsx";
 import Colaboradores from "./Components/UserHospital/Colaboradores/Colaboradores.jsx";
 import PerfilHospital from "./Components/UserHospital/Perfil/Perfil.jsx";
+import EscalistaInfo from "./Components/UserHospital/EscalistaInfo/EscalistaInfo.jsx";
 import PerfilEscalista from "./Components/UserEscalista/Perfil/Perfil.jsx"
 import Delegacao from "./Components/UserEscalista/Delegacao/Delegacao.jsx";
 import DetalhePlantonista from "./Components/UserEscalista/DetalhePlantonista/DetalhePlantonista.jsx"
@@ -141,6 +142,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["hospital"]}>
               <PerfilHospital />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserHospital/EscalistaInfo/:id"
+          element={
+            <ProtectedRoute allowedRoles={["hospital"]}>
+              <EscalistaInfo />
             </ProtectedRoute>
           }
         />

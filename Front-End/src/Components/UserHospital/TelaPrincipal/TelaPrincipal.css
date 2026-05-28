@@ -106,15 +106,22 @@
    ESCALISTAS
 ========================= */
 
+.secao-profissionais {
+  background: var(--app-surface);
+  border-radius: var(--border-radius-2xl);
+  padding: 24px;
+}
+
 .secao-profissionais h2 {
-  font-size: 2rem;
+  font-size: 1.6rem;
   color: var(--app-heading);
 }
 
 .cabecalho-secao {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 26px;
+  align-items: center;
+  margin-bottom: 18px;
 }
 
 .cabecalho-secao button {
@@ -127,27 +134,28 @@
 
 .grid-profissionais {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 26px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
 }
 
 .card-profissional {
-  background: var(--medical-card);
-  border-radius: var(--border-radius-2xl);
-  padding: 24px;
+  background: var(--app-bg);
+  border-radius: var(--border-radius-xl);
+  padding: 14px 16px;
 
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+  gap: 12px;
 }
 
 .avatar-escalista {
-  width: 84px;
-  height: 84px;
-  border-radius: var(--border-radius-xl);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--border-radius-lg);
   background: var(--app-surface);
   border: 2px solid var(--app-panel);
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
@@ -157,15 +165,26 @@
 }
 
 /* INFO */
+.info-profissional {
+  flex: 1;
+  min-width: 0;
+}
+
 .info-profissional h3 {
-  font-size: 1.4rem;
+  font-size: 1rem;
   color: var(--app-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .info-profissional p {
-  margin-top: 4px;
+  margin-top: 2px;
   color: var(--app-muted);
-  font-size: 0.95rem;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .estado-dashboard,
@@ -183,13 +202,30 @@
   color: #b42318;
 }
 
-.botao-seta {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
+.escalista-info-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--app-muted);
+}
+
+.escalista-excluir-btn {
   border: none;
-  background: #fff;
+  min-height: 44px;
+  padding: 14px;
+  border-radius: 14px;
+  background: #cfe6da;
+  color: #b42318;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.escalista-excluir-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 @media (max-width: 1024px) {
@@ -222,10 +258,6 @@
     gap: 16px;
     margin-bottom: 24px;
   }
-
-  .grid-profissionais {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 600px) {
@@ -235,5 +267,9 @@
 
   .card-dashboard strong {
     font-size: 1.8rem;
+  }
+
+  .grid-profissionais {
+    grid-template-columns: 1fr;
   }
 }

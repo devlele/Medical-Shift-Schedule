@@ -1,0 +1,151 @@
+.ei-pagina {
+    min-height: 100vh;
+    display: flex;
+    background: var(--app-bg);
+    padding-left: var(--sidebar-width);
+}
+
+.ei-conteudo {
+    flex: 1;
+    padding: 30px;
+}
+
+/* TOPO */
+.ei-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 25px;
+}
+
+.ei-topo h1 {
+    font-size: 42px;
+    color: var(--medical-text);
+    font-weight: 700;
+}
+
+.ei-topo p {
+    color: var(--medical-muted);
+    margin-top: 5px;
+}
+
+/* CARD AVATAR */
+.ei-card-perfil {
+    background: var(--app-panel);
+    border-radius: var(--border-radius-2xl);
+    padding: 30px 40px;
+    display: flex;
+    align-items: center;
+    gap: 35px;
+    margin-bottom: 30px;
+}
+
+.ei-lado-foto {
+    position: relative;
+}
+
+.ei-foto-perfil {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    color: var(--medical-dark);
+}
+
+.ei-dados-perfil h2 {
+    font-size: 30px;
+    color: var(--medical-text);
+}
+
+.ei-dados-perfil p {
+    margin-top: 8px;
+    font-size: 20px;
+    color: var(--medical-dark);
+}
+
+/* ÁREA INFERIOR */
+.ei-area-baixo {
+    display: flex;
+    gap: 25px;
+    justify-content: center;
+}
+
+.ei-card-info {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 30px;
+    flex: 1;
+    max-width: 920px;
+    width: 100%;
+}
+
+.ei-card-info h3 {
+    font-size: 22px;
+    color: var(--medical-text);
+    margin-bottom: 25px;
+}
+
+.ei-grupo-campo {
+    margin-bottom: 20px;
+}
+
+.ei-grupo-campo label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--medical-muted);
+    margin-bottom: 8px;
+}
+
+.ei-campo-fixo {
+    background: var(--app-input);
+    padding: 14px;
+    border-radius: var(--border-radius-sm);
+}
+
+.ei-linha-dupla {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* RESPONSIVO */
+@media (max-width: 1024px) {
+    .ei-pagina {
+        padding-left: 0;
+    }
+
+    .ei-conteudo {
+        padding-top: 90px;
+    }
+}
+
+@media (max-width: 850px) {
+    .ei-pagina {
+        flex-direction: column;
+    }
+
+    .ei-topo,
+    .ei-card-perfil {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .ei-linha-dupla {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .ei-card-perfil {
+        padding: 20px;
+    }
+
+    .ei-foto-perfil {
+        width: 130px;
+        height: 130px;
+    }
+
+    .ei-topo h1 {
+        font-size: 28px;
+    }
+}

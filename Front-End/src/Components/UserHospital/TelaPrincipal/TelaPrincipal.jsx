@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
+import { NavLink } from "react-router-dom";
 import {
   Bell,
-  ArrowRight,
   Users,
   CalendarCheck,
   Building2,
   CircleUserRound,
   User,
+  Info,
+  Trash2,
 } from "lucide-react";
 
 import Sidebar from "../../Sidebar/Sidebar";
@@ -16,6 +18,7 @@ import {
   getEscalistas,
   getSetores,
   getMeuDashboard,
+  excluirEscalista as excluirEscalistaService,
 } from "../Setores/setorServices.js";
 
 import { getStoredUser } from "../../../utils/authStorage";
@@ -31,6 +34,7 @@ export default function TelaPrincipal() {
   const [escalistas, setEscalistas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
+  const [excluindoId, setExcluindoId] = useState("");
 
   useEffect(() => {
     carregarDashboard();
@@ -75,6 +79,21 @@ export default function TelaPrincipal() {
       setErro("Não foi possível carregar os dados do painel.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleExcluirEscalista = async (id) => {
+    if (!window.confirm("Deseja realmente excluir este escalista?")) return;
+    try {
+      setExcluindoId(String(id));
+      setErro("");
+      await excluirEscalistaService(id);
+      setEscalistas((prev) => prev.filter((e) => String(e.id) !== String(id)));
+    } catch (error) {
+      console.error(error);
+      setErro(error.message || "Não foi possível excluir o escalista.");
+    } finally {
+      setExcluindoId("");
     }
   };
 
@@ -180,15 +199,26 @@ export default function TelaPrincipal() {
                   <div className="info-profissional">
                     <h3>{profissional.name}</h3>
 
-                    <p>{profissional.setorNome || "Sem setor vinculado"}</p>
+                    <p>{profissional.email || profissional.setorNome || "Sem setor vinculado"}</p>
                   </div>
+
+                  <NavLink
+                    to={`/UserHospital/EscalistaInfo/${profissional.id}`}
+                    state={{ escalista: profissional }}
+                    className="escalista-info-btn"
+                    aria-label="Ver detalhes do escalista"
+                  >
+                    <Info size={18} />
+                  </NavLink>
 
                   <button
                     type="button"
-                    className="botao-seta"
-                    aria-label="Abrir escalista"
+                    className="escalista-excluir-btn"
+                    onClick={() => handleExcluirEscalista(profissional.id)}
+                    disabled={excluindoId === String(profissional.id)}
+                    aria-label="Excluir escalista"
                   >
-                    <ArrowRight size={18} />
+                    <Trash2 size={18} />
                   </button>
                 </article>
               ))}
