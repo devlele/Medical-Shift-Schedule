@@ -146,11 +146,82 @@
 .calendar-wrapper {
     background: var(--white);
     border-radius: var(--border-radius-3xl);
-    padding: 20px;
+    padding: 20px 0 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    min-width: 0;
+}
+
+.calendar-wrapper::-webkit-scrollbar {
+    display: none;
+}
+
+.calendar-wrapper .fc-scroller {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.calendar-wrapper .fc-scroller::-webkit-scrollbar {
+    display: none;
+}
+
+.calendar-wrapper .fc-toolbar.fc-header-toolbar {
+    padding: 0 20px 12px;
 }
 
 .fc {
     font-family: inherit;
+    min-width: 560px;
+    width: 100%;
+}
+
+@media (max-width: 1024px) {
+    .professional-page {
+        padding-left: 0;
+    }
+
+    .professional-content {
+        padding-top: 90px;
+    }
+}
+
+@media (max-width: 900px) {
+    .professional-content {
+        padding: 90px 20px 32px;
+    }
+
+    .professional-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .doctor-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .doctor-card h2 {
+        font-size: 28px;
+    }
+
+    .calendar-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 600px) {
+    .professional-header h1 {
+        font-size: 26px;
+    }
+
+    .doctor-left {
+        flex-direction: column;
+    }
 }
 
 .fc-theme-standard td,

@@ -255,11 +255,17 @@
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .medicos-setor-layout {
     padding-left: 0;
   }
 
+  .medicos-setor-main {
+    padding-top: 90px;
+  }
+}
+
+@media (max-width: 900px) {
   .medicos-setor-main {
     padding: 90px 20px 32px;
   }

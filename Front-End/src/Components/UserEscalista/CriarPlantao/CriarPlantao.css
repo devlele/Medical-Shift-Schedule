@@ -257,11 +257,17 @@
 }
 
 /* RESPONSIVO */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .layout-escalista {
     padding-left: 0;
   }
 
+  .criar-plantao-container {
+    padding-top: 90px;
+  }
+}
+
+@media (max-width: 900px) {
   .criar-plantao-container {
     padding: 90px 20px 32px;
   }

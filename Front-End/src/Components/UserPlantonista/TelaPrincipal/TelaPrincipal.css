@@ -66,12 +66,20 @@
   background: var(--medical-soft);
   padding: var(--spacing-lg);
   border-radius: var(--border-radius-xl);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.calendario::-webkit-scrollbar {
+  display: none;
 }
 
 .dias {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: var(--spacing-sm);
+  min-width: 280px;
 }
 
 .dia {
@@ -145,11 +153,42 @@
 /* RESPONSIVIDADE */
 @media (max-width: 1024px) {
   .conteudo {
-    padding: 24px;
+    padding: 90px 24px 24px;
   }
 
   .grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .conteudo {
+    padding: 90px 12px 24px;
+  }
+
+  .cards {
+    gap: 12px;
+  }
+
+  .card {
+    padding: var(--spacing-md);
+    min-width: 100%;
+  }
+
+  .calendario {
+    padding: var(--spacing-sm);
+  }
+
+  .dias {
+    gap: 4px;
+  }
+
+  .dia {
+    padding: 6px 2px;
+  }
+
+  .data strong {
+    font-size: 16px;
   }
 }
 

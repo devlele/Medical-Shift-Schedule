@@ -344,9 +344,15 @@ table {
 
 /* RESPONSIVO */
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .setores-content {
     margin-left: 0;
+    padding-top: 90px;
+  }
+}
+
+@media (max-width: 900px) {
+  .setores-content {
     padding: 90px 20px 32px;
   }
 

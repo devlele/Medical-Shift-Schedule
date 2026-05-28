@@ -191,3 +191,49 @@
   background: #fff;
   cursor: pointer;
 }
+
+@media (max-width: 1024px) {
+  .layout-hospital {
+    padding-left: 0;
+  }
+
+  .conteudo-hospital {
+    padding-top: 90px;
+  }
+}
+
+@media (max-width: 900px) {
+  .conteudo-hospital {
+    padding: 90px 20px 32px;
+  }
+
+  .cards-dashboard {
+    flex-direction: column;
+  }
+
+  .card-dashboard {
+    flex: 1 1 100%;
+    min-height: 140px;
+  }
+
+  .topo-hospital {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .grid-profissionais {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .topo-hospital h1 {
+    font-size: 1.8rem;
+  }
+
+  .card-dashboard strong {
+    font-size: 1.8rem;
+  }
+}

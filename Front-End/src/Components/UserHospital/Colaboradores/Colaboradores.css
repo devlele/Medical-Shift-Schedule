@@ -154,17 +154,34 @@ tbody tr:hover {
 }
 
 /* RESPONSIVO */
+@media (max-width: 1024px) {
+  .colaboradores-content {
+    margin-left: 0;
+    padding-top: 90px;
+  }
+}
+
 @media (max-width: 900px) {
+  .colaboradores-content {
+    padding: 90px 20px 32px;
+  }
+
   .cards-colaboradores {
     grid-template-columns: 1fr;
   }
 
-  .colaboradores-content {
-    margin-left: 0;
-    padding: 90px 20px 32px;
-  }
-
   .acoes-colaboradores {
     justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .table-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .table-top input {
+    max-width: 100%;
   }
 }

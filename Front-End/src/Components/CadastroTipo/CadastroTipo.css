@@ -1,8 +1,3 @@
-:root {
-  --medical-dark: #1f7a63;
-  --medical-teal: #2bbf9c;
-  --medical-mint: #e6faf3;
-}
 
 /* PÁGINA */
 .pagina-tipo {
@@ -171,4 +166,33 @@
 
 .link-login:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .pagina-tipo {
+    padding: 20px 16px;
+    justify-content: flex-start;
+    padding-top: 40px;
+  }
+
+  .logo-tipo {
+    height: 60px;
+    margin-bottom: 20px;
+  }
+
+  .cabecalho-tipo {
+    margin-bottom: 28px;
+  }
+
+  .cartao-tipo {
+    padding: 28px 24px;
+  }
+
+  .titulo-tipo {
+    font-size: 22px;
+  }
+
+  .area-login {
+    margin-top: 28px;
+  }
 }

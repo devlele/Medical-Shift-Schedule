@@ -186,15 +186,21 @@
     }
 }
 
-@media (max-width: 850px) {
+@media (max-width: 1024px) {
     .pagina-perfil {
-        flex-direction: column;
         padding-left: 0;
     }
 
     .conteudo-perfil {
         padding-top: 90px;
     }
+}
+
+@media (max-width: 850px) {
+    .pagina-perfil {
+        flex-direction: column;
+    }
+
 
     .topo-perfil,
     .card-perfil {

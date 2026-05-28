@@ -156,9 +156,15 @@
   }
 }
 
+@media (max-width: 1024px) {
+  .detalhes-content {
+    padding-top: 90px;
+  }
+}
+
 @media (max-width: 768px) {
   .detalhes-content {
-    padding: 20px;
+    padding: 90px 20px 24px;
   }
 
   .detalhes-header {

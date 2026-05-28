@@ -186,13 +186,19 @@
 
 /* RESPONSIVO */
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     .pagina-delegacao {
         padding-left: 0;
     }
 
     .conteudo-delegacao {
-        padding: 90px 25px 32px;
+        padding-top: 90px;
+    }
+}
+
+@media (max-width: 900px) {
+    .conteudo-delegacao {
+        padding: 90px 20px 32px;
     }
 
     .topo-delegacao {
