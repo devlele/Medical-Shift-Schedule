@@ -96,6 +96,7 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
                 .filter(pedido -> pedido.getMedicoSolicitante() != null)
                 .filter(pedido -> !medico.getId().equals(pedido.getMedicoSolicitante().getId()))
                 .filter(pedido -> pedido.getPlantao() != null && PlantaoStatus.AGENDADO.equals(pedido.getPlantao().getStatus()))
+                .filter(pedido -> plantaoAindaNaoComecou(pedido.getPlantao()))
                 .toList();
     }
 
@@ -207,6 +208,9 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
         if (plantao.getDataInicio() == null || plantao.getDataFim() == null) {
             throw new IllegalArgumentException("Plantão sem período definido");
         }
+        if (!plantaoAindaNaoComecou(plantao)) {
+            throw new ConflictException("Não é possível assumir cobertura de plantão que já começou");
+        }
         if (!resolveSetorIdsAtivos(medicoCobridor).contains(plantao.getSetor().getId())) {
             throw new IllegalArgumentException("Médico cobridor não possui vínculo ativo com o setor do plantão");
         }
@@ -233,9 +237,18 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
         if (plantao.getDataInicio() == null || plantao.getDataFim() == null) {
             throw new IllegalArgumentException("Plantão sem período definido");
         }
+        if (!plantaoAindaNaoComecou(plantao)) {
+            throw new ConflictException("Não é possível ofertar cobertura de plantão que já começou");
+        }
         if (!resolveSetorIdsAtivos(medicoSolicitante).contains(plantao.getSetor().getId())) {
             throw new IllegalArgumentException("Médico solicitante não possui vínculo ativo com o setor do plantão");
         }
+    }
+
+    private boolean plantaoAindaNaoComecou(Plantao plantao) {
+        return plantao != null
+                && plantao.getDataInicio() != null
+                && plantao.getDataInicio().isAfter(LocalDateTime.now());
     }
 
     private List<Long> resolveSetorIdsAtivos(Doctor medico) {

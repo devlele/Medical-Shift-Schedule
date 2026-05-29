@@ -155,6 +155,7 @@ public class PlantaoServiceImple implements PlantaoService {
         List<PlantaoPeriodo> periodos = datas.stream()
                 .map(data -> toPeriodo(data, timeRange))
                 .toList();
+        validatePeriodosFuturos(periodos);
         List<Doctor> medicos = loadAndValidateMedicos(medicoIdsNormalizados, setor, periodos);
         Doctor medicoPrincipal = medicos.get(0);
 
@@ -328,6 +329,9 @@ public class PlantaoServiceImple implements PlantaoService {
         if (!dataInicio.isBefore(dataFim)) {
             throw new IllegalArgumentException("Start date must be before end date");
         }
+        if (!dataInicio.isAfter(LocalDateTime.now())) {
+            throw new ConflictException("Não é possível criar plantão com início no passado");
+        }
         if (escalista.getSetor() == null || escalista.getSetor().getId() == null
                 || !escalista.getSetor().getId().equals(setorId)) {
             throw new IllegalArgumentException("Escalista não é responsável pelo setor informado");
@@ -431,6 +435,16 @@ public class PlantaoServiceImple implements PlantaoService {
         long dias = ChronoUnit.DAYS.between(dataInicioVigencia, dataFimGeracao);
         if (dias > 366) {
             throw new IllegalArgumentException("A geração inicial de plantões fixos deve ter no máximo 366 dias");
+        }
+    }
+
+    private void validatePeriodosFuturos(List<PlantaoPeriodo> periodos) {
+        LocalDateTime now = LocalDateTime.now();
+        boolean hasPeriodoNoPassado = periodos.stream()
+                .anyMatch(periodo -> !periodo.dataInicio().isAfter(now));
+
+        if (hasPeriodoNoPassado) {
+            throw new ConflictException("Não é possível criar plantões com início no passado");
         }
     }
 
