@@ -5,7 +5,6 @@ import {
   Home,
   CalendarDays,
   ClipboardPlus,
-  History,
   User,
   LogOut,
   Menu,
@@ -81,11 +80,6 @@ export default function Sidebar() {
       to: "/UserPlantonista/PlantoesOfertados",
       label: "Oferta de Plantões",
       icon: ClipboardPlus,
-    },
-    {
-      to: "/UserPlantonista/Historico",
-      label: "Histórico",
-      icon: History,
     },
     {
       to: "/UserPlantonista/Perfil",

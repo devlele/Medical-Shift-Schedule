@@ -15,7 +15,6 @@ import DetalhePlantao from "./Components/UserPlantonista/Agenda/DetalhePlantao";
 import PlantoesOfertados from "./Components/UserPlantonista/Plantoes/PlantoesOfertados.jsx";
 import DetalhesOferta from "./Components/UserPlantonista/Plantoes/DetalhesOferta.jsx";
 import OferecerPlantao from "./Components/UserPlantonista/Plantoes/OferecerPlantao.jsx";
-import HistoricoPlantonista from "./Components/UserPlantonista/Historico/Historico.jsx";
 import TelaPrincipalHospital from "./Components/UserHospital/TelaPrincipal/TelaPrincipal";
 import Setores from "./Components/UserHospital/Setores/Setores.jsx";
 import CadastrarProfissional from "./Components/UserHospital/CadastrarProfissional/CadastrarProfissional.jsx";
@@ -102,14 +101,6 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["medico"]}>
               <DetalhesOferta />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/UserPlantonista/Historico"
-          element={
-            <ProtectedRoute allowedRoles={["medico"]}>
-              <HistoricoPlantonista />
             </ProtectedRoute>
           }
         />
