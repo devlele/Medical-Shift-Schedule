@@ -117,6 +117,21 @@ tbody tr:hover {
   background: #f8fafc;
 }
 
+.estado-colaboradores {
+  padding: 18px;
+  text-align: center;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.estado-colaboradores.erro {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  background: #fee2e2;
+  color: #991b1b;
+  text-align: left;
+}
+
 /* TAGS */
 .tag {
   padding: 6px 10px;

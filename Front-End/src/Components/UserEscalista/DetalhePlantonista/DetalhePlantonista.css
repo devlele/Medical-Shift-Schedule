@@ -108,6 +108,20 @@
     margin-top: 4px;
 }
 
+.estado-profissional {
+    width: 100%;
+    padding: 18px;
+    color: var(--app-muted);
+    font-weight: 600;
+}
+
+.estado-profissional.erro {
+    margin-bottom: 20px;
+    border-radius: var(--border-radius-lg);
+    background: #fff5f5;
+    color: #b42318;
+}
+
 .doctor-right h4 {
     font-size: 20px;
     color: var(--medical-text);

@@ -293,7 +293,7 @@ export default function MedicosSetor() {
                     </div>
 
                     <NavLink
-                      to="/detalhePlantonista"
+                      to={`/UserEscalista/Medicos/${medico.id}`}
                       className="medico-info-btn"
                     >
                       <Info size={18} />

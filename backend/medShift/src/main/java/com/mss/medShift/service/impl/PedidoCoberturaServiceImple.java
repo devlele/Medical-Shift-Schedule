@@ -12,9 +12,11 @@ import com.mss.medShift.domain.model.Doctor;
 import com.mss.medShift.domain.model.PedidoCobertura;
 import com.mss.medShift.domain.model.PedidoCoberturaStatus;
 import com.mss.medShift.domain.model.Plantao;
+import com.mss.medShift.domain.model.PlantaoMedico;
 import com.mss.medShift.domain.model.PlantaoStatus;
 import com.mss.medShift.domain.repository.MedicoSetorRepository;
 import com.mss.medShift.domain.repository.PedidoCoberturaRepository;
+import com.mss.medShift.domain.repository.PlantaoMedicoRepository;
 import com.mss.medShift.domain.repository.PlantaoRepository;
 import com.mss.medShift.service.NotificacaoService;
 import com.mss.medShift.service.PedidoCoberturaService;
@@ -25,15 +27,17 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
 
     private final PedidoCoberturaRepository pedidoCoberturaRepository;
     private final PlantaoRepository plantaoRepository;
+    private final PlantaoMedicoRepository plantaoMedicoRepository;
     private final MedicoSetorRepository medicoSetorRepository;
     private final NotificacaoService notificacaoService;
 
     public PedidoCoberturaServiceImple(PedidoCoberturaRepository pedidoCoberturaRepository,
-            PlantaoRepository plantaoRepository,
+            PlantaoRepository plantaoRepository, PlantaoMedicoRepository plantaoMedicoRepository,
             MedicoSetorRepository medicoSetorRepository,
             NotificacaoService notificacaoService) {
         this.pedidoCoberturaRepository = pedidoCoberturaRepository;
         this.plantaoRepository = plantaoRepository;
+        this.plantaoMedicoRepository = plantaoMedicoRepository;
         this.medicoSetorRepository = medicoSetorRepository;
         this.notificacaoService = notificacaoService;
     }
@@ -41,6 +45,12 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
     @Override
     @Transactional
     public PedidoCobertura abrirPedido(Long plantaoId, Doctor medicoSolicitante) {
+        return abrirPedido(plantaoId, null, medicoSolicitante);
+    }
+
+    @Override
+    @Transactional
+    public PedidoCobertura abrirPedido(Long plantaoId, Long plantaoMedicoId, Doctor medicoSolicitante) {
         if (plantaoId == null) {
             throw new IllegalArgumentException("Plantão é obrigatório");
         }
@@ -50,18 +60,17 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
 
         Plantao plantao = plantaoRepository.findById(plantaoId)
                 .orElseThrow(() -> new NoSuchElementException("Plantão não encontrado"));
-        validatePlantaoPodeSerOfertado(plantao, medicoSolicitante);
+        PlantaoMedico plantaoMedico = resolvePlantaoMedico(plantao, plantaoMedicoId, medicoSolicitante);
+        validatePlantaoPodeSerOfertado(plantaoMedico, medicoSolicitante);
 
-        pedidoCoberturaRepository.findByPlantaoIdAndStatus(plantao.getId(), PedidoCoberturaStatus.ABERTO)
+        pedidoCoberturaRepository.findByPlantaoMedicoIdAndStatus(plantaoMedico.getId(), PedidoCoberturaStatus.ABERTO)
                 .ifPresent(pedido -> {
-                    throw new ConflictException("Já existe pedido de cobertura aberto para este plantão");
+                    throw new ConflictException("Já existe pedido de cobertura aberto para esta atribuição");
                 });
 
         LocalDateTime now = LocalDateTime.now();
         PedidoCobertura pedido = new PedidoCobertura();
-        pedido.setPlantao(plantao);
-        pedido.setHospital(plantao.getHospital());
-        pedido.setSetor(plantao.getSetor());
+        pedido.setPlantaoMedico(plantaoMedico);
         pedido.setMedicoSolicitante(medicoSolicitante);
         pedido.setStatus(PedidoCoberturaStatus.ABERTO);
         pedido.setAbertoEm(now);
@@ -114,15 +123,23 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
         validatePedidoPodeSerAssumido(pedido, medicoCobridor);
 
         LocalDateTime now = LocalDateTime.now();
-        Plantao plantao = pedido.getPlantao();
-        plantao.setMedicoResponsavelAtual(medicoCobridor);
-        plantao.setAtualizadoEm(now);
+        PlantaoMedico plantaoMedico = pedido.getPlantaoMedico();
+        Plantao plantao = plantaoMedico.getPlantao();
+        plantaoMedico.setMedicoResponsavelAtual(medicoCobridor);
+        plantaoMedico.setAtualizadoEm(now);
+        if (plantao.getMedicoResponsavelAtual() != null
+                && pedido.getMedicoSolicitante() != null
+                && plantao.getMedicoResponsavelAtual().getId().equals(pedido.getMedicoSolicitante().getId())) {
+            plantao.setMedicoResponsavelAtual(medicoCobridor);
+            plantao.setAtualizadoEm(now);
+        }
 
         pedido.setMedicoCobridor(medicoCobridor);
         pedido.setStatus(PedidoCoberturaStatus.ASSUMIDO);
         pedido.setAssumidoEm(now);
         pedido.setAtualizadoEm(now);
 
+        plantaoMedicoRepository.save(plantaoMedico);
         plantaoRepository.save(plantao);
         PedidoCobertura pedidoAssumido = pedidoCoberturaRepository.save(pedido);
         notificacaoService.criarCoberturaAssumida(pedidoAssumido);
@@ -167,12 +184,22 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
             throw new IllegalArgumentException("O médico solicitante não pode assumir o próprio pedido");
         }
 
-        Plantao plantao = pedido.getPlantao();
+        PlantaoMedico plantaoMedico = pedido.getPlantaoMedico();
+        if (plantaoMedico == null) {
+            throw new IllegalArgumentException("Pedido sem atribuição médica vinculada");
+        }
+        if (plantaoMedico.getMedicoResponsavelAtual() == null) {
+            throw new IllegalArgumentException("Atribuição sem médico responsável atual");
+        }
+        Plantao plantao = plantaoMedico.getPlantao();
         if (plantao == null) {
-            throw new IllegalArgumentException("Pedido sem plantão vinculado");
+            throw new IllegalArgumentException("Atribuição sem plantão vinculado");
         }
         if (!PlantaoStatus.AGENDADO.equals(plantao.getStatus())) {
             throw new IllegalArgumentException("Plantão precisa estar agendado para ser assumido");
+        }
+        if (!PlantaoStatus.AGENDADO.equals(plantaoMedico.getStatus())) {
+            throw new IllegalArgumentException("Atribuição precisa estar agendada para ser assumida");
         }
         if (plantao.getSetor() == null || plantao.getSetor().getId() == null) {
             throw new IllegalArgumentException("Plantão sem setor vinculado");
@@ -188,12 +215,16 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
         }
     }
 
-    private void validatePlantaoPodeSerOfertado(Plantao plantao, Doctor medicoSolicitante) {
+    private void validatePlantaoPodeSerOfertado(PlantaoMedico plantaoMedico, Doctor medicoSolicitante) {
+        Plantao plantao = plantaoMedico.getPlantao();
         if (!PlantaoStatus.AGENDADO.equals(plantao.getStatus())) {
             throw new IllegalArgumentException("Plantão precisa estar agendado para receber pedido de cobertura");
         }
-        if (plantao.getMedicoResponsavelAtual() == null
-                || !medicoSolicitante.getId().equals(plantao.getMedicoResponsavelAtual().getId())) {
+        if (!PlantaoStatus.AGENDADO.equals(plantaoMedico.getStatus())) {
+            throw new IllegalArgumentException("Atribuição precisa estar agendada para receber pedido de cobertura");
+        }
+        if (plantaoMedico.getMedicoResponsavelAtual() == null
+                || !medicoSolicitante.getId().equals(plantaoMedico.getMedicoResponsavelAtual().getId())) {
             throw new IllegalArgumentException("Apenas o médico responsável atual pode abrir pedido de cobertura");
         }
         if (plantao.getSetor() == null || plantao.getSetor().getId() == null) {
@@ -222,8 +253,24 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
         return setorIds.stream().distinct().toList();
     }
 
+    private PlantaoMedico resolvePlantaoMedico(Plantao plantao, Long plantaoMedicoId, Doctor medicoSolicitante) {
+        if (plantaoMedicoId != null) {
+            PlantaoMedico plantaoMedico = plantaoMedicoRepository.findById(plantaoMedicoId)
+                    .orElseThrow(() -> new NoSuchElementException("Atribuição médica não encontrada"));
+            if (plantaoMedico.getPlantao() == null || !plantao.getId().equals(plantaoMedico.getPlantao().getId())) {
+                throw new IllegalArgumentException("Atribuição médica não pertence ao plantão informado");
+            }
+            return plantaoMedico;
+        }
+
+        return plantaoMedicoRepository
+                .findByPlantaoIdAndMedicoResponsavelAtualId(plantao.getId(), medicoSolicitante.getId())
+                .or(() -> plantaoMedicoRepository.findByPlantaoIdAndMedicoTitularId(plantao.getId(), medicoSolicitante.getId()))
+                .orElseThrow(() -> new IllegalArgumentException("Médico não possui atribuição neste plantão"));
+    }
+
     private boolean hasConflitoHorario(Long medicoId, LocalDateTime dataInicio, LocalDateTime dataFim) {
-        return plantaoRepository.existsByMedicoResponsavelAtualIdAndStatusNotAndDataInicioLessThanAndDataFimGreaterThan(
+        return plantaoMedicoRepository.existsConflitoHorario(
                 medicoId,
                 PlantaoStatus.CANCELADO,
                 dataFim,

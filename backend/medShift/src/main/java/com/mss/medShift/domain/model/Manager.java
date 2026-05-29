@@ -13,10 +13,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Table(name = "tb_escalista")
 @Entity
@@ -37,9 +37,6 @@ public class Manager extends User {
 
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.ESCALISTA;
-
-    @ManyToOne
-    private Hospital hospital;
 
     /*
      * Canonical sector managed by this escalista.
@@ -141,12 +138,17 @@ public class Manager extends User {
         }
     }
 
+    @Transient
     public Hospital getHospital() {
-        return hospital;
+        return setor != null ? setor.getHospital() : null;
     }
 
     public void setHospital(Hospital hospital) {
-        this.hospital = hospital;
+        /*
+         * Hospital is derived from setor. This setter is kept for backwards
+         * compatibility with older request/DTO flows and intentionally does not
+         * persist a direct hospital relationship.
+         */
     }
 
     public Setor getSetor() {

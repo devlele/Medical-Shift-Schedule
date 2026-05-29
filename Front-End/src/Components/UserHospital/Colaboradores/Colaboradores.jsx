@@ -1,9 +1,13 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Bell, CircleUserRound, Plus } from "lucide-react";
 
 import Sidebar from "../../Sidebar/Sidebar";
 import { useNavigate } from "react-router-dom";
 import { getStoredUser } from "../../../utils/authStorage";
+import {
+  getDoctors,
+  getEscalistas,
+} from "../Setores/setorServices.js";
 import "./Colaboradores.css";
 
 export default function Colaboradores() {
@@ -15,39 +19,64 @@ export default function Colaboradores() {
 
   const [search, setSearch] = useState("");
   const [tipoFiltro, setTipoFiltro] = useState("todos");
+  const [colaboradores, setColaboradores] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState("");
 
-  // MOCK (sem backend)
-  const [colaboradores] = useState([
-    {
-      id: 1,
-      nome: "Dr. João Silva",
-      email: "joao@hospital.com",
-      tipo: "escalista",
-      setor: "Cardiologia",
-    },
-    {
-      id: 2,
-      nome: "Dra. Maria Souza",
-      email: "maria@hospital.com",
-      tipo: "plantonista",
-      setor: "Ortopedia",
-    },
-    {
-      id: 3,
-      nome: "Dr. Carlos Lima",
-      email: "carlos@hospital.com",
-      tipo: "escalista",
-      setor: "Neurologia",
-    },
-  ]);
+  useEffect(() => {
+    carregarColaboradores();
+  }, []);
+
+  const carregarColaboradores = async () => {
+    try {
+      setLoading(true);
+      setErro("");
+
+      const [escalistasData, doctorsData] = await Promise.all([
+        getEscalistas(),
+        getDoctors(),
+      ]);
+
+      const escalistas = Array.isArray(escalistasData)
+        ? escalistasData
+            .filter((escalista) => escalista.ativo !== false)
+            .map(normalizarEscalista)
+        : [];
+
+      const plantonistas = Array.isArray(doctorsData)
+        ? doctorsData
+            .filter((doctor) => doctor.ativo !== false)
+            .map(normalizarPlantonista)
+        : [];
+
+      setColaboradores([...escalistas, ...plantonistas]);
+    } catch (error) {
+      console.error(error);
+      setColaboradores([]);
+      setErro(error.message || "Não foi possível carregar os colaboradores.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtrados = useMemo(() => {
+    const termo = search.trim().toLowerCase();
+
     return colaboradores.filter((c) => {
-      const matchNome = c.nome.toLowerCase().includes(search.toLowerCase());
+      const matchBusca =
+        !termo ||
+        [
+          c.nome,
+          c.email,
+          c.setor,
+          c.cpf,
+          c.crm,
+          c.especialidade,
+        ].some((valor) => valor?.toLowerCase().includes(termo));
 
       const matchTipo = tipoFiltro === "todos" || c.tipo === tipoFiltro;
 
-      return matchNome && matchTipo;
+      return matchBusca && matchTipo;
     });
   }, [search, tipoFiltro, colaboradores]);
 
@@ -85,17 +114,17 @@ export default function Colaboradores() {
         <section className="cards-colaboradores">
           <div className="card-info">
             <h3>Total de Colaboradores</h3>
-            <span>{colaboradores.length}</span>
+            <span>{loading ? "..." : colaboradores.length}</span>
           </div>
 
           <div className="card-info">
             <h3>Escalistas</h3>
-            <span>{totalEscalistas}</span>
+            <span>{loading ? "..." : totalEscalistas}</span>
           </div>
 
           <div className="card-info">
             <h3>Plantonistas</h3>
-            <span>{totalPlantonistas}</span>
+            <span>{loading ? "..." : totalPlantonistas}</span>
           </div>
         </section>
 
@@ -131,6 +160,8 @@ export default function Colaboradores() {
             </select>
           </div>
 
+          {erro && <div className="estado-colaboradores erro">{erro}</div>}
+
           <table>
             <thead>
               <tr>
@@ -142,23 +173,63 @@ export default function Colaboradores() {
             </thead>
 
             <tbody>
-              {filtrados.map((c) => (
-                <tr key={c.id}>
-                  <td>{c.nome}</td>
-
-                  <td>{c.email}</td>
-
-                  <td>
-                    <span className={`tag ${c.tipo}`}>{c.tipo}</span>
+              {loading ? (
+                <tr>
+                  <td colSpan={4}>
+                    <div className="estado-colaboradores">Carregando colaboradores...</div>
                   </td>
-
-                  <td>{c.setor}</td>
                 </tr>
-              ))}
+              ) : filtrados.length === 0 ? (
+                <tr>
+                  <td colSpan={4}>
+                    <div className="estado-colaboradores">Nenhum colaborador encontrado.</div>
+                  </td>
+                </tr>
+              ) : (
+                filtrados.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.nome}</td>
+
+                    <td>{c.email}</td>
+
+                    <td>
+                      <span className={`tag ${c.tipo}`}>{c.tipo}</span>
+                    </td>
+
+                    <td>{c.setor}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </section>
       </main>
     </div>
   );
+}
+
+function normalizarEscalista(escalista) {
+  return {
+    id: `escalista-${escalista.id}`,
+    nome: escalista.name || escalista.nome || "Escalista sem nome",
+    email: escalista.email || "-",
+    cpf: escalista.cpf || "",
+    crm: "",
+    especialidade: escalista.cargo || "",
+    tipo: "escalista",
+    setor: escalista.setorNome || "Sem setor vinculado",
+  };
+}
+
+function normalizarPlantonista(doctor) {
+  return {
+    id: `plantonista-${doctor.id}`,
+    nome: doctor.name || doctor.nome || "Médico sem nome",
+    email: doctor.email || "-",
+    cpf: doctor.cpf || "",
+    crm: doctor.crm || "",
+    especialidade: doctor.specialty || doctor.especialidade || "",
+    tipo: "plantonista",
+    setor: doctor.setorNome || "Sem setor vinculado",
+  };
 }

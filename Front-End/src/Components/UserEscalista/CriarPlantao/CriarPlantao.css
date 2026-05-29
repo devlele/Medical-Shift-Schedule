@@ -39,7 +39,7 @@
 /* GRID */
 .linha-tripla {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 22px;
 }
 
@@ -243,6 +243,15 @@
 
 .dropdown-item:hover {
   background: var(--app-bg);
+}
+
+.dropdown-item.disabled {
+  color: #667085;
+  cursor: default;
+}
+
+.dropdown-item.disabled:hover {
+  background: transparent;
 }
 
 .dropdown-item input[type="checkbox"] {

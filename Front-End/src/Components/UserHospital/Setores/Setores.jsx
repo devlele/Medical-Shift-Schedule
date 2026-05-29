@@ -148,7 +148,7 @@ export default function Setores() {
       carregarDados();
     } catch (error) {
       console.error(error);
-      alert("Erro ao excluir setor");
+      alert(error.message || "Erro ao excluir setor");
     } finally {
       setExcluindo(false);
     }

@@ -3,34 +3,11 @@ import Sidebar from "../../Sidebar/Sidebar";
 import { getStoredUser } from "../../../utils/authStorage";
 import { Bell, CircleUserRound } from "lucide-react";
 
-const atividades = [
-    {
-        id: 1,
-        tempo: "Há 10 minutos",
-        titulo: "Dra. Aline aceitou o plantão de Pediatria - 01/05",
-        descricao: "Originado por Dr. Ricardo",
-        tipo: "sucesso",
-    },
-    {
-        id: 2,
-        tempo: "Há 2 horas",
-        titulo: "Nova Oferta Adicionada",
-        descricao: "Dr. João S. ofertou seu plantão em UTI Adulto - 23/04",
-        tipo: "neutro",
-    },
-    {
-        id: 3,
-        tempo: "Há 2 dias",
-        titulo: "Nova Oferta Adicionada",
-        descricao: "Dra. Maria C. ofertou seu plantão em Cardiologia - 30/04",
-        tipo: "neutro",
-    },
-];
-
-    const usuario = getStoredUser();
-    const nomeUsuario = usuario?.name || "Hospital";
-
 const Delegacao = () => {
+    const usuario = getStoredUser();
+    const nomeUsuario = usuario?.name || "Escalista";
+    const atividades = [];
+
     return (
         <div className="pagina-delegacao">
             {/* MENU LATERAL */}
@@ -69,20 +46,26 @@ const Delegacao = () => {
                         <h2>Atividades</h2>
 
                         <div className="lista-atividades">
-                            {atividades.map((atividade) => (
-                                <div
-                                    key={atividade.id}
-                                    className={`card-atividade ${atividade.tipo}`}
-                                >
-                                    <span className="tempo-atividade">
-                                        {atividade.tempo}
-                                    </span>
-
-                                    <h3>{atividade.titulo}</h3>
-
-                                    <p>{atividade.descricao}</p>
+                            {atividades.length === 0 ? (
+                                <div className="delegacao-empty">
+                                    Nenhuma delegação registrada até o momento.
                                 </div>
-                            ))}
+                            ) : (
+                                atividades.map((atividade) => (
+                                    <div
+                                        key={atividade.id}
+                                        className={`card-atividade ${atividade.tipo}`}
+                                    >
+                                        <span className="tempo-atividade">
+                                            {atividade.tempo}
+                                        </span>
+
+                                        <h3>{atividade.titulo}</h3>
+
+                                        <p>{atividade.descricao}</p>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 </section>

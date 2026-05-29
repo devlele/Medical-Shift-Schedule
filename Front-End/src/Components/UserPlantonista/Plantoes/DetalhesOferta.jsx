@@ -3,7 +3,10 @@ import Sidebar from "../../Sidebar/Sidebar";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, CalendarDays, Clock3, MapPin } from "lucide-react";
 import { useState } from "react";
-import { assumirCobertura } from "../../../services/doctorServices";
+import {
+  assumirCobertura,
+  cancelarPedidoCobertura,
+} from "../../../services/doctorServices";
 import {
   formatDateLong,
   normalizePedidoCobertura,
@@ -36,6 +39,23 @@ export default function DetalhesOferta() {
     }
   }
 
+  async function handleCancelar() {
+    if (!pedido) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setErro("");
+      await cancelarPedidoCobertura(pedido.id);
+      navigate("/UserPlantonista/PlantoesOfertados");
+    } catch (error) {
+      setErro(error.message || "Nao foi possivel cancelar este pedido.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="detalhes-layout">
       <Sidebar />
@@ -61,6 +81,18 @@ export default function DetalhesOferta() {
                 onClick={handleAssumir}
               >
                 {loading ? "Assumindo..." : "Aceitar Plantão"}
+              </button>
+            </div>
+          )}
+
+          {pedido && modo === "meu" && pedido.status === "ABERTO" && (
+            <div className="header-buttons">
+              <button
+                className="aceitar-btn"
+                disabled={loading}
+                onClick={handleCancelar}
+              >
+                {loading ? "Cancelando..." : "Cancelar Pedido"}
               </button>
             </div>
           )}
@@ -111,11 +143,22 @@ export default function DetalhesOferta() {
                 <div className="general-info">
                   <h3>INFORMAÇÕES GERAIS</h3>
 
-                  <p>
-                    {pedido.medicoSolicitante} está oferecendo este plantão em{" "}
-                    {pedido.setor}, no {pedido.hospital}. Ao aceitar, você se
-                    torna o médico responsável por essa cobertura.
-                  </p>
+                  {modo === "meu" ? (
+                    <p>
+                      Você abriu este pedido de cobertura para o plantão em{" "}
+                      {pedido.setor}, no {pedido.hospital}. Status atual:{" "}
+                      {pedido.status}
+                      {pedido.medicoCobridor
+                        ? `. Coberto por ${pedido.medicoCobridor}.`
+                        : "."}
+                    </p>
+                  ) : (
+                    <p>
+                      {pedido.medicoSolicitante} está oferecendo este plantão em{" "}
+                      {pedido.setor}, no {pedido.hospital}. Ao aceitar, você se
+                      torna o médico responsável por essa cobertura.
+                    </p>
+                  )}
                 </div>
               </>
             )}

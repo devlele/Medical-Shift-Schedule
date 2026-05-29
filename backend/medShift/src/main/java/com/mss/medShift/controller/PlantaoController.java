@@ -43,7 +43,7 @@ public class PlantaoController {
         Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, request.setorId());
         var plantaoCriado = plantaoService.createAvulso(
                 request.setorId(),
-                request.medicoId(),
+                request.resolveMedicoIds(),
                 request.data(),
                 request.turno(),
                 request.dataInicio(),
@@ -63,7 +63,7 @@ public class PlantaoController {
         Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, request.setorId());
         var resultado = plantaoService.createFixo(
                 request.setorId(),
-                request.medicoId(),
+                request.resolveMedicoIds(),
                 request.tipoRecorrencia(),
                 request.diaSemana(),
                 request.semanaDoMes(),
@@ -89,7 +89,6 @@ public class PlantaoController {
         }
         Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, plantao.getSetor().getId());
         plantao.setCriadoPorEscalista(escalista);
-        plantao.setHospital(escalista.getHospital());
 
         var plantaoCriado = plantaoService.create(plantao);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -115,7 +114,6 @@ public class PlantaoController {
         accessScopeService.requireEscalistaCanAccessSetor(usuarioLogado, plantaoAtual.getSetor().getId());
         if (plantao.getSetor() != null && plantao.getSetor().getId() != null) {
             Manager escalista = accessScopeService.requireEscalistaInSetor(usuarioLogado, plantao.getSetor().getId());
-            plantao.setHospital(escalista.getHospital());
             plantao.setCriadoPorEscalista(escalista);
         }
 

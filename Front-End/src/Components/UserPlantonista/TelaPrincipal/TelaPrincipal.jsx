@@ -86,6 +86,7 @@ export default function TelaPrincipal() {
   const eventosCalendario = useMemo(() => {
     const plantaoIdsComPedidoProprio = new Set(
       meusPedidosCobertura
+        .filter((pedido) => pedido.status === "ABERTO")
         .map((pedido) => pedido.plantao?.id)
         .filter((id) => id != null),
     );

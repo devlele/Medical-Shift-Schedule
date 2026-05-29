@@ -17,14 +17,12 @@ public interface PlantaoRepository extends JpaRepository<Plantao, Long> {
     List<Plantao> findByDataInicioBetween(LocalDateTime start, LocalDateTime end);
     List<Plantao> findBySetorIdAndDataInicioBetween(Long setorId, LocalDateTime start, LocalDateTime end);
     List<Plantao> findByMedicoResponsavelAtualIdAndDataInicioBetween(Long doctorId, LocalDateTime start, LocalDateTime end);
-    List<Plantao> findByHospitalId(Long hospitalId);
-    List<Plantao> findByHospitalIdAndDataInicioBetween(Long hospitalId, LocalDateTime start, LocalDateTime end);
-    List<Plantao> findByMedicoResponsavelAtualIdAndHospitalId(Long doctorId, Long hospitalId);
-    List<Plantao> findByMedicoResponsavelAtualIdAndHospitalIdAndDataInicioBetween(Long doctorId, Long hospitalId, LocalDateTime start, LocalDateTime end);
-    Optional<Plantao> findByIdAndHospitalId(Long id, Long hospitalId);
-    Optional<Plantao> findByIdAndHospitalIdAndSetorId(Long id, Long hospitalId, Long setorId);
-    List<Plantao> findByHospitalIdAndSetorId(Long hospitalId, Long setorId);
-    List<Plantao> findByHospitalIdAndSetorIdAndDataInicioBetween(Long hospitalId, Long setorId, LocalDateTime start, LocalDateTime end);
+    List<Plantao> findBySetor_Hospital_Id(Long hospitalId);
+    List<Plantao> findBySetor_Hospital_IdAndDataInicioBetween(Long hospitalId, LocalDateTime start, LocalDateTime end);
+    Optional<Plantao> findByIdAndSetor_Hospital_Id(Long id, Long hospitalId);
+    Optional<Plantao> findByIdAndSetor_Hospital_IdAndSetorId(Long id, Long hospitalId, Long setorId);
+    List<Plantao> findBySetor_Hospital_IdAndSetorId(Long hospitalId, Long setorId);
+    List<Plantao> findBySetor_Hospital_IdAndSetorIdAndDataInicioBetween(Long hospitalId, Long setorId, LocalDateTime start, LocalDateTime end);
     boolean existsByMedicoResponsavelAtualIdAndStatusNotAndDataInicioLessThanAndDataFimGreaterThan(
             Long medicoId,
             PlantaoStatus status,

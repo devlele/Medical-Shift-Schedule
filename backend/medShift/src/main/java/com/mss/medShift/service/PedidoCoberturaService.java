@@ -7,6 +7,7 @@ import com.mss.medShift.domain.model.PedidoCobertura;
 
 public interface PedidoCoberturaService {
     PedidoCobertura abrirPedido(Long plantaoId, Doctor medicoSolicitante);
+    PedidoCobertura abrirPedido(Long plantaoId, Long plantaoMedicoId, Doctor medicoSolicitante);
     List<PedidoCobertura> findDisponiveisParaMedico(Doctor medico);
     List<PedidoCobertura> findSolicitadosPorMedico(Doctor medico);
     PedidoCobertura assumir(Long pedidoId, Doctor medicoCobridor);

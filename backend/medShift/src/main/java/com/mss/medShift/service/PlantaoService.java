@@ -17,9 +17,24 @@ public interface PlantaoService {
         return createAvulso(setorId, medicoId, null, null, dataInicio, dataFim, escalista);
     }
 
-    Plantao createAvulso(Long setorId, Long medicoId, LocalDate data, PlantaoTurno turno,
+    default Plantao createAvulso(Long setorId, Long medicoId, LocalDate data, PlantaoTurno turno,
+            LocalDateTime dataInicio, LocalDateTime dataFim, Manager escalista) {
+        return createAvulso(setorId, medicoId != null ? List.of(medicoId) : List.of(), data, turno, dataInicio,
+                dataFim, escalista);
+    }
+
+    Plantao createAvulso(Long setorId, List<Long> medicoIds, LocalDate data, PlantaoTurno turno,
             LocalDateTime dataInicio, LocalDateTime dataFim, Manager escalista);
-    PlantaoFixoCreationResult createFixo(Long setorId, Long medicoId, TipoRecorrenciaPlantao tipoRecorrencia,
+
+    default PlantaoFixoCreationResult createFixo(Long setorId, Long medicoId, TipoRecorrenciaPlantao tipoRecorrencia,
+            String diaSemana, Integer semanaDoMes, Integer diaDoMes, PlantaoTurno turno,
+            LocalTime horaInicio, LocalTime horaFim, LocalDate dataInicioVigencia,
+            LocalDate dataFimVigencia, Manager escalista) {
+        return createFixo(setorId, medicoId != null ? List.of(medicoId) : List.of(), tipoRecorrencia, diaSemana,
+                semanaDoMes, diaDoMes, turno, horaInicio, horaFim, dataInicioVigencia, dataFimVigencia, escalista);
+    }
+
+    PlantaoFixoCreationResult createFixo(Long setorId, List<Long> medicoIds, TipoRecorrenciaPlantao tipoRecorrencia,
             String diaSemana, Integer semanaDoMes, Integer diaDoMes, PlantaoTurno turno,
             LocalTime horaInicio, LocalTime horaFim, LocalDate dataInicioVigencia,
             LocalDate dataFimVigencia, Manager escalista);

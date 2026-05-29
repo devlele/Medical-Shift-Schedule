@@ -163,6 +163,10 @@ export const getEscalistaById = async (id) => {
     return request(`/manager/${id}`);
 };
 
+export const getDoctorById = async (id) => {
+    return request(`/doctor/${id}`);
+};
+
 export const getSetoresByEscalista = async (id) => {
     return request(`/manager/${id}/setores`);
 };

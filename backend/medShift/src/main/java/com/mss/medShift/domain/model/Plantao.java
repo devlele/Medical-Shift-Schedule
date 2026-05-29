@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,9 +23,6 @@ public class Plantao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne
-    private Hospital hospital;
 
     @ManyToOne
     private Setor setor;
@@ -60,6 +58,10 @@ public class Plantao {
     @JsonIgnore
     private List<PedidoCobertura> pedidosCobertura;
 
+    @OneToMany(mappedBy = "plantao", fetch = FetchType.EAGER)
+    @JsonIgnore
+    private List<PlantaoMedico> medicos;
+
     @OneToMany(mappedBy = "plantao")
     @JsonIgnore
     private List<Notificacao> notificacoes;
@@ -69,7 +71,6 @@ public class Plantao {
 
     public Plantao(Setor setor, Doctor doctorAssignado, LocalDateTime dataInicio, LocalDateTime dataFim) {
         this.setor = setor;
-        this.hospital = setor != null ? setor.getHospital() : null;
         this.medicoTitular = doctorAssignado;
         this.medicoResponsavelAtual = doctorAssignado;
         this.dataInicio = dataInicio;
@@ -88,11 +89,11 @@ public class Plantao {
     }
 
     public Hospital getHospital() {
-        return hospital;
+        return setor != null ? setor.getHospital() : null;
     }
 
     public void setHospital(Hospital hospital) {
-        this.hospital = hospital;
+        // Compatibilidade com APIs antigas. O hospital do plantão é derivado do setor.
     }
 
     public Setor getSetor() {
@@ -101,9 +102,6 @@ public class Plantao {
 
     public void setSetor(Setor setor) {
         this.setor = setor;
-        if (setor != null && this.hospital == null) {
-            this.hospital = setor.getHospital();
-        }
     }
 
     public RegraPlantaoFixo getRegraPlantaoFixo() {
@@ -203,6 +201,14 @@ public class Plantao {
 
     public void setPedidosCobertura(List<PedidoCobertura> pedidosCobertura) {
         this.pedidosCobertura = pedidosCobertura;
+    }
+
+    public List<PlantaoMedico> getMedicos() {
+        return medicos;
+    }
+
+    public void setMedicos(List<PlantaoMedico> medicos) {
+        this.medicos = medicos;
     }
 
     public List<Notificacao> getNotificacoes() {

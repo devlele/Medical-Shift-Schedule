@@ -1,22 +1,32 @@
 package com.mss.medShift.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 
 import com.mss.medShift.domain.model.Hospital;
+import com.mss.medShift.domain.model.Manager;
 import com.mss.medShift.domain.model.Setor;
+import com.mss.medShift.domain.repository.EscalistaSetorRepository;
+import com.mss.medShift.domain.repository.ManagerRepository;
 import com.mss.medShift.domain.repository.SetorRepository;
 import com.mss.medShift.service.SetorService;
+import com.mss.medShift.service.exception.ConflictException;
 
 @Service
 public class SetorServiceImple implements SetorService {
 
     private final SetorRepository setorRepository;
+    private final ManagerRepository managerRepository;
+    private final EscalistaSetorRepository escalistaSetorRepository;
 
-    public SetorServiceImple(SetorRepository setorRepository) {
+    public SetorServiceImple(SetorRepository setorRepository, ManagerRepository managerRepository,
+            EscalistaSetorRepository escalistaSetorRepository) {
         this.setorRepository = setorRepository;
+        this.managerRepository = managerRepository;
+        this.escalistaSetorRepository = escalistaSetorRepository;
     }
 
     @Override
@@ -39,7 +49,9 @@ public class SetorServiceImple implements SetorService {
 
     @Override
     public List<Setor> findByHospitalId(Long hospitalId) {
-        return setorRepository.findByHospitalId(hospitalId);
+        return setorRepository.findByHospitalId(hospitalId).stream()
+                .filter(this::isAtivo)
+                .toList();
     }
 
     @Override
@@ -69,6 +81,35 @@ public class SetorServiceImple implements SetorService {
     @Override
     public void delete(Long id) {
         Setor setor = findById(id);
-        setorRepository.delete(setor);
+        if (hasEscalistaAtivoAssociado(setor)) {
+            throw new ConflictException(
+                    "Não é possível excluir este setor porque há um escalista ativo responsável. Remova ou transfira o escalista antes.");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        escalistaSetorRepository.findBySetorIdAndAtivoTrue(setor.getId())
+                .forEach(vinculo -> {
+                    vinculo.setAtivo(false);
+                    vinculo.setDesvinculadoEm(now);
+                    escalistaSetorRepository.save(vinculo);
+                });
+
+        setor.setAtivo(false);
+        setor.setAtualizadoEm(now);
+        setorRepository.save(setor);
+    }
+
+    private boolean hasEscalistaAtivoAssociado(Setor setor) {
+        return managerRepository.findAllBySetorId(setor.getId()).stream()
+                .anyMatch(this::isAtivo);
+    }
+
+    private boolean isAtivo(Setor setor) {
+        return setor.getAtivo() == null || setor.getAtivo();
+    }
+
+    private boolean isAtivo(Manager manager) {
+        return manager.getAtivo() == null || manager.getAtivo();
     }
 }

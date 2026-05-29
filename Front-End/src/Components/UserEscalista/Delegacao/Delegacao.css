@@ -113,6 +113,15 @@
     gap: 18px;
 }
 
+.delegacao-empty {
+    background: var(--gray-light);
+    border-radius: var(--border-radius-xl);
+    padding: 24px 26px;
+    color: var(--app-muted);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
 /* CARD */
 
 .card-atividade {

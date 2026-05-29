@@ -8,9 +8,11 @@ import java.time.DayOfWeek;
 import java.time.DateTimeException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.mss.medShift.domain.model.Doctor;
 import com.mss.medShift.domain.model.Manager;
 import com.mss.medShift.domain.model.Plantao;
+import com.mss.medShift.domain.model.PlantaoMedico;
 import com.mss.medShift.domain.model.PlantaoStatus;
 import com.mss.medShift.domain.model.PlantaoTipo;
 import com.mss.medShift.domain.model.PlantaoTurno;
@@ -26,6 +29,7 @@ import com.mss.medShift.domain.model.Setor;
 import com.mss.medShift.domain.model.TipoRecorrenciaPlantao;
 import com.mss.medShift.domain.repository.DoctorRepository;
 import com.mss.medShift.domain.repository.MedicoSetorRepository;
+import com.mss.medShift.domain.repository.PlantaoMedicoRepository;
 import com.mss.medShift.domain.repository.PlantaoRepository;
 import com.mss.medShift.domain.repository.RegraPlantaoFixoRepository;
 import com.mss.medShift.domain.repository.SetorRepository;
@@ -40,15 +44,17 @@ public class PlantaoServiceImple implements PlantaoService {
     private final SetorRepository setorRepository;
     private final DoctorRepository doctorRepository;
     private final MedicoSetorRepository medicoSetorRepository;
+    private final PlantaoMedicoRepository plantaoMedicoRepository;
     private final RegraPlantaoFixoRepository regraPlantaoFixoRepository;
 
     public PlantaoServiceImple(PlantaoRepository plantaoRepository, SetorRepository setorRepository,
             DoctorRepository doctorRepository, MedicoSetorRepository medicoSetorRepository,
-            RegraPlantaoFixoRepository regraPlantaoFixoRepository) {
+            PlantaoMedicoRepository plantaoMedicoRepository, RegraPlantaoFixoRepository regraPlantaoFixoRepository) {
         this.plantaoRepository = plantaoRepository;
         this.setorRepository = setorRepository;
         this.doctorRepository = doctorRepository;
         this.medicoSetorRepository = medicoSetorRepository;
+        this.plantaoMedicoRepository = plantaoMedicoRepository;
         this.regraPlantaoFixoRepository = regraPlantaoFixoRepository;
     }
 
@@ -78,31 +84,28 @@ public class PlantaoServiceImple implements PlantaoService {
     @Override
     public Plantao createAvulso(Long setorId, Long medicoId, LocalDate data, PlantaoTurno turno,
             LocalDateTime dataInicio, LocalDateTime dataFim, Manager escalista) {
+        return createAvulso(setorId, medicoId != null ? List.of(medicoId) : List.of(), data, turno, dataInicio,
+                dataFim, escalista);
+    }
+
+    @Override
+    @Transactional
+    public Plantao createAvulso(Long setorId, List<Long> medicoIds, LocalDate data, PlantaoTurno turno,
+            LocalDateTime dataInicio, LocalDateTime dataFim, Manager escalista) {
         PlantaoPeriodo periodo = resolvePeriodo(data, turno, dataInicio, dataFim);
-        validateCreateAvulsoRequest(setorId, medicoId, periodo.dataInicio(), periodo.dataFim(), escalista);
+        List<Long> medicoIdsNormalizados = normalizeMedicoIds(medicoIds);
+        validateCreateAvulsoRequest(setorId, medicoIdsNormalizados, periodo.dataInicio(), periodo.dataFim(), escalista);
 
         Setor setor = setorRepository.findByIdAndHospitalId(setorId, escalista.getHospital().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Setor não encontrado para o hospital do escalista"));
-        Doctor medico = doctorRepository.findById(medicoId)
-                .orElseThrow(() -> new IllegalArgumentException("Médico não encontrado"));
-
-        boolean medicoAtuaNoSetor = medicoSetorRepository
-                .findByMedicoIdAndSetorIdAndAtivoTrue(medico.getId(), setor.getId())
-                .isPresent();
-        if (!medicoAtuaNoSetor) {
-            throw new IllegalArgumentException("Médico não possui vínculo ativo com o setor informado");
-        }
-
-        if (hasConflitoHorario(medico.getId(), periodo.dataInicio(), periodo.dataFim())) {
-            throw new ConflictException("Médico já possui plantão conflitante no período informado");
-        }
+        List<Doctor> medicos = loadAndValidateMedicos(medicoIdsNormalizados, setor, List.of(periodo));
+        Doctor medicoPrincipal = medicos.get(0);
 
         LocalDateTime now = LocalDateTime.now();
         Plantao plantao = new Plantao();
-        plantao.setHospital(setor.getHospital());
         plantao.setSetor(setor);
-        plantao.setMedicoTitular(medico);
-        plantao.setMedicoResponsavelAtual(medico);
+        plantao.setMedicoTitular(medicoPrincipal);
+        plantao.setMedicoResponsavelAtual(medicoPrincipal);
         plantao.setCriadoPorEscalista(escalista);
         plantao.setTipo(PlantaoTipo.AVULSO);
         plantao.setTurno(resolveTurno(turno, periodo.dataInicio(), periodo.dataFim()));
@@ -112,7 +115,9 @@ public class PlantaoServiceImple implements PlantaoService {
         plantao.setCriadoEm(now);
         plantao.setAtualizadoEm(now);
 
-        return plantaoRepository.save(plantao);
+        Plantao plantaoSalvo = plantaoRepository.save(plantao);
+        plantaoSalvo.setMedicos(criarAlocacoes(plantaoSalvo, medicos, now));
+        return plantaoSalvo;
     }
 
     @Override
@@ -121,22 +126,28 @@ public class PlantaoServiceImple implements PlantaoService {
             String diaSemana, Integer semanaDoMes, Integer diaDoMes, PlantaoTurno turno,
             LocalTime horaInicio, LocalTime horaFim, LocalDate dataInicioVigencia,
             LocalDate dataFimVigencia, Manager escalista) {
+        return createFixo(setorId, medicoId != null ? List.of(medicoId) : List.of(), tipoRecorrencia, diaSemana,
+                semanaDoMes, diaDoMes, turno, horaInicio, horaFim, dataInicioVigencia, dataFimVigencia, escalista);
+    }
+
+    @Override
+    @Transactional
+    public PlantaoFixoCreationResult createFixo(Long setorId, List<Long> medicoIds, TipoRecorrenciaPlantao tipoRecorrencia,
+            String diaSemana, Integer semanaDoMes, Integer diaDoMes, PlantaoTurno turno,
+            LocalTime horaInicio, LocalTime horaFim, LocalDate dataInicioVigencia,
+            LocalDate dataFimVigencia, Manager escalista) {
         TimeRange timeRange = resolveTimeRange(turno, horaInicio, horaFim);
-        validateCreateFixoRequest(setorId, medicoId, tipoRecorrencia, diaSemana, semanaDoMes, diaDoMes,
+        List<Long> medicoIdsNormalizados = normalizeMedicoIds(medicoIds);
+        validateCreateFixoRequest(setorId, medicoIdsNormalizados, tipoRecorrencia, diaSemana, semanaDoMes, diaDoMes,
                 dataInicioVigencia, dataFimVigencia, escalista);
 
         Setor setor = setorRepository.findByIdAndHospitalId(setorId, escalista.getHospital().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Setor não encontrado para o hospital do escalista"));
-        Doctor medico = doctorRepository.findById(medicoId)
-                .orElseThrow(() -> new IllegalArgumentException("Médico não encontrado"));
 
-        validateMedicoAtuaNoSetor(medico, setor);
-
-        LocalDate dataFimGeracao = dataFimVigencia != null ? dataFimVigencia : dataInicioVigencia.plusDays(90);
-        validateGenerationWindow(dataInicioVigencia, dataFimGeracao);
+        validateGenerationWindow(dataInicioVigencia, dataFimVigencia);
 
         List<LocalDate> datas = gerarDatasRecorrentes(tipoRecorrencia, diaSemana, semanaDoMes, diaDoMes,
-                dataInicioVigencia, dataFimGeracao);
+                dataInicioVigencia, dataFimVigencia);
         if (datas.isEmpty()) {
             throw new IllegalArgumentException("A regra fixa não gerou nenhum plantão dentro da vigência informada");
         }
@@ -144,13 +155,14 @@ public class PlantaoServiceImple implements PlantaoService {
         List<PlantaoPeriodo> periodos = datas.stream()
                 .map(data -> toPeriodo(data, timeRange))
                 .toList();
-        validateNoConflicts(medico, periodos);
+        List<Doctor> medicos = loadAndValidateMedicos(medicoIdsNormalizados, setor, periodos);
+        Doctor medicoPrincipal = medicos.get(0);
 
         LocalDateTime now = LocalDateTime.now();
         RegraPlantaoFixo regra = new RegraPlantaoFixo();
         regra.setHospital(setor.getHospital());
         regra.setSetor(setor);
-        regra.setMedicoTitular(medico);
+        regra.setMedicoTitular(medicoPrincipal);
         regra.setCriadoPorEscalista(escalista);
         regra.setTipoRecorrencia(tipoRecorrencia);
         regra.setDiaSemana(resolveDiaSemanaParaSalvar(tipoRecorrencia, diaSemana));
@@ -167,11 +179,13 @@ public class PlantaoServiceImple implements PlantaoService {
         RegraPlantaoFixo regraSalva = regraPlantaoFixoRepository.save(regra);
 
         List<Plantao> plantoes = periodos.stream()
-                .map(periodo -> buildPlantaoFixo(setor, medico, escalista, regraSalva, resolveTurno(turno,
+                .map(periodo -> buildPlantaoFixo(setor, medicoPrincipal, escalista, regraSalva, resolveTurno(turno,
                         periodo.dataInicio(), periodo.dataFim()), periodo, now))
                 .toList();
 
-        return new PlantaoFixoCreationResult(regraSalva, plantaoRepository.saveAll(plantoes));
+        List<Plantao> plantoesSalvos = plantaoRepository.saveAll(plantoes);
+        plantoesSalvos.forEach(plantao -> plantao.setMedicos(criarAlocacoes(plantao, medicos, now)));
+        return new PlantaoFixoCreationResult(regraSalva, plantoesSalvos);
     }
 
     @Override
@@ -182,13 +196,13 @@ public class PlantaoServiceImple implements PlantaoService {
 
     @Override
     public Plantao findByIdAndHospitalId(Long id, Long hospitalId) {
-        return plantaoRepository.findByIdAndHospitalId(id, hospitalId)
+        return plantaoRepository.findByIdAndSetor_Hospital_Id(id, hospitalId)
                 .orElseThrow(() -> new NoSuchElementException("Plantao not found with id: " + id));
     }
 
     @Override
     public Plantao findByIdAndHospitalIdAndSetorId(Long id, Long hospitalId, Long setorId) {
-        return plantaoRepository.findByIdAndHospitalIdAndSetorId(id, hospitalId, setorId)
+        return plantaoRepository.findByIdAndSetor_Hospital_IdAndSetorId(id, hospitalId, setorId)
                 .orElseThrow(() -> new NoSuchElementException("Plantao not found with id: " + id));
     }
 
@@ -199,17 +213,17 @@ public class PlantaoServiceImple implements PlantaoService {
 
     @Override
     public List<Plantao> findByDoctorId(Long doctorId) {
-        return plantaoRepository.findByMedicoResponsavelAtualId(doctorId);
+        return plantaoMedicoRepository.findPlantoesByMedicoResponsavelAtualId(doctorId);
     }
 
     @Override
     public List<Plantao> findByHospitalId(Long hospitalId) {
-        return plantaoRepository.findByHospitalId(hospitalId);
+        return plantaoRepository.findBySetor_Hospital_Id(hospitalId);
     }
 
     @Override
     public List<Plantao> findByHospitalIdAndSetorId(Long hospitalId, Long setorId) {
-        return plantaoRepository.findByHospitalIdAndSetorId(hospitalId, setorId);
+        return plantaoRepository.findBySetor_Hospital_IdAndSetorId(hospitalId, setorId);
     }
 
     @Override
@@ -219,27 +233,27 @@ public class PlantaoServiceImple implements PlantaoService {
 
     @Override
     public List<Plantao> findByDoctorAndPeriod(Long doctorId, LocalDateTime start, LocalDateTime end) {
-        return plantaoRepository.findByMedicoResponsavelAtualIdAndDataInicioBetween(doctorId, start, end);
+        return plantaoMedicoRepository.findPlantoesByMedicoResponsavelAtualIdAndPeriodo(doctorId, start, end);
     }
 
     @Override
     public List<Plantao> findByHospitalAndPeriod(Long hospitalId, LocalDateTime start, LocalDateTime end) {
-        return plantaoRepository.findByHospitalIdAndDataInicioBetween(hospitalId, start, end);
+        return plantaoRepository.findBySetor_Hospital_IdAndDataInicioBetween(hospitalId, start, end);
     }
 
     @Override
     public List<Plantao> findByHospitalAndSetorAndPeriod(Long hospitalId, Long setorId, LocalDateTime start, LocalDateTime end) {
-        return plantaoRepository.findByHospitalIdAndSetorIdAndDataInicioBetween(hospitalId, setorId, start, end);
+        return plantaoRepository.findBySetor_Hospital_IdAndSetorIdAndDataInicioBetween(hospitalId, setorId, start, end);
     }
 
     @Override
     public List<Plantao> findByDoctorAndHospital(Long doctorId, Long hospitalId) {
-        return plantaoRepository.findByMedicoResponsavelAtualIdAndHospitalId(doctorId, hospitalId);
+        return plantaoMedicoRepository.findPlantoesByMedicoResponsavelAtualIdAndHospitalId(doctorId, hospitalId);
     }
 
     @Override
     public List<Plantao> findByDoctorAndHospitalAndPeriod(Long doctorId, Long hospitalId, LocalDateTime start, LocalDateTime end) {
-        return plantaoRepository.findByMedicoResponsavelAtualIdAndHospitalIdAndDataInicioBetween(doctorId, hospitalId, start, end);
+        return plantaoMedicoRepository.findPlantoesByMedicoResponsavelAtualIdAndHospitalIdAndPeriodo(doctorId, hospitalId, start, end);
     }
 
     @Override
@@ -254,9 +268,6 @@ public class PlantaoServiceImple implements PlantaoService {
         }
         if (updatedPlantao.getMedicoResponsavelAtual() != null) {
             plantao.setMedicoResponsavelAtual(updatedPlantao.getMedicoResponsavelAtual());
-        }
-        if (updatedPlantao.getHospital() != null) {
-            plantao.setHospital(updatedPlantao.getHospital());
         }
         if (updatedPlantao.getRegraPlantaoFixo() != null) {
             plantao.setRegraPlantaoFixo(updatedPlantao.getRegraPlantaoFixo());
@@ -297,7 +308,7 @@ public class PlantaoServiceImple implements PlantaoService {
         throw new NoSuchElementException("Plantao not found with id: " + id);
     }
 
-    private void validateCreateAvulsoRequest(Long setorId, Long medicoId, LocalDateTime dataInicio,
+    private void validateCreateAvulsoRequest(Long setorId, List<Long> medicoIds, LocalDateTime dataInicio,
             LocalDateTime dataFim, Manager escalista) {
         if (escalista == null) {
             throw new IllegalArgumentException("Usuário logado não possui perfil de escalista");
@@ -308,8 +319,8 @@ public class PlantaoServiceImple implements PlantaoService {
         if (setorId == null) {
             throw new IllegalArgumentException("Setor is required");
         }
-        if (medicoId == null) {
-            throw new IllegalArgumentException("Doctor is required");
+        if (medicoIds.isEmpty()) {
+            throw new IllegalArgumentException("Ao menos um médico é obrigatório");
         }
         if (dataInicio == null || dataFim == null) {
             throw new IllegalArgumentException("Start and end dates are required");
@@ -323,7 +334,7 @@ public class PlantaoServiceImple implements PlantaoService {
         }
     }
 
-    private void validateCreateFixoRequest(Long setorId, Long medicoId, TipoRecorrenciaPlantao tipoRecorrencia,
+    private void validateCreateFixoRequest(Long setorId, List<Long> medicoIds, TipoRecorrenciaPlantao tipoRecorrencia,
             String diaSemana, Integer semanaDoMes, Integer diaDoMes, LocalDate dataInicioVigencia,
             LocalDate dataFimVigencia, Manager escalista) {
         if (escalista == null) {
@@ -339,14 +350,17 @@ public class PlantaoServiceImple implements PlantaoService {
         if (setorId == null) {
             throw new IllegalArgumentException("Setor is required");
         }
-        if (medicoId == null) {
-            throw new IllegalArgumentException("Doctor is required");
+        if (medicoIds.isEmpty()) {
+            throw new IllegalArgumentException("Ao menos um médico é obrigatório");
         }
         if (tipoRecorrencia == null) {
             throw new IllegalArgumentException("Tipo de recorrência é obrigatório");
         }
         if (dataInicioVigencia == null) {
             throw new IllegalArgumentException("Data de início da vigência é obrigatória");
+        }
+        if (dataFimVigencia == null) {
+            throw new IllegalArgumentException("Data final da vigência é obrigatória");
         }
         if (dataFimVigencia != null && dataFimVigencia.isBefore(dataInicioVigencia)) {
             throw new IllegalArgumentException("Data final da vigência não pode ser anterior à data inicial");
@@ -397,7 +411,7 @@ public class PlantaoServiceImple implements PlantaoService {
     }
 
     private boolean hasConflitoHorario(Long medicoId, LocalDateTime dataInicio, LocalDateTime dataFim) {
-        return plantaoRepository.existsByMedicoResponsavelAtualIdAndStatusNotAndDataInicioLessThanAndDataFimGreaterThan(
+        return plantaoMedicoRepository.existsConflitoHorario(
                 medicoId,
                 PlantaoStatus.CANCELADO,
                 dataFim,
@@ -429,6 +443,57 @@ public class PlantaoServiceImple implements PlantaoService {
         }
     }
 
+    private List<Long> normalizeMedicoIds(List<Long> medicoIds) {
+        if (medicoIds == null) {
+            return List.of();
+        }
+
+        Set<Long> normalized = new LinkedHashSet<>();
+        medicoIds.stream()
+                .filter(id -> id != null)
+                .forEach(normalized::add);
+
+        if (normalized.size() > 4) {
+            throw new IllegalArgumentException("Um plantão pode ter no máximo 4 médicos");
+        }
+        return List.copyOf(normalized);
+    }
+
+    private List<Doctor> loadAndValidateMedicos(List<Long> medicoIds, Setor setor, List<PlantaoPeriodo> periodos) {
+        if (medicoIds.isEmpty()) {
+            throw new IllegalArgumentException("Ao menos um médico é obrigatório");
+        }
+
+        List<Doctor> medicos = medicoIds.stream()
+                .map(medicoId -> doctorRepository.findById(medicoId)
+                        .orElseThrow(() -> new IllegalArgumentException("Médico não encontrado: " + medicoId)))
+                .toList();
+
+        medicos.forEach(medico -> {
+            validateMedicoAtuaNoSetor(medico, setor);
+            validateNoConflicts(medico, periodos);
+        });
+
+        return medicos;
+    }
+
+    private List<PlantaoMedico> criarAlocacoes(Plantao plantao, List<Doctor> medicos, LocalDateTime now) {
+        List<PlantaoMedico> alocacoes = medicos.stream()
+                .map(medico -> {
+                    PlantaoMedico plantaoMedico = new PlantaoMedico();
+                    plantaoMedico.setPlantao(plantao);
+                    plantaoMedico.setMedicoTitular(medico);
+                    plantaoMedico.setMedicoResponsavelAtual(medico);
+                    plantaoMedico.setStatus(PlantaoStatus.AGENDADO);
+                    plantaoMedico.setCriadoEm(now);
+                    plantaoMedico.setAtualizadoEm(now);
+                    return plantaoMedico;
+                })
+                .toList();
+
+        return plantaoMedicoRepository.saveAll(alocacoes);
+    }
+
     private TimeRange resolveTimeRange(PlantaoTurno turno, LocalTime horaInicio, LocalTime horaFim) {
         if (turno == PlantaoTurno.DIURNO) {
             return new TimeRange(LocalTime.of(7, 0), LocalTime.of(19, 0));
@@ -456,7 +521,6 @@ public class PlantaoServiceImple implements PlantaoService {
     private Plantao buildPlantaoFixo(Setor setor, Doctor medico, Manager escalista, RegraPlantaoFixo regra,
             PlantaoTurno turno, PlantaoPeriodo periodo, LocalDateTime now) {
         Plantao plantao = new Plantao();
-        plantao.setHospital(setor.getHospital());
         plantao.setSetor(setor);
         plantao.setRegraPlantaoFixo(regra);
         plantao.setMedicoTitular(medico);

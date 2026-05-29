@@ -27,6 +27,9 @@ public class PedidoCobertura {
     private Plantao plantao;
 
     @ManyToOne
+    private PlantaoMedico plantaoMedico;
+
+    @ManyToOne
     private Hospital hospital;
 
     @ManyToOne
@@ -68,6 +71,17 @@ public class PedidoCobertura {
         if (plantao != null) {
             this.hospital = plantao.getHospital();
             this.setor = plantao.getSetor();
+        }
+    }
+
+    public PlantaoMedico getPlantaoMedico() {
+        return plantaoMedico;
+    }
+
+    public void setPlantaoMedico(PlantaoMedico plantaoMedico) {
+        this.plantaoMedico = plantaoMedico;
+        if (plantaoMedico != null) {
+            setPlantao(plantaoMedico.getPlantao());
         }
     }
 

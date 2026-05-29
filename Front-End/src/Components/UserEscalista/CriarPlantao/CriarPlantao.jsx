@@ -36,6 +36,7 @@ import { getStoredUser } from "../../../utils/authStorage";
 
 const initialFormData = {
   dataPlantao: "",
+  dataFimVigencia: "",
   horaInicio: "07:00",
   horaFim: "19:00",
   tipoTurno: "DIURNO",
@@ -116,6 +117,11 @@ export default function CriarPlantao() {
     setFormData((prev) => {
       const exists = prev.medicoIds.includes(id);
 
+      if (!exists && prev.medicoIds.length >= 4) {
+        setErro("Um plantão pode ter no máximo 4 médicos.");
+        return prev;
+      }
+
       return {
         ...prev,
         medicoIds: exists
@@ -129,6 +135,7 @@ export default function CriarPlantao() {
     setFormData((prev) => ({
       ...prev,
       frequencia: tipo,
+      dataFimVigencia: tipo === "unico" ? "" : prev.dataFimVigencia,
     }));
   }
 
@@ -176,62 +183,74 @@ export default function CriarPlantao() {
     e.preventDefault();
 
     if (!formData.dataPlantao) return setErro("Data do plantão é obrigatória");
-    if (!formData.horaInicio || !formData.horaFim)
+    if (formData.tipoTurno === "PERSONALIZADO" && (!formData.horaInicio || !formData.horaFim))
       return setErro("Horário obrigatório");
     if (!formData.setorId) return setErro("Setor obrigatório");
     if (!formData.medicoIds.length)
       return setErro("Selecione pelo menos um médico");
+    if (formData.medicoIds.length > 4)
+      return setErro("Um plantão pode ter no máximo 4 médicos");
+    if (formData.frequencia !== "unico" && !formData.dataFimVigencia)
+      return setErro("Data final da vigência é obrigatória para plantão fixo");
+    if (
+      formData.frequencia !== "unico" &&
+      formData.dataFimVigencia < formData.dataPlantao
+    )
+      return setErro("Data final da vigência não pode ser anterior à data inicial");
 
     try {
       setSubmitting(true);
 
       if (formData.frequencia === "unico") {
-        // await criarPlantaoAvulso({
-        //   setorId: Number(formData.setorId),
-        //   medicoIds: formData.medicoIds.map(Number),
-        //   data: formData.dataPlantao,
-        //   horaInicio: formData.horaInicio,
-        //   horaFim: formData.horaFim,
-        // });
         await criarPlantaoAvulso({
           setorId: Number(formData.setorId),
           medicoIds: formData.medicoIds.map(Number),
-          data: formData.dataPlantao,
+          data: formData.tipoTurno === "PERSONALIZADO" ? null : formData.dataPlantao,
           turno: formData.tipoTurno,
-          horaInicio:
+          dataInicio:
             formData.tipoTurno === "PERSONALIZADO"
-              ? formData.horaInicio
+              ? `${formData.dataPlantao}T${formData.horaInicio}:00`
               : null,
-          horaFim:
+          dataFim:
             formData.tipoTurno === "PERSONALIZADO"
-              ? formData.horaFim
+              ? buildDataFimPersonalizada(
+                  formData.dataPlantao,
+                  formData.horaInicio,
+                  formData.horaFim,
+                )
               : null,
         });
-
       } else {
-        // await criarPlantaoFixo({
-        //   setorId: Number(formData.setorId),
-        //   medicoIds: formData.medicoIds.map(Number),
-        //   frequencia: formData.frequencia,
-        //   dataInicioVigencia: formData.dataPlantao,
-        // });
+        const tipoRecorrencia =
+          formData.frequencia === "mensal"
+            ? "MENSAL_DIA_FIXO"
+            : "SEMANAL";
+
+        const dataBase = new Date(`${formData.dataPlantao}T00:00:00`);
+
         await criarPlantaoFixo({
           setorId: Number(formData.setorId),
           medicoIds: formData.medicoIds.map(Number),
-          frequencia: formData.frequencia,
+          tipoRecorrencia,
+          diaSemana:
+            tipoRecorrencia === "SEMANAL"
+              ? String(dataBase.getDay() === 0 ? 7 : dataBase.getDay())
+              : null,
+          diaDoMes:
+            tipoRecorrencia === "MENSAL_DIA_FIXO"
+              ? dataBase.getDate()
+              : null,
           turno: formData.tipoTurno,
-
           horaInicio:
             formData.tipoTurno === "PERSONALIZADO"
               ? formData.horaInicio
               : null,
-
           horaFim:
             formData.tipoTurno === "PERSONALIZADO"
               ? formData.horaFim
               : null,
-
           dataInicioVigencia: formData.dataPlantao,
+          dataFimVigencia: formData.dataFimVigencia,
         });
       }
 
@@ -310,6 +329,22 @@ export default function CriarPlantao() {
                 />
               </div>
             </div>
+
+            {formData.frequencia !== "unico" && (
+              <div className="campo">
+                <label>Fim da Vigência</label>
+                <div className="input-box">
+                  <CalendarDays size={18} />
+                  <input
+                    type="date"
+                    name="dataFimVigencia"
+                    value={formData.dataFimVigencia}
+                    min={formData.dataPlantao || undefined}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="campo">
               <label>Hora Início</label>
@@ -398,6 +433,12 @@ export default function CriarPlantao() {
                     </label>
                   );
                 })}
+
+                {medicosDisponiveis.length === 0 && (
+                  <div className="dropdown-item disabled">
+                    Nenhum médico vinculado ao setor.
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -434,16 +475,6 @@ export default function CriarPlantao() {
                 Todo Mês
               </button>
 
-              {/* INTEGRAR */}
-              {/* PODE TIRAR O TODO DIA NÉ? */}
-              <button
-                type="button"
-                className={`freq-btn ${formData.frequencia === "semanal" ? "active" : ""
-                  }`}
-                onClick={() => handleFrequencia("semanal")}
-              >
-                Toda dia
-              </button>
             </div>
           </div>
 
@@ -473,4 +504,18 @@ export default function CriarPlantao() {
 
 function obterUsuarioLogado() {
   return getStoredUser();
+}
+
+function buildDataFimPersonalizada(data, horaInicio, horaFim) {
+  const fim = new Date(`${data}T${horaFim}:00`);
+
+  if (horaFim <= horaInicio) {
+    fim.setDate(fim.getDate() + 1);
+  }
+
+  const year = fim.getFullYear();
+  const month = String(fim.getMonth() + 1).padStart(2, "0");
+  const day = String(fim.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${horaFim}:00`;
 }

@@ -51,6 +51,12 @@ public class ManagerController {
                 .toList());
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<ManagerResponse> getMeuPerfil(@AuthenticationPrincipal Usuario usuarioLogado) {
+        Manager escalistaLogado = accessScopeService.requireEscalistaProfile(usuarioLogado);
+        return ResponseEntity.ok(ManagerResponse.from(escalistaLogado));
+    }
+
     @PostMapping
     public ResponseEntity<ManagerResponse> create(@RequestBody Manager managerToCreate,
             @AuthenticationPrincipal Usuario usuarioLogado) {
@@ -118,7 +124,10 @@ public class ManagerController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id,
+            @AuthenticationPrincipal Usuario usuarioLogado) {
+        Hospital hospitalLogado = accessScopeService.requireHospitalProfile(usuarioLogado);
+        managerService.findById(id, hospitalLogado);
         managerService.delete(id);
         return ResponseEntity.noContent().build();
     }

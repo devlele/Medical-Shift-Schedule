@@ -4,17 +4,18 @@ Este documento registra a ordem recomendada para completar o backend do MedShift
 
 ## 1. Plantao avulso (IMPLEMENTADO)
 
-Implementar o fluxo em que o escalista cria um plantao unico para um medico em uma data e horario especificos.
+Implementado: o escalista cria um plantao unico para 1 a 4 medicos em uma data e horario especificos.
 
 O backend deve validar:
 
 - o usuario logado e um escalista;
 - o escalista atua no setor informado;
-- o medico possui vinculo ativo com o setor;
+- todos os medicos possuem vinculo ativo com o setor;
 - `dataInicio` e anterior a `dataFim`;
-- o medico nao possui outro plantao conflitante no mesmo periodo.
+- nenhum medico possui outro plantao conflitante no mesmo periodo;
+- o limite maximo e de 4 medicos por plantao.
 
-Resultado esperado: um registro `PLANTAO` com `tipo = AVULSO`, `status = AGENDADO`, hospital, setor, medico titular, medico responsavel atual e escalista criador.
+Resultado esperado: um registro `PLANTAO` com `tipo = AVULSO`, `status = AGENDADO`, hospital, setor e escalista criador, acompanhado de registros `PLANTAO_MEDICO` para cada medico atribuido.
 
 ## 2. Listagens de agenda e calendario
 
@@ -44,15 +45,15 @@ Resultado esperado: o sistema separa a regra recorrente das ocorrencias reais ex
 
 ## 4. Pedido de cobertura
 
-Implementar o fluxo em que o medico solicita que outro medico assuma um plantao.
+Implementado: o medico solicita que outro medico assuma sua atribuicao individual em um plantao.
 
 Regras esperadas:
 
-- apenas o medico responsavel atual pode abrir pedido para seu plantao;
-- o pedido fica associado ao plantao, hospital, setor e medico solicitante;
+- apenas o medico responsavel atual pode abrir pedido para sua atribuicao;
+- o pedido fica associado ao plantao, atribuicao (`PLANTAO_MEDICO`), hospital, setor e medico solicitante;
 - medicos elegiveis do mesmo hospital e setor conseguem visualizar o pedido;
-- um medico elegivel pode assumir o plantao;
-- ao assumir, `medicoResponsavelAtual` do plantao e atualizado.
+- um medico elegivel pode assumir a atribuicao;
+- ao assumir, `medicoResponsavelAtual` da atribuicao e atualizado.
 
 Resultado esperado: plantao ofertado aparece no calendario dos medicos elegiveis como pedido de cobertura.
 

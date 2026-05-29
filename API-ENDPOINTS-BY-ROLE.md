@@ -125,11 +125,13 @@ Payload recomendado para `POST /plantao/avulso`:
 ```json
 {
   "setorId": 1,
-  "medicoId": 2,
+  "medicoIds": [2, 3],
   "data": "2026-05-15",
   "turno": "DIURNO"
 }
 ```
+
+Observacao: `medicoId` ainda e aceito por compatibilidade, mas para novos fluxos o front deve enviar `medicoIds`. O backend aceita de 1 a 4 medicos por plantao.
 
 Turnos aceitos:
 
@@ -142,7 +144,7 @@ Payload recomendado para `POST /plantao/fixo`:
 ```json
 {
   "setorId": 1,
-  "medicoId": 2,
+  "medicoIds": [2, 3],
   "tipoRecorrencia": "SEMANAL",
   "diaSemana": "SABADO",
   "turno": "DIURNO",
@@ -159,6 +161,7 @@ Tipos aceitos em `tipoRecorrencia`:
 
 Para `turno = PERSONALIZADO`, enviar `horaInicio` e `horaFim` no formato `HH:mm:ss`.
 Se `dataFimVigencia` nao for enviada, a regra fica aberta e o backend gera ocorrencias iniciais para 90 dias.
+`medicoId` ainda e aceito por compatibilidade, mas `medicoIds` e o formato recomendado. O limite por plantao gerado tambem e de 4 medicos.
 
 ## Rotas do Medico
 
@@ -186,11 +189,22 @@ Valem para `MEDICO` e `DOCTOR`.
 
 | Metodo | Endpoint | Uso no front | Resposta |
 |---|---|---|---|
-| `POST` | `/coberturas` | Abrir pedido para passar plantao | `PedidoCoberturaResponse` |
+| `POST` | `/coberturas` | Abrir pedido para passar uma atribuicao de plantao | `PedidoCoberturaResponse` |
 | `GET` | `/coberturas/disponiveis` | Listar pedidos disponiveis nos setores do medico | `PedidoCoberturaResponse[]` |
 | `GET` | `/coberturas/me` | Listar pedidos criados pelo medico logado | `PedidoCoberturaResponse[]` |
 | `POST` | `/coberturas/{id}/assumir` | Assumir cobertura | `PedidoCoberturaResponse` |
 | `POST` | `/coberturas/{id}/cancelar` | Cancelar pedido proprio aberto | `PedidoCoberturaResponse` |
+
+Payload recomendado para `POST /coberturas`:
+
+```json
+{
+  "plantaoId": 10,
+  "plantaoMedicoId": 22
+}
+```
+
+`plantaoMedicoId` identifica a atribuicao individual do medico dentro do plantao. Se omitido, o backend tenta localizar a atribuicao do medico logado pelo `plantaoId`.
 
 ### Notificacoes
 

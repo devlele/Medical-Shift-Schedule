@@ -1,4 +1,5 @@
-import React, { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import {
     Bell,
     CircleUserRound,
@@ -12,62 +13,79 @@ import interactionPlugin from "@fullcalendar/interaction";
 import ptBrLocale from "@fullcalendar/core/locales/pt-br";
 
 import { getStoredUser } from "../../../utils/authStorage";
+import {
+    getDoctorById,
+    getMinhaAgenda,
+} from "../../UserHospital/Setores/setorServices.js";
+import {
+    getPlantaoType,
+    normalizePlantao,
+} from "../../../utils/plantaoFormatters";
 
 import Sidebar from "../../Sidebar/Sidebar";
 import "./DetalhePlantonista.css";
 
 export default function ProfissionalVinculado() {
+    const { id } = useParams();
     const calendarRef = useRef(null);
 
-    const [currentMonth, setCurrentMonth] = useState("Março 2026");
-
-    const profissional = {
-        nome: "Dr. House",
-        especialidade: "Cardiologista",
-        crm: "123456",
-        cpf: "523.455.789-12",
-        email: "house@gmail.com",
-        telefone: "(15) 98117-1506",
-    };
+    const [currentMonth, setCurrentMonth] = useState("");
+    const [profissional, setProfissional] = useState(null);
+    const [plantoes, setPlantoes] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [erro, setErro] = useState("");
 
     const usuario = getStoredUser();
     const nomeUsuario = usuario?.name || "Escalista";
 
-    const eventos = useMemo(
-        () => [
-            {
-                title: "DAY SHIFT",
-                start: "2026-03-02",
-                className: "event-day",
-            },
-            {
-                title: "NIGHT SHIFT",
-                start: "2026-03-04",
-                className: "event-night",
-            },
-            {
-                title: "DAY SHIFT",
-                start: "2026-03-10",
-                className: "event-day",
-            },
-            {
-                title: "NIGHT SHIFT",
-                start: "2026-03-16",
-                className: "event-night",
-            },
-            {
-                title: "DAY SHIFT",
-                start: "2026-03-20",
-                className: "event-day",
-            },
-            {
-                title: "NIGHT SHIFT",
-                start: "2026-03-25",
-                className: "event-night",
-            },
-        ],
-        []
-    );
+    useEffect(() => {
+        carregarDetalhes();
+    }, [id]);
+
+    async function carregarDetalhes() {
+        if (!id) {
+            setErro("Médico não informado.");
+            setLoading(false);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            setErro("");
+
+            const [doctorData, agendaData] = await Promise.all([
+                getDoctorById(id),
+                getMinhaAgenda(),
+            ]);
+
+            setProfissional(doctorData);
+            setPlantoes(
+                Array.isArray(agendaData)
+                    ? agendaData.filter((plantao) => plantaoPertenceAoMedico(plantao, id))
+                    : [],
+            );
+        } catch (error) {
+            console.error(error);
+            setErro(error.message || "Não foi possível carregar o médico.");
+            setProfissional(null);
+            setPlantoes([]);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const eventos = useMemo(() => {
+        return plantoes.map((plantao) => {
+            const plantaoNormalizado = normalizePlantao(plantao);
+            const isNight = getPlantaoType(plantaoNormalizado).includes("noite");
+
+            return {
+                title: isNight ? "Noturno" : "Diurno",
+                start: plantaoNormalizado.date,
+                className: isNight ? "event-night" : "event-day",
+            };
+        });
+    }, [plantoes]);
 
     function updateMonthTitle(calendarApi) {
         const currentDate = calendarApi.getDate();
@@ -111,7 +129,7 @@ export default function ProfissionalVinculado() {
                         <h1>Profissionais Vinculados</h1>
 
                         <p>
-                            Visualiza as informações do Dr House e seus plantões.
+                            Visualize as informações do médico e seus plantões.
                         </p>
                     </div>
 
@@ -128,22 +146,32 @@ export default function ProfissionalVinculado() {
                     </div>
                 </header>
 
+                {erro && <div className="estado-profissional erro">{erro}</div>}
+
                 {/* CARD PROFISSIONAL */}
                 <section className="doctor-card">
-                    <div className="doctor-left">
-                        <div>
-                            <h2>{profissional.nome}</h2>
+                    {loading ? (
+                        <div className="estado-profissional">Carregando médico...</div>
+                    ) : profissional ? (
+                        <>
+                            <div className="doctor-left">
+                                <div>
+                                    <h2>{profissional.name || profissional.nome}</h2>
 
-                            <p>CRM: {profissional.crm}</p>
-                            <p>CPF: {profissional.cpf}</p>
-                            <p>Telefone: {profissional.telefone}</p>
-                        </div>
-                    </div>
+                                    <p>CRM: {profissional.crm || "-"}</p>
+                                    <p>CPF: {profissional.cpf || "-"}</p>
+                                    <p>Telefone: {profissional.telefone || "-"}</p>
+                                </div>
+                            </div>
 
-                    <div className="doctor-right">
-                        <h4>{profissional.especialidade}</h4>
-                        <h4>Email: {profissional.email}</h4>
-                    </div>
+                            <div className="doctor-right">
+                                <h4>{profissional.specialty || "Especialidade não informada"}</h4>
+                                <h4>Email: {profissional.email || "-"}</h4>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="estado-profissional">Médico não encontrado.</div>
+                    )}
                 </section>
 
                 {/* CALENDÁRIO */}
@@ -174,7 +202,6 @@ export default function ProfissionalVinculado() {
                             ]}
                             locale={ptBrLocale}
                             initialView="dayGridMonth"
-                            initialDate="2026-03-01"
                             headerToolbar={false}
                             fixedWeekCount={false}
                             height="auto"
@@ -200,4 +227,21 @@ export default function ProfissionalVinculado() {
             </main>
         </div>
     );
+}
+
+function plantaoPertenceAoMedico(plantao, medicoId) {
+    const id = String(medicoId);
+
+    if (String(plantao.doctorId || "") === id) {
+        return true;
+    }
+
+    return Array.isArray(plantao.medicos)
+        ? plantao.medicos.some((medico) =>
+            [medico.medicoTitularId, medico.medicoResponsavelAtualId]
+                .filter(Boolean)
+                .map(String)
+                .includes(id),
+        )
+        : false;
 }

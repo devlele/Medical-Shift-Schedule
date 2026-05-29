@@ -12,12 +12,12 @@ Garantir o fluxo principal do sistema:
 4. hospital define um setor responsavel para cada escalista;
 5. medico se cadastra e faz login;
 6. escalista busca medicos e os vincula a setores;
-7. escalista cria plantao avulso para medico do setor;
+7. escalista cria plantao avulso para um ou mais medicos do setor;
 8. medico visualiza sua agenda;
 9. medico abre pedido de cobertura;
 10. outro medico do mesmo setor visualiza o pedido;
 11. outro medico assume a cobertura;
-12. plantao muda de responsavel atual;
+12. a atribuicao individual do plantao muda de responsavel atual;
 13. medico solicitante recebe notificacao.
 
 ## Estado Atual do Backend
@@ -35,6 +35,7 @@ Implementado:
 - Busca de medicos candidatos para vinculo.
 - Criacao de plantao avulso por escalista.
 - Criacao de plantao fixo/recorrente por escalista.
+- Atribuicao de 1 a 4 medicos no mesmo plantao via `medicoIds`.
 - Plantao por turno:
   - `DIURNO`: 07:00 ate 19:00;
   - `NOTURNO`: 19:00 ate 07:00 do dia seguinte;
@@ -347,18 +348,20 @@ Formato recomendado para plantao padrao:
 ```json
 {
   "setorId": 1,
-  "medicoId": 2,
+  "medicoIds": [2, 3],
   "data": "2026-05-15",
   "turno": "DIURNO"
 }
 ```
+
+`medicoId` ainda e aceito por compatibilidade. Para novos fluxos, usar `medicoIds` com no maximo 4 medicos.
 
 Tambem aceita:
 
 ```json
 {
   "setorId": 1,
-  "medicoId": 2,
+  "medicoIds": [2, 3],
   "data": "2026-05-15",
   "turno": "NOTURNO"
 }
@@ -374,7 +377,7 @@ Formato personalizado:
 ```json
 {
   "setorId": 1,
-  "medicoId": 2,
+  "medicoIds": [2, 3],
   "dataInicio": "2026-05-15T08:00:00",
   "dataFim": "2026-05-15T14:00:00"
 }
@@ -385,7 +388,7 @@ Tambem pode enviar:
 ```json
 {
   "setorId": 1,
-  "medicoId": 2,
+  "medicoIds": [2, 3],
   "turno": "PERSONALIZADO",
   "dataInicio": "2026-05-15T08:00:00",
   "dataFim": "2026-05-15T14:00:00"
@@ -417,14 +420,16 @@ Campos importantes:
 - `time`
 - `duracaoHoras`
 - `status`
+- `medicos`: lista de atribuicoes individuais do plantao, com `id`, medico titular, medico responsavel atual e status.
 
 Regras validadas:
 
 - usuario logado e escalista;
 - escalista e responsavel pelo setor informado;
-- medico possui vinculo ativo com o setor;
+- todos os medicos possuem vinculo ativo com o setor;
 - periodo valido;
-- medico nao possui outro plantao conflitante.
+- nenhum medico possui outro plantao conflitante;
+- o plantao possui no maximo 4 medicos.
 
 ### 6. Plantoes Fixos
 
@@ -439,7 +444,7 @@ Exemplo semanal:
 ```json
 {
   "setorId": 1,
-  "medicoId": 2,
+  "medicoIds": [2, 3],
   "tipoRecorrencia": "SEMANAL",
   "diaSemana": "SABADO",
   "turno": "DIURNO",
@@ -453,7 +458,7 @@ Exemplo mensal no segundo sabado do mes:
 ```json
 {
   "setorId": 1,
-  "medicoId": 2,
+  "medicoIds": [2, 3],
   "tipoRecorrencia": "MENSAL_N_ESIMO_DIA_SEMANA",
   "diaSemana": "SABADO",
   "semanaDoMes": 2,
@@ -468,7 +473,7 @@ Exemplo mensal por dia fixo:
 ```json
 {
   "setorId": 1,
-  "medicoId": 2,
+  "medicoIds": [2, 3],
   "tipoRecorrencia": "MENSAL_DIA_FIXO",
   "diaDoMes": 15,
   "turno": "NOTURNO",
@@ -482,7 +487,7 @@ Exemplo com horario personalizado:
 ```json
 {
   "setorId": 1,
-  "medicoId": 2,
+  "medicoIds": [2, 3],
   "tipoRecorrencia": "SEMANAL",
   "diaSemana": "QUARTA",
   "turno": "PERSONALIZADO",
@@ -499,9 +504,10 @@ Regras validadas:
 
 - usuario logado e escalista;
 - escalista e responsavel pelo setor informado;
-- medico possui vinculo ativo com o setor;
+- todos os medicos possuem vinculo ativo com o setor;
 - recorrencia e vigencia validas;
-- medico nao possui outro plantao conflitante em nenhuma ocorrencia gerada;
+- nenhum medico possui outro plantao conflitante em nenhuma ocorrencia gerada;
+- cada plantao gerado possui no maximo 4 medicos;
 - geracao inicial limitada a 366 dias;
 - se `dataFimVigencia` nao for enviada, a regra fica aberta e o backend gera ocorrencias iniciais para 90 dias.
 
@@ -544,7 +550,7 @@ Resposta: lista de `PlantaoSummaryResponse`.
 
 ### 8. Pedido de Cobertura
 
-Abrir pedido de cobertura como medico responsavel atual:
+Abrir pedido de cobertura como medico responsavel atual por uma atribuicao:
 
 ```http
 POST /coberturas
@@ -554,9 +560,12 @@ Payload:
 
 ```json
 {
-  "plantaoId": 10
+  "plantaoId": 10,
+  "plantaoMedicoId": 22
 }
 ```
+
+`plantaoMedicoId` vem de `PlantaoSummaryResponse.medicos[].id`. Ele identifica qual vaga/atribuicao daquele plantao esta sendo passada. Se o front enviar apenas `plantaoId`, o backend tenta resolver automaticamente pela atribuicao do medico logado.
 
 Listar pedidos disponiveis para o medico logado:
 
@@ -587,12 +596,13 @@ Resposta: `PedidoCoberturaResponse`.
 Regras:
 
 - apenas medico responsavel atual abre pedido;
+- o pedido pertence a uma atribuicao individual em `PlantaoMedico`;
 - plantao precisa estar `AGENDADO`;
-- nao pode haver outro pedido `ABERTO` para o mesmo plantao;
+- nao pode haver outro pedido `ABERTO` para a mesma atribuicao;
 - apenas medicos do mesmo setor visualizam o pedido;
 - solicitante nao pode assumir o proprio pedido;
 - medico cobridor nao pode ter conflito de horario;
-- ao assumir, `Plantao.medicoResponsavelAtual` muda para o cobridor;
+- ao assumir, `PlantaoMedico.medicoResponsavelAtual` muda para o cobridor;
 - ao assumir, solicitante recebe notificacao.
 
 ### 9. Notificacoes
@@ -650,7 +660,7 @@ Quando uma cobertura e assumida, o backend cria uma notificacao para o medico so
 2. Login em `POST /auth/login`.
 3. Se `role = MEDICO` ou `DOCTOR`, direcionar para painel do medico.
 4. Agenda usa `GET /agenda/me`.
-5. Para passar plantao, usar `POST /coberturas`.
+5. Para passar plantao, usar `POST /coberturas` com `plantaoId` e, preferencialmente, `plantaoMedicoId`.
 6. Para ver plantoes ofertados por outros medicos do mesmo setor, usar `GET /coberturas/disponiveis`.
 7. Para assumir, usar `POST /coberturas/{id}/assumir`.
 8. Para notificacoes, usar `GET /notificacoes/me`.
@@ -689,8 +699,8 @@ Para mostrar pedidos de cobertura no calendario do medico:
 8. Ver setor do escalista.
 9. Buscar medico A e medico B como candidatos.
 10. Vincular medico A e medico B ao setor.
-11. Criar plantao avulso para medico A usando `data + turno`.
-12. Criar plantao fixo para medico A usando `POST /plantao/fixo`.
+11. Criar plantao avulso para medico A ou para medico A+B usando `data + turno` e `medicoIds`.
+12. Criar plantao fixo para medico A ou para medico A+B usando `POST /plantao/fixo`.
 13. Logar como medico A.
 14. Ver plantoes em `GET /agenda/me`.
 15. Medico A abre pedido de cobertura.
@@ -704,7 +714,7 @@ Para mostrar pedidos de cobertura no calendario do medico:
 
 ## Pendente ou Fora do MVP
 
-- Grupo de plantao com quantidade necessaria de medicos por turno.
+- Quantidade obrigatoria/exata de medicos por setor ou turno. Hoje ha limite maximo de 4, mas nao obrigatoriedade de exatamente 4.
 - Relatorios.
 - Dashboards analiticos completos.
 - Recuperacao de senha.

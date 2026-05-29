@@ -141,7 +141,7 @@ export function normalizePlantao(plantao) {
     setor: plantao.setor || "Setor nao informado",
     hospital: plantao.hospital || "Hospital nao informado",
     local: plantao.local || plantao.hospital || "Local nao informado",
-    doctor: plantao.doctor || "Medico nao informado",
+    doctor: resolvePlantaoDoctors(plantao),
     date: getPlantaoDate(plantao),
     time: formatPlantaoTime(plantao),
     type: getPlantaoType(plantao),
@@ -150,6 +150,24 @@ export function normalizePlantao(plantao) {
     status: plantao.status || "AGENDADO",
     raw: plantao,
   };
+}
+
+function resolvePlantaoDoctors(plantao) {
+  const nomes = Array.isArray(plantao?.medicos)
+    ? plantao.medicos
+        .map((medico) => medico.medicoResponsavelAtualNome || medico.medicoTitularNome)
+        .filter(Boolean)
+    : [];
+
+  if (nomes.length === 1) {
+    return nomes[0];
+  }
+
+  if (nomes.length > 1) {
+    return `${nomes.slice(0, 2).join(", ")}${nomes.length > 2 ? ` +${nomes.length - 2}` : ""}`;
+  }
+
+  return plantao?.doctor || "Medico nao informado";
 }
 
 export function normalizePedidoCobertura(pedido) {

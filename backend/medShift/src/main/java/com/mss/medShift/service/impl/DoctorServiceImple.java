@@ -49,12 +49,20 @@ public class DoctorServiceImple implements DoctorService {
 
     @Override
     public Doctor findByIdAndHospitalId(Long id, Long hospitalId) {
-        return doctorRepository.findByIdAndHospitalId(id, hospitalId).orElseThrow(NoSuchElementException::new);
+        Doctor doctor = findById(id);
+        if (!doctorBelongsToHospital(doctor, hospitalId)) {
+            throw new NoSuchElementException();
+        }
+        return doctor;
     }
 
     @Override
     public Doctor findByIdAndHospitalIdAndSetorId(Long id, Long hospitalId, Long setorId) {
-        return doctorRepository.findByIdAndHospitalIdAndSetorId(id, hospitalId, setorId).orElseThrow(NoSuchElementException::new);
+        Doctor doctor = findById(id);
+        if (!doctorBelongsToSetor(doctor, setorId) || !setorBelongsToHospital(setorId, hospitalId)) {
+            throw new NoSuchElementException();
+        }
+        return doctor;
     }
 
     @Override
@@ -64,12 +72,32 @@ public class DoctorServiceImple implements DoctorService {
 
     @Override
     public List<Doctor> findByHospitalId(Long hospitalId) {
-        return doctorRepository.findByHospitalId(hospitalId);
+        if (hospitalId == null) {
+            return List.of();
+        }
+
+        List<Long> setorIds = setorRepository.findByHospitalId(hospitalId).stream()
+                .map(Setor::getId)
+                .filter(id -> id != null)
+                .toList();
+
+        var doctorsById = new LinkedHashMap<Long, Doctor>();
+
+        findBySetorIds(setorIds).forEach(doctor -> doctorsById.putIfAbsent(doctor.getId(), doctor));
+
+        doctorRepository.findByHospitalId(hospitalId).stream()
+                .filter(doctor -> doctor.getId() != null)
+                .forEach(doctor -> doctorsById.putIfAbsent(doctor.getId(), doctor));
+
+        return List.copyOf(doctorsById.values());
     }
 
     @Override
     public List<Doctor> findByHospitalIdAndSetorId(Long hospitalId, Long setorId) {
-        return doctorRepository.findByHospitalIdAndSetorId(hospitalId, setorId);
+        if (!setorBelongsToHospital(setorId, hospitalId)) {
+            return List.of();
+        }
+        return findBySetorIds(List.of(setorId));
     }
 
     @Override
@@ -101,13 +129,9 @@ public class DoctorServiceImple implements DoctorService {
             throw new IllegalArgumentException("Escalista sem hospital");
         }
 
-        Long hospitalId = escalistaLogado.getHospital().getId();
         String termoNormalizado = termo != null ? termo.trim().toLowerCase() : "";
 
         return doctorRepository.findAll().stream()
-                .filter(doctor -> doctor.getHospital() == null
-                        || doctor.getHospital().getId() == null
-                        || hospitalId.equals(doctor.getHospital().getId()))
                 .filter(doctor -> setorId == null
                         || medicoSetorRepository.findByMedicoIdAndSetorIdAndAtivoTrue(doctor.getId(), setorId).isEmpty())
                 .filter(doctor -> matchesTermo(doctor, termoNormalizado))
@@ -182,15 +206,6 @@ public class DoctorServiceImple implements DoctorService {
         Doctor doctor = findById(doctorId);
         Setor setor = findSetorDoHospital(setorId, escalistaLogado);
 
-        if (doctor.getHospital() != null && !doctor.getHospital().getId().equals(escalistaLogado.getHospital().getId())) {
-            throw new IllegalArgumentException("Médico pertence a outro hospital");
-        }
-        if (doctor.getSetor() != null
-                && doctor.getSetor().getHospital() != null
-                && !doctor.getSetor().getHospital().getId().equals(escalistaLogado.getHospital().getId())) {
-            throw new IllegalArgumentException("Médico pertence a setor de outro hospital");
-        }
-
         if (doctor.getHospital() == null) {
             doctor.setHospital(escalistaLogado.getHospital());
         }
@@ -221,6 +236,7 @@ public class DoctorServiceImple implements DoctorService {
 
         if (isLegacySetor(doctor, setor)) {
             doctor.setSetor(resolveNextSetor(doctor.getId(), setor.getId()));
+            syncLegacyHospitalFromSetor(doctor);
             doctor.setAtualizadoEm(LocalDateTime.now());
             doctorRepository.save(doctor);
         }
@@ -311,6 +327,49 @@ public class DoctorServiceImple implements DoctorService {
                 .filter(setor -> setor != null && setor.getId() != null && !setor.getId().equals(setorRemovidoId))
                 .findFirst()
                 .orElse(null);
+    }
+
+    private boolean doctorBelongsToHospital(Doctor doctor, Long hospitalId) {
+        if (doctor == null || doctor.getId() == null || hospitalId == null) {
+            return false;
+        }
+
+        boolean legacyHospital = doctor.getHospital() != null
+                && hospitalId.equals(doctor.getHospital().getId());
+
+        boolean linkedHospital = medicoSetorRepository.findByMedicoIdAndAtivoTrue(doctor.getId()).stream()
+                .map(MedicoSetor::getSetor)
+                .anyMatch(setor -> setor != null
+                        && setor.getHospital() != null
+                        && hospitalId.equals(setor.getHospital().getId()));
+
+        return legacyHospital || linkedHospital;
+    }
+
+    private boolean doctorBelongsToSetor(Doctor doctor, Long setorId) {
+        if (doctor == null || doctor.getId() == null || setorId == null) {
+            return false;
+        }
+
+        boolean legacySetor = doctor.getSetor() != null
+                && setorId.equals(doctor.getSetor().getId());
+
+        boolean linkedSetor = medicoSetorRepository
+                .findByMedicoIdAndSetorIdAndAtivoTrue(doctor.getId(), setorId)
+                .isPresent();
+
+        return legacySetor || linkedSetor;
+    }
+
+    private boolean setorBelongsToHospital(Long setorId, Long hospitalId) {
+        if (setorId == null || hospitalId == null) {
+            return false;
+        }
+        return setorRepository.findByIdAndHospitalId(setorId, hospitalId).isPresent();
+    }
+
+    private void syncLegacyHospitalFromSetor(Doctor doctor) {
+        doctor.setHospital(doctor.getSetor() != null ? doctor.getSetor().getHospital() : null);
     }
 
     private boolean matchesTermo(Doctor doctor, String termo) {

@@ -270,3 +270,4 @@ CREATE TABLE tb_notificacao (
     FOREIGN KEY (plantao_id) REFERENCES tb_plantao(id)
 );
 
+

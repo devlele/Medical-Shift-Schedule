@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import {
   criarPedidoCobertura,
+  getMeusPedidosCobertura,
   getMinhaAgendaMedico,
 } from "../../../services/doctorServices";
 import {
@@ -32,13 +33,23 @@ export default function OferecerPlantao() {
         setLoading(true);
         setErro("");
 
-        const agenda = await getMinhaAgendaMedico();
+        const [agenda, meusPedidos] = await Promise.all([
+          getMinhaAgendaMedico(),
+          getMeusPedidosCobertura(),
+        ]);
 
         if (!ativo) {
           return;
         }
 
         const agora = new Date();
+        const plantaoIdsComPedidoAberto = new Set(
+          (Array.isArray(meusPedidos) ? meusPedidos : [])
+            .filter((pedido) => pedido.status === "ABERTO")
+            .map((pedido) => pedido.plantao?.id)
+            .filter((id) => id != null),
+        );
+
         const normalizados = (Array.isArray(agenda) ? agenda : [])
           .filter((plantao) => {
             const inicio = plantao.dataInicio
@@ -47,6 +58,7 @@ export default function OferecerPlantao() {
 
             return (
               plantao.status === "AGENDADO" &&
+              !plantaoIdsComPedidoAberto.has(plantao.id) &&
               (!inicio || Number.isNaN(inicio.getTime()) || inicio >= agora)
             );
           })
@@ -153,7 +165,10 @@ export default function OferecerPlantao() {
                 </button>
               ))
             ) : (
-              <p>Nenhum plantão agendado disponível para oferta.</p>
+              <p>
+                Nenhum plantão agendado disponível para oferta. Plantões que já
+                possuem pedido aberto não aparecem nesta lista.
+              </p>
             )}
           </div>
 

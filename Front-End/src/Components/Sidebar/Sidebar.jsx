@@ -83,6 +83,11 @@ export default function Sidebar() {
       icon: ClipboardPlus,
     },
     {
+      to: "/UserPlantonista/Historico",
+      label: "Histórico",
+      icon: History,
+    },
+    {
       to: "/UserPlantonista/Perfil",
       label: "Perfil",
       icon: User,

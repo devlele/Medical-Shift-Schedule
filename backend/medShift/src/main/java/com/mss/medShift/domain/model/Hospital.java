@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Table(name = "tb_hospital")
 @Entity
@@ -56,7 +57,7 @@ public class Hospital {
     @JsonIgnore
     private List<Setor> setores;
 
-    @OneToMany(mappedBy = "hospital")
+    @Transient
     @JsonIgnore
     private List<Manager> managers;
 
@@ -68,7 +69,7 @@ public class Hospital {
     @JsonIgnore
     private List<RegraPlantaoFixo> regrasPlantaoFixo;
 
-    @OneToMany(mappedBy = "hospital")
+    @Transient
     @JsonIgnore
     private List<Plantao> plantoes;
 

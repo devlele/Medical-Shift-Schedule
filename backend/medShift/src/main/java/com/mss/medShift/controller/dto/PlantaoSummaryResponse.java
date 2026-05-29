@@ -3,6 +3,7 @@ package com.mss.medShift.controller.dto;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.mss.medShift.domain.model.Plantao;
 import com.mss.medShift.domain.model.PlantaoStatus;
@@ -28,7 +29,8 @@ public record PlantaoSummaryResponse(
         LocalDateTime dataFim,
         String time,
         Long duracaoHoras,
-        PlantaoStatus status) {
+        PlantaoStatus status,
+        List<PlantaoMedicoResponse> medicos) {
 
     public static PlantaoSummaryResponse from(Plantao plantao) {
         var setor = plantao.getSetor();
@@ -59,7 +61,8 @@ public record PlantaoSummaryResponse(
                 plantao.getDataFim(),
                 formatTime(plantao.getDataInicio(), plantao.getDataFim(), duracaoHoras),
                 duracaoHoras,
-                plantao.getStatus());
+                plantao.getStatus(),
+                resolveMedicos(plantao));
     }
 
     private static PlantaoTurno resolveTurno(Plantao plantao) {
@@ -92,5 +95,14 @@ public record PlantaoSummaryResponse(
                 dataFim.getMinute());
 
         return duracaoHoras != null ? periodo + " (" + duracaoHoras + "h)" : periodo;
+    }
+
+    private static List<PlantaoMedicoResponse> resolveMedicos(Plantao plantao) {
+        if (plantao.getMedicos() == null || plantao.getMedicos().isEmpty()) {
+            return List.of();
+        }
+        return plantao.getMedicos().stream()
+                .map(PlantaoMedicoResponse::from)
+                .toList();
     }
 }

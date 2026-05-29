@@ -98,8 +98,17 @@ erDiagram
         string status
     }
 
+    PLANTAO_MEDICO {
+        bigint id PK
+        bigint plantao_id FK
+        bigint medico_titular_id FK
+        bigint medico_responsavel_atual_id FK
+        string status
+    }
+
     PEDIDO_COBERTURA {
         bigint id PK
+        bigint plantao_medico_id FK
         string status
         datetime aberto_em
         datetime assumido_em
@@ -119,7 +128,7 @@ erDiagram
     USUARIO ||--o| MEDICO : acessa_como
 
     HOSPITAL ||--o{ SETOR : possui
-    HOSPITAL ||--o{ ESCALISTA : cadastra
+    HOSPITAL ||--o{ ESCALISTA : cadastra_via_setor
 
     SETOR ||--o| ESCALISTA : responsavel_por
     MEDICO ||--o{ MEDICO_SETOR : possui_vinculo
@@ -130,15 +139,16 @@ erDiagram
 
     ESCALISTA ||--o{ PLANTAO : cria
     SETOR ||--o{ PLANTAO : recebe
-    MEDICO ||--o{ PLANTAO : titular
-    MEDICO ||--o{ PLANTAO : responsavel_atual
+    PLANTAO ||--o{ PLANTAO_MEDICO : possui_medico
+    MEDICO ||--o{ PLANTAO_MEDICO : titular
+    MEDICO ||--o{ PLANTAO_MEDICO : responsavel_atual
 
     SETOR ||--o{ REGRA_PLANTAO_FIXO : possui
     MEDICO ||--o{ REGRA_PLANTAO_FIXO : escalado_em
     ESCALISTA ||--o{ REGRA_PLANTAO_FIXO : define
     REGRA_PLANTAO_FIXO ||--o{ PLANTAO : gera
 
-    PLANTAO ||--o| PEDIDO_COBERTURA : pode_originar
+    PLANTAO_MEDICO ||--o{ PEDIDO_COBERTURA : pode_originar
     MEDICO ||--o{ PEDIDO_COBERTURA : solicita
     MEDICO ||--o{ PEDIDO_COBERTURA : assume
 
@@ -160,7 +170,7 @@ No DER completo, essa decisao permite centralizar login, senha e permissoes em u
 
 Representa a instituicao hospitalar cadastrada no sistema.
 
-O hospital possui setores e cadastra escalistas. Cada escalista fica responsavel por um unico setor do hospital, e cada setor pode ter no maximo um escalista responsavel.
+O hospital possui setores e cadastra escalistas. O hospital do escalista e identificado pelo setor ao qual ele esta vinculado. Cada escalista fica responsavel por um unico setor do hospital, e cada setor pode ter no maximo um escalista responsavel.
 
 ### Setor
 
@@ -218,22 +228,30 @@ Essa entidade nao e o plantao realizado em si. Ela apenas define a regra que ger
 
 ### Plantao
 
-Representa uma ocorrencia real de plantao, com data, horario, setor, medico titular e medico responsavel atual.
+Representa uma ocorrencia real de plantao, com data, horario e setor.
 
 O plantao pode ser:
 
 - avulso: criado para uma data e horario especificos;
 - fixo: gerado a partir de uma regra de recorrencia.
 
-O medico titular e o medico originalmente escalado. O medico responsavel atual pode mudar quando outro medico assume uma cobertura.
+Um plantao pode ter de 1 a 4 atribuicoes medicas individuais. Essas atribuicoes ficam em `PLANTAO_MEDICO`.
+
+### Plantao medico
+
+Representa uma vaga/atribuicao de medico dentro de um plantao.
+
+O medico titular e o medico originalmente escalado naquela atribuicao. O medico responsavel atual pode mudar quando outro medico assume uma cobertura daquela atribuicao.
+
+No MVP, o limite de ate 4 medicos por plantao e uma regra de negocio validada no backend.
 
 ### Pedido de cobertura
 
-Representa a solicitacao feita por um medico que deseja passar um plantao para outro profissional.
+Representa a solicitacao feita por um medico que deseja passar sua atribuicao em um plantao para outro profissional.
 
 Quando o pedido e aberto, ele fica visivel apenas para medicos vinculados ao mesmo setor do plantao.
 
-Quando outro medico assume a cobertura, o pedido e marcado como assumido e o plantao passa a ter esse medico como responsavel atual.
+Quando outro medico assume a cobertura, o pedido e marcado como assumido e a atribuicao em `PLANTAO_MEDICO` passa a ter esse medico como responsavel atual.
 
 ### Notificacao
 
@@ -249,6 +267,7 @@ Este diagrama omite propositalmente alguns detalhes tecnicos para melhorar a cla
 - campos de auditoria, como `criado_em`, `atualizado_em` e `ativo`;
 - chaves estrangeiras explicitas em todas as entidades;
 - campos legados mantidos por compatibilidade com o codigo;
+- campos legados de medico titular/responsavel ainda existentes em `PLANTAO`;
 - detalhes internos de controle de status.
 
 Essas simplificacoes nao removem regras importantes do dominio. Elas apenas tornam o DER mais adequado para apresentacao e explicacao conceitual.
@@ -262,8 +281,8 @@ Uma forma clara de explicar este DER e seguir esta ordem:
 3. Cada escalista responde por um unico setor, e cada setor tem no maximo um escalista responsavel.
 4. O medico e vinculado aos setores por meio de `MEDICO_SETOR`.
 5. O medico possui especialidades por meio de `MEDICO_ESPECIALIDADE`.
-6. O escalista cria plantoes para os medicos.
-7. O medico pode solicitar cobertura de um plantao.
+6. O escalista cria plantoes e atribui de 1 a 4 medicos ao mesmo plantao.
+7. O medico pode solicitar cobertura da sua atribuicao em um plantao.
 8. Apenas medicos do mesmo setor visualizam e podem assumir a cobertura.
 9. Quando a cobertura e assumida, o solicitante recebe uma notificacao.
 

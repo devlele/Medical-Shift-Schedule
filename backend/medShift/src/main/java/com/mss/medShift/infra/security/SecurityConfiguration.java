@@ -75,6 +75,8 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/setor").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.GET, "/setor/{id}").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.PUT, "/setor/{id}").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.DELETE, "/setor/{id}").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.GET, "/manager/me").hasAnyRole("ESCALISTA", "MANAGER")
                         .requestMatchers(HttpMethod.GET, "/manager/me/setores").hasAnyRole("ESCALISTA", "MANAGER")
                         .requestMatchers(HttpMethod.GET, "/manager").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.GET, "/manager/{id}").hasRole("HOSPITAL")
@@ -82,6 +84,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/manager").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.POST, "/manager/**").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.PUT, "/manager/{id}").hasRole("HOSPITAL")
+                        .requestMatchers(HttpMethod.DELETE, "/manager/{id}").hasRole("HOSPITAL")
                         .requestMatchers(HttpMethod.DELETE, "/manager/{id}/setores/{setorId}").hasRole("HOSPITAL")
 
                         // Manager endpoints - MANAGER, HOSPITAL or ADMIN role

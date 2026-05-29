@@ -80,7 +80,8 @@ public class SetorController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal Usuario usuarioLogado) {
+        accessScopeService.requireSetorOfAuthenticatedHospital(usuarioLogado, id);
         setorService.delete(id);
         return ResponseEntity.noContent().build();
     }

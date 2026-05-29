@@ -8,8 +8,9 @@ Este documento e a fonte unica proposta para o DER do MedShift. Ele consolida as
 - cada escalista fica responsavel por um unico setor do hospital;
 - cada setor pode ter no maximo um escalista responsavel;
 - escalistas vinculam medicos ao seu setor e atribuem plantoes;
+- um mesmo plantao pode possuir de 1 a 4 medicos atribuidos;
 - plantoes podem ser avulsos ou fixos/recorrentes;
-- o medico pode abrir um pedido para outro medico assumir seu plantao;
+- o medico pode abrir um pedido para outro medico assumir sua atribuicao individual no plantao;
 - pedidos de cobertura aparecem apenas para medicos vinculados ao mesmo hospital e setor;
 - quando um medico assume a cobertura, o solicitante recebe uma notificacao;
 - check-in e check-out nao fazem parte deste modelo.
@@ -60,7 +61,6 @@ erDiagram
     ESCALISTA {
         bigint id PK
         bigint usuario_id FK
-        bigint hospital_id FK
         bigint setor_id FK
         string cargo
         boolean ativo
@@ -137,7 +137,6 @@ erDiagram
 
     PLANTAO {
         bigint id PK
-        bigint hospital_id FK
         bigint setor_id FK
         bigint regra_plantao_fixo_id FK
         bigint medico_titular_id FK
@@ -152,9 +151,20 @@ erDiagram
         datetime atualizado_em
     }
 
+    PLANTAO_MEDICO {
+        bigint id PK
+        bigint plantao_id FK
+        bigint medico_titular_id FK
+        bigint medico_responsavel_atual_id FK
+        string status
+        datetime criado_em
+        datetime atualizado_em
+    }
+
     PEDIDO_COBERTURA {
         bigint id PK
         bigint plantao_id FK
+        bigint plantao_medico_id FK
         bigint hospital_id FK
         bigint setor_id FK
         bigint medico_solicitante_id FK
@@ -186,9 +196,7 @@ erDiagram
     USUARIO ||--o{ NOTIFICACAO : recebe
 
     HOSPITAL ||--o{ SETOR : possui
-    HOSPITAL ||--o{ ESCALISTA : cadastra
     HOSPITAL ||--o{ REGRA_PLANTAO_FIXO : possui
-    HOSPITAL ||--o{ PLANTAO : possui
     HOSPITAL ||--o{ PEDIDO_COBERTURA : restringe
 
     SETOR ||--o| ESCALISTA : responsavel_por
@@ -209,11 +217,13 @@ erDiagram
 
     REGRA_PLANTAO_FIXO ||--o{ PLANTAO : gera
     SETOR ||--o{ PLANTAO : recebe
-    MEDICO ||--o{ PLANTAO : titular
-    MEDICO ||--o{ PLANTAO : responsavel_atual
     ESCALISTA ||--o{ PLANTAO : atribui
+    PLANTAO ||--o{ PLANTAO_MEDICO : possui_alocacao
+    MEDICO ||--o{ PLANTAO_MEDICO : titular
+    MEDICO ||--o{ PLANTAO_MEDICO : responsavel_atual
 
-    PLANTAO ||--o{ PEDIDO_COBERTURA : origina
+    PLANTAO ||--o{ PEDIDO_COBERTURA : agrupa
+    PLANTAO_MEDICO ||--o{ PEDIDO_COBERTURA : origina
     SETOR ||--o{ PEDIDO_COBERTURA : filtra_calendario
     MEDICO ||--o{ PEDIDO_COBERTURA : solicita
     MEDICO ||--o{ PEDIDO_COBERTURA : assume
@@ -257,11 +267,11 @@ Assim, uma regra fixa pode gerar varios plantoes concretos.
 
 Nao existe tabela de candidatura. O fluxo e direto:
 
-1. O medico responsavel atual abre um `PEDIDO_COBERTURA`.
+1. O medico responsavel atual por uma atribuicao abre um `PEDIDO_COBERTURA`.
 2. O pedido aparece como marcacao vermelha no calendario dos medicos elegiveis do mesmo hospital e setor.
 3. Um medico elegivel clica e assume.
 4. O pedido muda de `ABERTO` para `ASSUMIDO`.
-5. `PLANTAO.medico_responsavel_atual_id` passa a ser o medico cobridor.
+5. `PLANTAO_MEDICO.medico_responsavel_atual_id` passa a ser o medico cobridor.
 6. O medico solicitante recebe uma `NOTIFICACAO`.
 
 ## Entidades e campos
@@ -322,7 +332,6 @@ Perfil operacional responsavel por montar escalas e vincular medicos a setores.
 
 - `id`: chave primaria.
 - `usuario_id`: FK para `USUARIO`.
-- `hospital_id`: FK para `HOSPITAL`.
 - `setor_id`: FK para `SETOR`; setor unico pelo qual o escalista responde.
 - `cargo`: cargo ou funcao interna.
 - `ativo`: indica se o escalista esta ativo.
@@ -332,7 +341,7 @@ Perfil operacional responsavel por montar escalas e vincular medicos a setores.
 Restricao recomendada:
 
 - o usuario associado deve ter `role = ESCALISTA`.
-- o setor informado deve pertencer ao mesmo hospital do escalista.
+- o hospital do escalista e derivado por `ESCALISTA.setor_id -> SETOR.hospital_id`.
 - o escalista deve possuir exatamente um setor responsavel enquanto estiver ativo.
 - `setor_id` deve ser unico entre escalistas, garantindo que um setor nao tenha dois responsaveis.
 
@@ -456,14 +465,13 @@ Regras:
 
 ### PLANTAO
 
-Representa uma ocorrencia concreta de plantao em data e horario especificos.
+Representa uma ocorrencia concreta de plantao em data e horario especificos. O plantao agora agrupa ate 4 atribuicoes medicas individuais em `PLANTAO_MEDICO`.
 
 - `id`: chave primaria.
-- `hospital_id`: FK para `HOSPITAL`; copia o hospital do setor para facilitar filtros.
 - `setor_id`: FK para `SETOR`.
 - `regra_plantao_fixo_id`: FK para `REGRA_PLANTAO_FIXO`; nulo para plantao avulso.
-- `medico_titular_id`: FK para `MEDICO`; medico originalmente escalado.
-- `medico_responsavel_atual_id`: FK para `MEDICO`; medico que esta responsavel pelo plantao no momento.
+- `medico_titular_id`: FK legado/compatibilidade para o primeiro medico originalmente escalado.
+- `medico_responsavel_atual_id`: FK legado/compatibilidade para o primeiro medico responsavel atual.
 - `criado_por_escalista_id`: FK para `ESCALISTA`.
 - `tipo`: `FIXO` ou `AVULSO`.
 - `data_inicio`: data e hora de inicio.
@@ -474,11 +482,32 @@ Representa uma ocorrencia concreta de plantao em data e horario especificos.
 
 Regras:
 
-- na criacao, `medico_responsavel_atual_id` deve ser igual a `medico_titular_id`;
+- o plantao deve possuir de 1 a 4 registros em `PLANTAO_MEDICO`;
+- o hospital do plantao e sempre derivado por `PLANTAO.setor_id -> SETOR.hospital_id`;
 - plantao avulso deve ter `regra_plantao_fixo_id = null`;
 - plantao fixo deve ter `regra_plantao_fixo_id` preenchido;
-- cobertura nao deve apagar o titular original;
-- quando uma cobertura e assumida, apenas `medico_responsavel_atual_id` muda.
+- cobertura nao deve apagar o titular original da alocacao;
+- quando uma cobertura e assumida, apenas `PLANTAO_MEDICO.medico_responsavel_atual_id` muda.
+
+### PLANTAO_MEDICO
+
+Representa a atribuicao individual de um medico dentro de um plantao. Essa tabela permite que o mesmo plantao tenha mais de um medico, mantendo cobertura individual por profissional.
+
+- `id`: chave primaria.
+- `plantao_id`: FK para `PLANTAO`.
+- `medico_titular_id`: FK para `MEDICO`; medico originalmente escalado naquela vaga.
+- `medico_responsavel_atual_id`: FK para `MEDICO`; medico que atualmente cobre aquela vaga.
+- `status`: `AGENDADO`, `CANCELADO`, `REALIZADO`.
+- `criado_em`: data de criacao.
+- `atualizado_em`: data da ultima alteracao.
+
+Regras:
+
+- um plantao pode ter no maximo 4 registros em `PLANTAO_MEDICO`;
+- na criacao, `medico_responsavel_atual_id` deve ser igual a `medico_titular_id`;
+- o medico titular deve ter vinculo ativo com o setor do plantao;
+- o medico nao pode ter outra atribuicao conflitante no mesmo periodo;
+- `plantao_id + medico_titular_id` deve ser unico.
 
 ### PEDIDO_COBERTURA
 
@@ -486,7 +515,8 @@ Representa o pedido aberto por um medico para passar um plantao a outro medico e
 
 - `id`: chave primaria.
 - `plantao_id`: FK para `PLANTAO`.
-- `hospital_id`: FK para `HOSPITAL`; copia o hospital do plantao para filtros.
+- `plantao_medico_id`: FK para `PLANTAO_MEDICO`; identifica qual atribuicao individual esta sendo passada.
+- `hospital_id`: FK para `HOSPITAL`; copia o hospital derivado do setor do plantao para filtros.
 - `setor_id`: FK para `SETOR`; copia o setor do plantao para filtros.
 - `medico_solicitante_id`: FK para `MEDICO`; medico que abriu o pedido.
 - `medico_cobridor_id`: FK para `MEDICO`; medico que assumiu, nulo enquanto estiver aberto.
@@ -499,8 +529,8 @@ Representa o pedido aberto por um medico para passar um plantao a outro medico e
 
 Regras:
 
-- apenas o medico responsavel atual pelo plantao pode abrir o pedido;
-- deve existir no maximo um pedido `ABERTO` por plantao;
+- apenas o medico responsavel atual pela atribuicao pode abrir o pedido;
+- deve existir no maximo um pedido `ABERTO` por atribuicao de plantao;
 - pedidos `ABERTO` aparecem no calendario como marcacao vermelha;
 - a marcacao vermelha e derivada de `PEDIDO_COBERTURA.status = ABERTO`, nao precisa ser um campo no banco;
 - o pedido so aparece para medicos com vinculo ativo no mesmo setor do plantao;
@@ -510,9 +540,9 @@ Regras:
   - `PEDIDO_COBERTURA.status` muda para `ASSUMIDO`;
   - `PEDIDO_COBERTURA.medico_cobridor_id` recebe o medico que assumiu;
   - `PEDIDO_COBERTURA.assumido_em` e preenchido;
-  - `PLANTAO.medico_responsavel_atual_id` passa a ser o medico cobridor;
+  - `PLANTAO_MEDICO.medico_responsavel_atual_id` passa a ser o medico cobridor;
   - uma notificacao e criada para o solicitante;
-- a operacao de assumir deve ser atomica e condicionar a atualizacao a `status = ABERTO`, evitando que dois medicos assumam o mesmo plantao.
+- a operacao de assumir deve ser atomica e condicionar a atualizacao a `status = ABERTO`, evitando que dois medicos assumam a mesma atribuicao.
 
 ### NOTIFICACAO
 
@@ -545,9 +575,11 @@ Regra:
 - `SETOR 1:N REGRA_PLANTAO_FIXO`.
 - `REGRA_PLANTAO_FIXO 1:N PLANTAO`.
 - `SETOR 1:N PLANTAO`.
-- `MEDICO 1:N PLANTAO` como titular.
-- `MEDICO 1:N PLANTAO` como responsavel atual.
-- `PLANTAO 1:N PEDIDO_COBERTURA`, mas apenas um pode estar `ABERTO`.
+- `PLANTAO 1:N PLANTAO_MEDICO`; cada plantao deve ter de 1 a 4 atribuicoes.
+- `MEDICO 1:N PLANTAO_MEDICO` como titular da atribuicao.
+- `MEDICO 1:N PLANTAO_MEDICO` como responsavel atual da atribuicao.
+- `PLANTAO 1:N PEDIDO_COBERTURA` como agrupamento historico.
+- `PLANTAO_MEDICO 1:N PEDIDO_COBERTURA`, mas apenas um pode estar `ABERTO` por atribuicao.
 - `MEDICO 1:N PEDIDO_COBERTURA` como solicitante.
 - `MEDICO 1:N PEDIDO_COBERTURA` como cobridor.
 - `USUARIO 1:N NOTIFICACAO`.
@@ -582,7 +614,7 @@ WHERE pc.status = 'ABERTO'
 - `hospital.cnpj` unico.
 - `hospital.usuario_id` unico.
 - `setor.hospital_id + setor.nome` unico.
-- `escalista.usuario_id + escalista.hospital_id` unico.
+- `escalista.usuario_id` unico.
 - `escalista.setor_id` obrigatorio para escalistas ativos.
 - `escalista.setor_id` unico para impedir dois escalistas no mesmo setor.
 - `escalista_setor.escalista_id` deve possuir no maximo um vinculo ativo.
@@ -592,8 +624,10 @@ WHERE pc.status = 'ABERTO'
 - `medico_setor.medico_id + medico_setor.setor_id` unico para vinculos ativos.
 - `regra_plantao_fixo.setor_id + regra_plantao_fixo.medico_titular_id`.
 - `plantao.setor_id + plantao.data_inicio`.
-- `plantao.medico_responsavel_atual_id + plantao.data_inicio`.
-- `pedido_cobertura.plantao_id` unico para pedidos com status `ABERTO`.
+- `plantao_medico.plantao_id + plantao_medico.medico_titular_id` unico.
+- `plantao_medico.medico_responsavel_atual_id`.
+- `plantao.data_inicio + plantao.data_fim` para busca de conflitos por periodo.
+- `pedido_cobertura.plantao_medico_id` unico para pedidos com status `ABERTO`.
 - `pedido_cobertura.hospital_id + pedido_cobertura.setor_id + pedido_cobertura.status`.
 - `notificacao.usuario_destino_id + notificacao.lida_em`.
 
