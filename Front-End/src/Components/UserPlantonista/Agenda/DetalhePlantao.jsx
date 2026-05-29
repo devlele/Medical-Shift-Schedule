@@ -1,7 +1,7 @@
 import "./DetalhePlantao.css";
 import Sidebar from "../../Sidebar/Sidebar";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, CalendarDays, Clock3, MapPin } from "lucide-react";
+import { ArrowLeft,ArrowLeftRight, CalendarDays, Clock3, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getPlantao } from "../../../services/doctorServices";
 import {
@@ -10,12 +10,14 @@ import {
   formatTurno,
   normalizePlantao,
 } from "../../../utils/plantaoFormatters";
+import { useNavigate } from "react-router-dom";
 
 export default function DetalhePlantao() {
   const { id } = useParams();
   const [plantao, setPlantao] = useState(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     let ativo = true;
@@ -65,6 +67,17 @@ export default function DetalhePlantao() {
             </div>
           </div>
         </header>
+
+        <div className="offer-button-container">
+          <button
+            className="offer-btn"
+            onClick={() => navigate("/UserPlantonista/OferecerPlantao")}
+          >
+            <ArrowLeftRight size={18} />
+            Oferecer plantão
+          </button>
+        </div>
+
         {/* CONTEÚDO */}
         <section className="top-section">
           <div className="details-card">

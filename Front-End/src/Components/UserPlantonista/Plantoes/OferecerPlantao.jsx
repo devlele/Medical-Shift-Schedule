@@ -4,7 +4,7 @@ import Sidebar from "../../Sidebar/Sidebar";
 import "./OferecerPlantao.css";
 import {
   ArrowLeft,
-  CheckCircle,
+  // CheckCircle,
 } from "lucide-react";
 import {
   criarPedidoCobertura,
@@ -143,9 +143,8 @@ export default function OferecerPlantao() {
                 <button
                   key={appointment.id}
                   type="button"
-                  className={`appointment-card ${
-                    selectedId === appointment.id ? "selected" : ""
-                  }`}
+                  className={`appointment-card ${selectedId === appointment.id ? "selected" : ""
+                    }`}
                   onClick={() => setSelectedId(appointment.id)}
                 >
                   <div className="card-heading">
@@ -160,7 +159,16 @@ export default function OferecerPlantao() {
                         <span>Plantão {formatTurno(appointment.raw)}</span>
                       </div>
                     </div>
-                    {selectedId === appointment.id && <CheckCircle size={32} />}
+                    {selectedId === appointment.id && (
+                      <button
+                        type="button"
+                        className="confirm-btn"
+                        onClick={handleSubmit}
+                        disabled={!selectedAppointment || submitting}
+                      >
+                        {submitting ? "Publicando..." : "Clique aqui para confirmar"}
+                      </button>
+                    )}
                   </div>
                 </button>
               ))
@@ -170,17 +178,6 @@ export default function OferecerPlantao() {
                 possuem pedido aberto não aparecem nesta lista.
               </p>
             )}
-          </div>
-
-          <div className="action-footer">
-            <button
-              type="button"
-              className="confirm-btn"
-              onClick={handleSubmit}
-              disabled={!selectedAppointment || submitting}
-            >
-              {submitting ? "Publicando..." : "Oferecer este Plantão"}
-            </button>
           </div>
         </section>
       </main>
