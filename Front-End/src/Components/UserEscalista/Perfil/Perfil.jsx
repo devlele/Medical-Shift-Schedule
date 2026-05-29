@@ -37,14 +37,7 @@ const Perfil = () => {
           ? setoresData.filter((setor) => setor.ativo !== false)
           : [];
 
-        // Tenta extrair nome do hospital dos dados do setor
-        const primeiroSetor = setoresAtivos[0];
-        const nomeHospital =
-          primeiroSetor?.hospitalNome ||
-          primeiroSetor?.hospital?.nomeFantasia ||
-          primeiroSetor?.nomeHospital ||
-          primeiroSetor?.hospital?.nome ||
-          "";
+        const nomeHospital = managerData?.hospitalNome || "";
 
         if (ativo) {
           setPerfil(managerData);

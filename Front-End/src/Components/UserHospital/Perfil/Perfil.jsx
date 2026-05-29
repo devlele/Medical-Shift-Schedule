@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Bell, CircleUserRound } from "lucide-react";
 import "./Perfil.css";
 import Sidebar from "../../Sidebar/Sidebar";
-import { getMeuDashboard } from "../Setores/setorServices";
+import { getPerfilHospital } from "../Setores/setorServices";
 import { getUsuarioLogado } from "../../../utils/plantaoFormatters";
 
 const Perfil = () => {
@@ -19,9 +19,7 @@ const Perfil = () => {
         setLoading(true);
         setErro("");
 
-        // GET /hospital/{id} exige ROLE_ADMIN; usamos apenas /dashboard/me
-        // que retorna os dados do hospital autenticado pelo token
-        const dashboard = await getMeuDashboard();
+        const dashboard = await getPerfilHospital();
 
         if (ativo) setPerfil(dashboard);
       } catch (error) {
