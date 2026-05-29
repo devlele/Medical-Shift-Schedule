@@ -54,7 +54,7 @@ const CadastroTipo = () => {
             tempo real e reduza a sobrecarga administrativa.
           </p>
           <Link to="/CadastroHospital" className="link-tipo">
-            Fazer requisição dos serviços <ArrowRight className="icone-link" />
+            Iniciar integração da instituição <ArrowRight className="icone-link" />
           </Link>
 
           <Building2 className="icone-fundo" />

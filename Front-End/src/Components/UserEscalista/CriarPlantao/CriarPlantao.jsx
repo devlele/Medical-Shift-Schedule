@@ -24,10 +24,21 @@ import {
 
 import { getStoredUser } from "../../../utils/authStorage";
 
+// const initialFormData = {
+//   dataPlantao: "",
+//   horaInicio: "07:00",
+//   horaFim: "19:00",
+//   setorId: "",
+//   medicoIds: [],
+//   openMedico: false,
+//   frequencia: "unico",
+// };
+
 const initialFormData = {
   dataPlantao: "",
   horaInicio: "07:00",
   horaFim: "19:00",
+  tipoTurno: "DIURNO",
   setorId: "",
   medicoIds: [],
   openMedico: false,
@@ -64,11 +75,11 @@ export default function CriarPlantao() {
 
       const setoresNormalizados = Array.isArray(setoresData)
         ? setoresData
-            .filter((v) => v.ativo !== false)
-            .map((v) => ({
-              id: v.setorId,
-              nome: v.setorNome,
-            }))
+          .filter((v) => v.ativo !== false)
+          .map((v) => ({
+            id: v.setorId,
+            nome: v.setorNome,
+          }))
         : [];
 
       const medicosNormalizados = Array.isArray(medicosData)
@@ -121,6 +132,39 @@ export default function CriarPlantao() {
     }));
   }
 
+  // ADICIONADO
+  function handleTipoTurno(tipo) {
+    setErro("");
+    setSucesso("");
+
+    if (tipo === "DIURNO") {
+      setFormData((prev) => ({
+        ...prev,
+        tipoTurno: tipo,
+        horaInicio: "07:00",
+        horaFim: "19:00",
+      }));
+    }
+
+    else if (tipo === "NOTURNO") {
+      setFormData((prev) => ({
+        ...prev,
+        tipoTurno: tipo,
+        horaInicio: "19:00",
+        horaFim: "07:00",
+      }));
+    }
+
+    else {
+      setFormData((prev) => ({
+        ...prev,
+        tipoTurno: tipo,
+        horaInicio: "",
+        horaFim: "",
+      }));
+    }
+  }
+
   function handleClear() {
     setFormData({
       ...initialFormData,
@@ -142,18 +186,51 @@ export default function CriarPlantao() {
       setSubmitting(true);
 
       if (formData.frequencia === "unico") {
+        // await criarPlantaoAvulso({
+        //   setorId: Number(formData.setorId),
+        //   medicoIds: formData.medicoIds.map(Number),
+        //   data: formData.dataPlantao,
+        //   horaInicio: formData.horaInicio,
+        //   horaFim: formData.horaFim,
+        // });
         await criarPlantaoAvulso({
           setorId: Number(formData.setorId),
           medicoIds: formData.medicoIds.map(Number),
           data: formData.dataPlantao,
-          horaInicio: formData.horaInicio,
-          horaFim: formData.horaFim,
+          turno: formData.tipoTurno,
+          horaInicio:
+            formData.tipoTurno === "PERSONALIZADO"
+              ? formData.horaInicio
+              : null,
+          horaFim:
+            formData.tipoTurno === "PERSONALIZADO"
+              ? formData.horaFim
+              : null,
         });
+
       } else {
+        // await criarPlantaoFixo({
+        //   setorId: Number(formData.setorId),
+        //   medicoIds: formData.medicoIds.map(Number),
+        //   frequencia: formData.frequencia,
+        //   dataInicioVigencia: formData.dataPlantao,
+        // });
         await criarPlantaoFixo({
           setorId: Number(formData.setorId),
           medicoIds: formData.medicoIds.map(Number),
           frequencia: formData.frequencia,
+          turno: formData.tipoTurno,
+
+          horaInicio:
+            formData.tipoTurno === "PERSONALIZADO"
+              ? formData.horaInicio
+              : null,
+
+          horaFim:
+            formData.tipoTurno === "PERSONALIZADO"
+              ? formData.horaFim
+              : null,
+
           dataInicioVigencia: formData.dataPlantao,
         });
       }
@@ -179,10 +256,10 @@ export default function CriarPlantao() {
           </div>
 
           <div className="topo-direita">
-            <Bell />
+            <Bell size={20} />
             <div className="usuario-topo">
-              <CircleUserRound size={18} />
-              <span>{nomeUsuario}</span>
+              <CircleUserRound className='perfilEscalista' size={18} />
+              <span className='perfilEscalista'>{nomeUsuario}</span>
             </div>
           </div>
         </header>
@@ -201,6 +278,23 @@ export default function CriarPlantao() {
               <span>{sucesso}</span>
             </div>
           )}
+
+          <div className="campo">
+            <label>Tipo de Turno</label>
+
+            <div className="input-box">
+              <Clock3 size={18} />
+
+              <select
+                value={formData.tipoTurno}
+                onChange={(e) => handleTipoTurno(e.target.value)}
+              >
+                <option value="DIURNO">Diurno</option>
+                <option value="NOTURNO">Noturno</option>
+                <option value="PERSONALIZADO">Personalizado</option>
+              </select>
+            </div>
+          </div>
 
           {/* DATA + HORAS */}
           <div className="linha-tripla">
@@ -226,6 +320,7 @@ export default function CriarPlantao() {
                   name="horaInicio"
                   value={formData.horaInicio}
                   onChange={handleChange}
+                  disabled={formData.tipoTurno !== "PERSONALIZADO"}
                 />
               </div>
             </div>
@@ -239,6 +334,7 @@ export default function CriarPlantao() {
                   name="horaFim"
                   value={formData.horaFim}
                   onChange={handleChange}
+                  disabled={formData.tipoTurno !== "PERSONALIZADO"}
                 />
               </div>
             </div>
@@ -313,9 +409,8 @@ export default function CriarPlantao() {
             <div className="frequencia-buttons">
               <button
                 type="button"
-                className={`freq-btn ${
-                  formData.frequencia === "unico" ? "active" : ""
-                }`}
+                className={`freq-btn ${formData.frequencia === "unico" ? "active" : ""
+                  }`}
                 onClick={() => handleFrequencia("unico")}
               >
                 Plantão Único
@@ -323,9 +418,8 @@ export default function CriarPlantao() {
 
               <button
                 type="button"
-                className={`freq-btn ${
-                  formData.frequencia === "semanal" ? "active" : ""
-                }`}
+                className={`freq-btn ${formData.frequencia === "semanal" ? "active" : ""
+                  }`}
                 onClick={() => handleFrequencia("semanal")}
               >
                 Toda semana
@@ -333,20 +427,19 @@ export default function CriarPlantao() {
 
               <button
                 type="button"
-                className={`freq-btn ${
-                  formData.frequencia === "mensal" ? "active" : ""
-                }`}
+                className={`freq-btn ${formData.frequencia === "mensal" ? "active" : ""
+                  }`}
                 onClick={() => handleFrequencia("mensal")}
               >
                 Todo Mês
               </button>
 
               {/* INTEGRAR */}
+              {/* PODE TIRAR O TODO DIA NÉ? */}
               <button
                 type="button"
-                className={`freq-btn ${
-                  formData.frequencia === "semanal" ? "active" : ""
-                }`}
+                className={`freq-btn ${formData.frequencia === "semanal" ? "active" : ""
+                  }`}
                 onClick={() => handleFrequencia("semanal")}
               >
                 Toda dia
