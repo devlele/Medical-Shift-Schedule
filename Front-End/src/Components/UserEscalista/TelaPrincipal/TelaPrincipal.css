@@ -259,6 +259,25 @@
   flex-wrap: wrap;
 }
 
+.ver-detalhes-btn {
+  border: 2px solid var(--medical-light, #4caf50);
+  background: transparent;
+  color: var(--medical-dark-alt, #2e7d32);
+  border-radius: var(--border-radius-lg);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ver-detalhes-btn:hover {
+  background: var(--medical-dark-alt, #2e7d32);
+  color: #fff;
+}
+
 .shift-icon {
   width: 90px;
   height: 90px;

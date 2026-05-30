@@ -1,0 +1,189 @@
+.detalhes-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #e8f5ef;
+}
+
+.detalhes-content {
+  flex: 1;
+  padding: 35px 45px;
+}
+
+.detalhes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 35px;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.back-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: #dbeee5;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1f4739;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.back-btn:hover {
+  background: #c6e4d4;
+}
+
+.title-section h1 {
+  font-size: 2.4rem;
+  color: #1f3730;
+}
+
+.offer-button-container {
+  margin-bottom: 28px;
+}
+
+.offer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #255443;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 14px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  box-shadow: 0 4px 12px rgba(37, 84, 67, 0.2);
+}
+
+.offer-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.top-section {
+  display: flex;
+  gap: 25px;
+  align-items: stretch;
+}
+
+.details-card {
+  flex: 1;
+  background: #fff;
+  border-radius: 35px;
+  padding: 35px;
+}
+
+.shift-badge {
+  background: #b7edf1;
+  color: #116a71;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.info-container {
+  display: flex;
+  gap: 60px;
+  margin-top: 45px;
+  flex-wrap: wrap;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-title {
+  color: #5c6a65;
+  margin-bottom: 10px;
+}
+
+.info-value {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #0d6c73;
+}
+
+.info-value strong {
+  color: #182f28;
+  font-size: 1.5rem;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: #e1ece6;
+  margin: 40px 0;
+}
+
+.general-info h3 {
+  color: #5d6d67;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+  font-size: 1rem;
+}
+
+.general-info p {
+  color: #505c58;
+  font-size: 1rem;
+  line-height: 1.9;
+  max-width: 760px;
+}
+
+.medicos-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.medicos-lista li {
+  color: #182f28;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 10px 16px;
+  background: #f0f9f4;
+  border-radius: 10px;
+}
+
+.erro-texto {
+  color: #b42318;
+  font-size: 15px;
+}
+
+@media (max-width: 1024px) {
+  .detalhes-content {
+    padding-top: 90px;
+  }
+}
+
+@media (max-width: 768px) {
+  .detalhes-content {
+    padding: 90px 20px 24px;
+  }
+
+  .detalhes-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .info-container {
+    flex-direction: column;
+    gap: 30px;
+  }
+}

@@ -27,6 +27,8 @@ import EscalistaInfo from "./Components/UserHospital/EscalistaInfo/EscalistaInfo
 import PerfilEscalista from "./Components/UserEscalista/Perfil/Perfil.jsx"
 import Delegacao from "./Components/UserEscalista/Delegacao/Delegacao.jsx";
 import DetalhePlantonista from "./Components/UserEscalista/DetalhePlantonista/DetalhePlantonista.jsx"
+import GerenciarPlantao from "./Components/UserEscalista/GerenciarPlantao/GerenciarPlantao.jsx"
+import DetalhePlantaoEscalista from "./Components/UserEscalista/DetalhePlantao/DetalhePlantao.jsx"
 
 function App() {
   return (
@@ -206,11 +208,27 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route 
+        <Route
           path="/UserEscalista/Perfil"
           element={
             <ProtectedRoute allowedRoles={["escalista"]} >
               <PerfilEscalista/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserEscalista/DetalhePlantao/:id"
+          element={
+            <ProtectedRoute allowedRoles={["escalista"]}>
+              <DetalhePlantaoEscalista />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/UserEscalista/GerenciarPlantao/:id"
+          element={
+            <ProtectedRoute allowedRoles={["escalista"]}>
+              <GerenciarPlantao />
             </ProtectedRoute>
           }
         />

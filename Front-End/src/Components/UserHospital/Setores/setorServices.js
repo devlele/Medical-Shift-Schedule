@@ -100,6 +100,23 @@ export const getHospitalById = async (id) => {
     return request(`/hospital/${id}`);
 };
 
+export const getPlantaoById = async (id) => {
+    return request(`/plantao/${id}`);
+};
+
+export const atualizarPlantao = async (id, data) => {
+    return request(`/plantao/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+    });
+};
+
+export const excluirPlantao = async (id) => {
+    return request(`/plantao/${id}`, {
+        method: "DELETE",
+    });
+};
+
 export const criarSetor = async (data) => {
     return request("/setor", {
         method: "POST",

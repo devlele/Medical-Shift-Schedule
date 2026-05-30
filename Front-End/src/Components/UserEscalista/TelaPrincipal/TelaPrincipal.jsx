@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bell, CircleUserRound, Clock3, MapPin, Moon, Sun } from "lucide-react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -20,6 +21,7 @@ import {
 import "./TelaPrincipal.css";
 
 export default function TelaPrincipal() {
+    const navigate = useNavigate();
     const usuario = obterUsuarioLogado();
     const nomeUsuario = usuario?.name || "Escalista";
     const [view, setView] = useState("week");
@@ -292,7 +294,7 @@ export default function TelaPrincipal() {
                                     })}
                                 </div>
 
-                                <ShiftList loading={loading} shifts={filteredShifts} erro={erro} />
+                                <ShiftList loading={loading} shifts={filteredShifts} erro={erro} navigate={navigate} />
                             </>
                         )}
 
@@ -311,6 +313,9 @@ export default function TelaPrincipal() {
                                     fixedWeekCount={false}
                                     events={calendarEvents}
                                     dateClick={(info) => setSelectedDay(info.dateStr)}
+                                    eventClick={(info) =>
+                                        navigate(`/UserEscalista/DetalhePlantao/${info.event.id}`)
+                                    }
                                 />
                             </div>
                         )}
@@ -321,7 +326,7 @@ export default function TelaPrincipal() {
     );
 }
 
-function ShiftList({ loading, shifts, erro }) {
+function ShiftList({ loading, shifts, erro, navigate }) {
     return (
         <div className="shifts-list">
             {loading ? (
@@ -354,6 +359,14 @@ function ShiftList({ loading, shifts, erro }) {
                                     </span>
                                 </div>
                             </div>
+
+                            <button
+                                type="button"
+                                className="ver-detalhes-btn"
+                                onClick={() => navigate(`/UserEscalista/DetalhePlantao/${shift.id}`)}
+                            >
+                                Ver detalhes
+                            </button>
                         </article>
                     );
                 })

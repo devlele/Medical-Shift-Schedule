@@ -1,0 +1,192 @@
+.gerenciar-plantao-container {
+  min-height: 100vh;
+  padding: 40px;
+  background: var(--app-bg);
+}
+
+.gerenciar-estado {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--app-muted);
+  font-size: 16px;
+}
+
+.gerenciar-conteudo {
+  max-width: 980px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* VOLTAR */
+.voltar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--app-muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 10px;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.voltar-btn:hover {
+  color: var(--medical-dark);
+}
+
+/* CARD */
+.card-secao-titulo {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--medical-text);
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #dde7e1;
+}
+
+/* GRID INFO */
+.linha-dupla-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+/* CAMPO READONLY */
+.input-box-readonly {
+  background: #f0f4f2;
+  cursor: default;
+}
+
+.input-box-readonly span {
+  font-size: 16px;
+  color: var(--medical-text);
+  font-weight: 500;
+}
+
+/* CHIPS DE MÉDICOS */
+.medicos-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.medico-chip {
+  background: var(--medical-dark-alt);
+  color: #fff;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* FOOTER DE AÇÕES */
+.gerenciar-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+/* EXCLUIR */
+.excluir-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 2px solid #fda29b;
+  background: #fff5f5;
+  color: #b42318;
+  border-radius: var(--border-radius-lg);
+  padding: 14px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.excluir-btn:hover {
+  background: #fee4e2;
+  border-color: #f04438;
+}
+
+/* CONFIRMAÇÃO */
+.confirmar-exclusao {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.confirmar-exclusao span {
+  font-weight: 600;
+  color: #b42318;
+  font-size: 15px;
+}
+
+.confirmar-btn {
+  border: none;
+  background: #b42318;
+  color: #fff;
+  border-radius: var(--border-radius-lg);
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.confirmar-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.cancelar-btn {
+  border: 2px solid #d0d5dd;
+  background: #fff;
+  color: #344054;
+  border-radius: var(--border-radius-lg);
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.cancelar-btn:hover {
+  background: #f9fafb;
+}
+
+/* RESPONSIVO */
+@media (max-width: 1024px) {
+  .gerenciar-plantao-container {
+    padding-top: 90px;
+  }
+}
+
+@media (max-width: 768px) {
+  .gerenciar-plantao-container {
+    padding: 90px 20px 32px;
+  }
+
+  .linha-dupla-info {
+    grid-template-columns: 1fr;
+  }
+
+  .gerenciar-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .excluir-btn,
+  .criar-btn {
+    justify-content: center;
+  }
+
+  .confirmar-exclusao {
+    flex-wrap: wrap;
+  }
+}

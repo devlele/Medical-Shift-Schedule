@@ -292,3 +292,205 @@
     justify-content: center;
   }
 }
+
+/* ======================== */
+/* MODAL DE REMOÇÃO         */
+/* ======================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-remocao {
+  background: #fff;
+  border-radius: 28px;
+  padding: 36px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+.modal-titulo {
+  font-size: 1.3rem;
+  color: #182f28;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.modal-titulo span {
+  color: var(--medical-dark-alt, #255443);
+}
+
+.modal-subtitulo {
+  color: #5c6a65;
+  font-size: 0.92rem;
+  margin-bottom: 28px;
+}
+
+/* OPÇÕES */
+.modal-opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.modal-opcao {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  border: 2px solid #e4ede9;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.modal-opcao:hover {
+  border-color: #b7d9c9;
+  background: #f7fbf9;
+}
+
+.modal-opcao.selecionada {
+  border-color: var(--medical-dark-alt, #255443);
+  background: #f0f9f4;
+}
+
+.modal-opcao input[type="radio"] {
+  margin-top: 2px;
+  flex-shrink: 0;
+  accent-color: var(--medical-dark-alt, #255443);
+  width: 17px;
+  height: 17px;
+}
+
+.modal-opcao-icone {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.modal-opcao-icone.ofertar {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.modal-opcao-icone.repassar {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.modal-opcao-icone.excluir {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.modal-opcao-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.modal-opcao-texto strong {
+  font-size: 0.95rem;
+  color: #182f28;
+}
+
+.modal-opcao-texto span {
+  font-size: 0.85rem;
+  color: #5c6a65;
+}
+
+/* SELECT DE MÉDICO */
+.modal-select-medico {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #c8ddd5;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #182f28;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+}
+
+.modal-select-medico:focus {
+  border-color: var(--medical-dark-alt, #255443);
+}
+
+/* ERRO */
+.modal-erro {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff5f5;
+  color: #b42318;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+/* FOOTER */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.modal-btn-cancelar {
+  border: 2px solid #d0d5dd;
+  background: #fff;
+  color: #344054;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.modal-btn-cancelar:hover {
+  background: #f9fafb;
+}
+
+.modal-btn-confirmar {
+  border: none;
+  background: var(--medical-dark-alt, #255443);
+  color: #fff;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.modal-btn-confirmar:hover {
+  opacity: 0.9;
+}
+
+.modal-btn-confirmar.perigo {
+  background: #b42318;
+}
+
+.modal-btn-confirmar:disabled,
+.modal-btn-cancelar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

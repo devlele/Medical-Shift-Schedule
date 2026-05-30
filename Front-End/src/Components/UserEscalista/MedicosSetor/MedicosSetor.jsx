@@ -10,6 +10,9 @@ import {
   UserPlus,
   UserRound,
   Info,
+  ArrowLeftRight,
+  TriangleAlert,
+  Share2,
 } from "lucide-react";
 
 import Sidebar from "../../Sidebar/Sidebar";
@@ -19,6 +22,9 @@ import {
   getMedicosCandidatos,
   getMeusSetoresEscalista,
   vincularMedicoSetor,
+  getMinhaAgenda,
+  atualizarPlantao,
+  excluirPlantao,
 } from "../../UserHospital/Setores/setorServices.js";
 import { getStoredUser } from "../../../utils/authStorage";
 import "./MedicosSetor.css";
@@ -37,6 +43,13 @@ export default function MedicosSetor() {
   const [removendoId, setRemovendoId] = useState("");
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
+
+  // Modal de remoção
+  const [medicoParaRemover, setMedicoParaRemover] = useState(null);
+  const [opcaoRemocao, setOpcaoRemocao] = useState("ofertar");
+  const [medicoDestinoId, setMedicoDestinoId] = useState("");
+  const [processandoRemocao, setProcessandoRemocao] = useState(false);
+  const [erroModal, setErroModal] = useState("");
 
   useEffect(() => {
     carregarDados();
@@ -129,26 +142,66 @@ export default function MedicosSetor() {
     }
   }
 
-  async function removerVinculo(medicoId) {
-    if (!setorId) {
+  function abrirModalRemocao(medico) {
+    setMedicoParaRemover(medico);
+    setOpcaoRemocao("ofertar");
+    setMedicoDestinoId("");
+    setErroModal("");
+  }
+
+  function fecharModal() {
+    setMedicoParaRemover(null);
+    setErroModal("");
+  }
+
+  async function confirmarRemocao() {
+    if (!medicoParaRemover || !setorId) return;
+
+    if (opcaoRemocao === "repassar" && !medicoDestinoId) {
+      setErroModal("Selecione o médico que receberá os plantões.");
       return;
     }
 
     try {
-      setRemovendoId(String(medicoId));
-      setErro("");
-      setSucesso("");
-      await desvincularMedicoSetor(medicoId, setorId);
-      await Promise.all([
-        recarregarMedicos(),
-        buscarCandidatos(setorId, termo),
-      ]);
+      setProcessandoRemocao(true);
+      setErroModal("");
+
+      // Busca os plantões do médico a partir da agenda do escalista
+      const agenda = await getMinhaAgenda();
+      const plantoesMedico = Array.isArray(agenda)
+        ? agenda.filter((p) =>
+            Array.isArray(p.medicos)
+              ? p.medicos.some(
+                  (m) =>
+                    m.medicoResponsavelAtualId === medicoParaRemover.id ||
+                    m.medicoTitularId === medicoParaRemover.id
+                )
+              : p.doctorId === medicoParaRemover.id
+          )
+        : [];
+
+      if (opcaoRemocao === "repassar") {
+        for (const plantao of plantoesMedico) {
+          await atualizarPlantao(plantao.id, {
+            medicoTitular: { id: Number(medicoDestinoId) },
+            medicoResponsavelAtual: { id: Number(medicoDestinoId) },
+          });
+        }
+      } else if (opcaoRemocao === "excluir") {
+        for (const plantao of plantoesMedico) {
+          await excluirPlantao(plantao.id);
+        }
+      }
+      // "ofertar" — será implementado quando o backend suportar a ação pelo escalista
+
+      await desvincularMedicoSetor(medicoParaRemover.id, setorId);
+      await Promise.all([recarregarMedicos(), buscarCandidatos(setorId, termo)]);
       setSucesso("Médico removido do setor.");
+      fecharModal();
     } catch (error) {
-      console.error(error);
-      setErro(error.message || "Não foi possível remover o vínculo do médico.");
+      setErroModal(error.message || "Não foi possível concluir a operação.");
     } finally {
-      setRemovendoId("");
+      setProcessandoRemocao(false);
     }
   }
 
@@ -302,8 +355,7 @@ export default function MedicosSetor() {
                     <button
                       type="button"
                       className="medico-remover-btn"
-                      onClick={() => removerVinculo(medico.id)}
-                      disabled={removendoId === String(medico.id)}
+                      onClick={() => abrirModalRemocao(medico)}
                       aria-label="Remover médico do setor"
                     >
                       <Trash2 size={18} />
@@ -315,6 +367,156 @@ export default function MedicosSetor() {
           </article>
         </section>
       </main>
+
+      {medicoParaRemover && (
+        <ModalRemocaoMedico
+          medico={medicoParaRemover}
+          opcao={opcaoRemocao}
+          onOpcaoChange={setOpcaoRemocao}
+          medicoDestinoId={medicoDestinoId}
+          onMedicoDestinoChange={setMedicoDestinoId}
+          outrosMedicos={medicos.filter((m) => m.id !== medicoParaRemover.id)}
+          erro={erroModal}
+          processando={processandoRemocao}
+          onConfirmar={confirmarRemocao}
+          onCancelar={fecharModal}
+        />
+      )}
+    </div>
+  );
+}
+
+function ModalRemocaoMedico({
+  medico,
+  opcao,
+  onOpcaoChange,
+  medicoDestinoId,
+  onMedicoDestinoChange,
+  outrosMedicos,
+  erro,
+  processando,
+  onConfirmar,
+  onCancelar,
+}) {
+  return (
+    <div className="modal-overlay" onClick={onCancelar}>
+      <div
+        className="modal-remocao"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+      >
+        <h2 className="modal-titulo">
+          O que fazer com os plantões de{" "}
+          <span>{medico.name}</span>?
+        </h2>
+        <p className="modal-subtitulo">
+          Escolha como tratar os plantões deste médico antes de removê-lo do setor.
+        </p>
+
+        <div className="modal-opcoes">
+          {/* OPÇÃO 1: OFERTAR */}
+          <label
+            className={`modal-opcao ${opcao === "ofertar" ? "selecionada" : ""}`}
+          >
+            <input
+              type="radio"
+              name="opcaoRemocao"
+              value="ofertar"
+              checked={opcao === "ofertar"}
+              onChange={() => onOpcaoChange("ofertar")}
+            />
+            <div className="modal-opcao-icone ofertar">
+              <Share2 size={20} />
+            </div>
+            <div className="modal-opcao-texto">
+              <strong>Ofertar os plantões</strong>
+              <span>Disponibiliza os plantões para outros médicos assumirem</span>
+            </div>
+          </label>
+
+          {/* OPÇÃO 2: REPASSAR */}
+          <label
+            className={`modal-opcao ${opcao === "repassar" ? "selecionada" : ""}`}
+          >
+            <input
+              type="radio"
+              name="opcaoRemocao"
+              value="repassar"
+              checked={opcao === "repassar"}
+              onChange={() => onOpcaoChange("repassar")}
+            />
+            <div className="modal-opcao-icone repassar">
+              <ArrowLeftRight size={20} />
+            </div>
+            <div className="modal-opcao-texto">
+              <strong>Repassar para outro médico</strong>
+              <span>Transfere todos os plantões para um médico do setor</span>
+              {opcao === "repassar" && (
+                <select
+                  className="modal-select-medico"
+                  value={medicoDestinoId}
+                  onChange={(e) => onMedicoDestinoChange(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <option value="">Selecione o médico</option>
+                  {outrosMedicos.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          </label>
+
+          {/* OPÇÃO 3: EXCLUIR */}
+          <label
+            className={`modal-opcao ${opcao === "excluir" ? "selecionada" : ""}`}
+          >
+            <input
+              type="radio"
+              name="opcaoRemocao"
+              value="excluir"
+              checked={opcao === "excluir"}
+              onChange={() => onOpcaoChange("excluir")}
+            />
+            <div className="modal-opcao-icone excluir">
+              <TriangleAlert size={20} />
+            </div>
+            <div className="modal-opcao-texto">
+              <strong>Excluir todos os plantões</strong>
+              <span>Remove permanentemente todos os plantões deste médico</span>
+            </div>
+          </label>
+        </div>
+
+        {erro && (
+          <div className="modal-erro">
+            <AlertCircle size={16} />
+            <span>{erro}</span>
+          </div>
+        )}
+
+        <div className="modal-footer">
+          <button
+            type="button"
+            className="modal-btn-cancelar"
+            onClick={onCancelar}
+            disabled={processando}
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            className={`modal-btn-confirmar ${opcao === "excluir" ? "perigo" : ""}`}
+            onClick={onConfirmar}
+            disabled={processando}
+          >
+            {processando ? "Processando..." : "Confirmar"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
