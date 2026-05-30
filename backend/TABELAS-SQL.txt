@@ -1,5 +1,4 @@
 TABELAS SQL - MEDSHIFT
-
 ------------------------------------------------------------
 tb_usuario
 ------------------------------------------------------------
@@ -69,7 +68,6 @@ CREATE TABLE tb_escalista (
     criado_em TIMESTAMP,
     atualizado_em TIMESTAMP,
     role VARCHAR(50),
-    hospital_id BIGINT,
     setor_id BIGINT,
     name VARCHAR(255),
     cpf VARCHAR(14) UNIQUE,
@@ -77,7 +75,6 @@ CREATE TABLE tb_escalista (
     birthday DATE,
     password VARCHAR(255),
     FOREIGN KEY (usuario_id) REFERENCES tb_usuario(id),
-    FOREIGN KEY (hospital_id) REFERENCES tb_hospital(id),
     FOREIGN KEY (setor_id) REFERENCES tb_setor(id),
     CONSTRAINT uk_tb_escalista_setor UNIQUE (setor_id)
 );
@@ -98,7 +95,6 @@ CREATE TABLE tb_medico (
     atualizado_em TIMESTAMP,
     specialty VARCHAR(100),
     role VARCHAR(50),
-    hospital_id BIGINT,
     setor_id BIGINT,
     name VARCHAR(255),
     cpf VARCHAR(14) UNIQUE,
@@ -106,7 +102,6 @@ CREATE TABLE tb_medico (
     birthday DATE,
     password VARCHAR(255),
     FOREIGN KEY (usuario_id) REFERENCES tb_usuario(id),
-    FOREIGN KEY (hospital_id) REFERENCES tb_hospital(id),
     FOREIGN KEY (setor_id) REFERENCES tb_setor(id)
 );
 
@@ -177,7 +172,6 @@ tb_regra_plantao_fixo
 
 CREATE TABLE tb_regra_plantao_fixo (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    hospital_id BIGINT,
     setor_id BIGINT,
     medico_titular_id BIGINT,
     criado_por_escalista_id BIGINT,
@@ -192,7 +186,6 @@ CREATE TABLE tb_regra_plantao_fixo (
     ativo BOOLEAN DEFAULT TRUE,
     criado_em TIMESTAMP,
     atualizado_em TIMESTAMP,
-    FOREIGN KEY (hospital_id) REFERENCES tb_hospital(id),
     FOREIGN KEY (setor_id) REFERENCES tb_setor(id),
     FOREIGN KEY (medico_titular_id) REFERENCES tb_medico(id),
     FOREIGN KEY (criado_por_escalista_id) REFERENCES tb_escalista(id)
@@ -209,7 +202,6 @@ CREATE TABLE tb_plantao (
     data_inicio TIMESTAMP NOT NULL,
     data_fim TIMESTAMP NOT NULL,
     status VARCHAR(50) NOT NULL,
-    hospital_id BIGINT,
     regra_plantao_fixo_id BIGINT,
     medico_titular_id BIGINT,
     medico_responsavel_atual_id BIGINT,
@@ -220,11 +212,28 @@ CREATE TABLE tb_plantao (
     atualizado_em TIMESTAMP,
     FOREIGN KEY (setor_id) REFERENCES tb_setor(id),
     FOREIGN KEY (doctor_assignado_id) REFERENCES tb_doctor(id),
-    FOREIGN KEY (hospital_id) REFERENCES tb_hospital(id),
     FOREIGN KEY (regra_plantao_fixo_id) REFERENCES tb_regra_plantao_fixo(id),
     FOREIGN KEY (medico_titular_id) REFERENCES tb_medico(id),
     FOREIGN KEY (medico_responsavel_atual_id) REFERENCES tb_medico(id),
     FOREIGN KEY (criado_por_escalista_id) REFERENCES tb_escalista(id)
+);
+
+------------------------------------------------------------
+tb_plantao_medico
+------------------------------------------------------------
+
+CREATE TABLE tb_plantao_medico (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    plantao_id BIGINT NOT NULL,
+    medico_titular_id BIGINT NOT NULL,
+    medico_responsavel_atual_id BIGINT NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'AGENDADO',
+    criado_em TIMESTAMP,
+    atualizado_em TIMESTAMP,
+    FOREIGN KEY (plantao_id) REFERENCES tb_plantao(id),
+    FOREIGN KEY (medico_titular_id) REFERENCES tb_medico(id),
+    FOREIGN KEY (medico_responsavel_atual_id) REFERENCES tb_medico(id),
+    CONSTRAINT uk_tb_plantao_medico_titular UNIQUE (plantao_id, medico_titular_id)
 );
 
 ------------------------------------------------------------
@@ -234,7 +243,7 @@ tb_pedido_cobertura
 CREATE TABLE tb_pedido_cobertura (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     plantao_id BIGINT,
-    hospital_id BIGINT,
+    plantao_medico_id BIGINT,
     setor_id BIGINT,
     medico_solicitante_id BIGINT,
     medico_cobridor_id BIGINT,
@@ -245,7 +254,7 @@ CREATE TABLE tb_pedido_cobertura (
     expirado_em TIMESTAMP,
     atualizado_em TIMESTAMP,
     FOREIGN KEY (plantao_id) REFERENCES tb_plantao(id),
-    FOREIGN KEY (hospital_id) REFERENCES tb_hospital(id),
+    FOREIGN KEY (plantao_medico_id) REFERENCES tb_plantao_medico(id),
     FOREIGN KEY (setor_id) REFERENCES tb_setor(id),
     FOREIGN KEY (medico_solicitante_id) REFERENCES tb_medico(id),
     FOREIGN KEY (medico_cobridor_id) REFERENCES tb_medico(id)
