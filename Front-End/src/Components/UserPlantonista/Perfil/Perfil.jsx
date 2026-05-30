@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Bell, CircleUserRound } from "lucide-react";
+import { CircleUserRound } from "lucide-react";
+import NotificacaoBell from "../Notificacoes/NotificacaoBell";
 import "./Perfil.css";
 import Sidebar from "../../Sidebar/Sidebar";
 import { getMeuPerfilMedico, getDoctorMe } from "../../../services/doctorServices";
@@ -65,7 +66,7 @@ const Perfil = () => {
           </div>
 
           <div className="topo-direita">
-            <Bell className="icone-topo" />
+            <NotificacaoBell className="icone-topo" />
 
             <div className="usuario-topo">
               <CircleUserRound className="perfilPlantonista" />

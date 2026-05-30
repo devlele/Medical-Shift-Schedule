@@ -1,0 +1,30 @@
+.notif-bell-btn {
+    position: relative;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: opacity 0.15s, transform 0.15s;
+}
+
+.notif-bell-btn:hover {
+    opacity: 0.75;
+    transform: scale(1.08);
+}
+
+.notif-bell-ponto {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 9px;
+    height: 9px;
+    background: #e04b4b;
+    border-radius: 50%;
+    border: 1.5px solid white;
+    pointer-events: none;
+}

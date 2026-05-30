@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, CircleUserRound, Clock3, MapPin, Sun, Moon } from "lucide-react";
+import { CircleUserRound, Clock3, MapPin, Sun, Moon } from "lucide-react";
+import NotificacaoBell from "../Notificacoes/NotificacaoBell";
 
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -311,7 +312,7 @@ export default function Agenda() {
           </div>
 
           <div className="topo-direita">
-            <Bell className="icone-topo" />
+            <NotificacaoBell className="icone-topo" />
 
             <div className="usuario-topo">
               <CircleUserRound className="perfilPlantonista" />

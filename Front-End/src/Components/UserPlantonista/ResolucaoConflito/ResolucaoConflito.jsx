@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import NotificacaoBell from "../Notificacoes/NotificacaoBell";
 import Sidebar from "../../Sidebar/Sidebar";
 import "./ResolucaoConflito.css";
 import { getMinhaAgendaMedico } from "../../../services/doctorServices";
@@ -92,7 +92,7 @@ export default function ResolucaoConflito() {
           </div>
 
           <div className="topo-direita">
-            <Bell className="icone-topo" />
+            <NotificacaoBell className="icone-topo" />
           </div>
         </header>
 

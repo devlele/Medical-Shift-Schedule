@@ -4,13 +4,13 @@ import "./PlantoesOfertados.css";
 import Sidebar from "../../Sidebar/Sidebar";
 import { useNavigate } from "react-router-dom";
 import {
-  Bell,
   CalendarDays,
   Clock3,
   CircleUserRound,
   UserRound,
   ArrowLeftRight,
 } from "lucide-react";
+import NotificacaoBell from "../Notificacoes/NotificacaoBell";
 import {
   assumirCobertura,
   cancelarPedidoCobertura,
@@ -186,7 +186,7 @@ export default function PlantoesOfertados() {
           </div>
 
           <div className="topo-direita">
-            <Bell className="icone-topo" />
+            <NotificacaoBell className="icone-topo" />
             <div className="usuario-topo">
               <CircleUserRound className="perfilPlantonista" />
               <span className="perfilPlantonista">{usuario?.name || "Medico"}</span>

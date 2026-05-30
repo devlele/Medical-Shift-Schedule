@@ -1,0 +1,313 @@
+.pagina-notificacoes {
+    display: flex;
+    min-height: 100vh;
+    background: var(--app-bg);
+    padding-left: var(--sidebar-width);
+}
+
+.conteudo-notificacoes {
+    flex: 1;
+    padding: 35px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    max-width: 860px;
+}
+
+/* TOPO */
+
+.topo-notificacoes {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.titulo-pagina-notif {
+    font-size: 2rem;
+    color: var(--medical-text);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.badge-nao-lidas {
+    background: #e04b4b;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 2px 10px;
+    min-width: 26px;
+    text-align: center;
+}
+
+.subtitulo-pagina-notif {
+    margin-top: 5px;
+    color: var(--app-muted);
+    font-size: 1rem;
+}
+
+
+/* BARRA DE AÇÕES */
+
+.barra-acoes-notif {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.filtros-notif {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-filtro {
+    background: var(--gray-light);
+    border: none;
+    border-radius: 999px;
+    padding: 7px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--app-muted);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-filtro.ativo {
+    background: var(--medical-soft, #e8e4f4);
+    color: var(--medical-text);
+}
+
+.btn-filtro:hover:not(.ativo) {
+    opacity: 0.75;
+}
+
+.btn-marcar-todas {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px solid var(--medical-soft, #c8c0e0);
+    border-radius: 999px;
+    padding: 7px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--medical-text);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-marcar-todas:hover:not(:disabled) {
+    background: var(--medical-soft, #e8e4f4);
+}
+
+.btn-marcar-todas:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ESTADOS */
+
+.notif-estado {
+    background: var(--gray-light);
+    border-radius: var(--border-radius-xl);
+    padding: 24px 26px;
+    color: var(--app-muted);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+.notif-erro {
+    color: #d91f1f;
+    border-left: 4px solid #ff3b3b;
+}
+
+.notif-vazia {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 60px 24px;
+    color: var(--app-muted);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.notif-vazia-icone {
+    color: var(--app-muted);
+    opacity: 0.5;
+}
+
+/* LISTA */
+
+.lista-notificacoes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* CARD */
+
+.card-notif {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    background: var(--gray-light);
+    border-radius: var(--border-radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    transition: box-shadow 0.15s, opacity 0.15s;
+}
+
+.card-notif.nao-lida {
+    cursor: pointer;
+}
+
+.card-notif.nao-lida:hover {
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+}
+
+.card-notif.lida {
+    opacity: 0.72;
+}
+
+/* BARRA LATERAL COLORIDA */
+
+.notif-barra-lateral {
+    width: 5px;
+    flex-shrink: 0;
+}
+
+.cor-assumida .notif-barra-lateral { background: #11b6a1; }
+.cor-padrao .notif-barra-lateral   { background: var(--medical-soft, #c8c0e0); }
+
+/* CORPO */
+
+.notif-corpo {
+    flex: 1;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.notif-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.tag-tipo {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 999px;
+    padding: 3px 10px;
+}
+
+.tag-assumida { background: #d4f5ef; color: #0a7a6b; }
+.tag-padrao   { background: var(--gray-light); color: var(--app-muted); }
+
+.notif-tempo {
+    font-size: 0.8rem;
+    color: var(--app-muted);
+    white-space: nowrap;
+}
+
+.notif-titulo {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--medical-text);
+    margin: 0;
+}
+
+.notif-mensagem {
+    font-size: 0.95rem;
+    color: var(--medical-text);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.notif-plantao-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    color: var(--app-muted);
+    font-weight: 600;
+}
+
+.separador {
+    color: var(--app-muted);
+    opacity: 0.5;
+}
+
+.btn-marcar-lida {
+    align-self: flex-start;
+    background: none;
+    border: 1px solid var(--medical-soft, #c8c0e0);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--app-muted);
+    cursor: pointer;
+    transition: 0.2s;
+    margin-top: 4px;
+}
+
+.btn-marcar-lida:hover {
+    background: var(--medical-soft, #e8e4f4);
+    color: var(--medical-text);
+}
+
+/* PONTO INDICADOR NÃO LIDA */
+
+.ponto-nao-lida {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #e04b4b;
+    flex-shrink: 0;
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 1024px) {
+    .pagina-notificacoes {
+        padding-left: 0;
+    }
+
+    .conteudo-notificacoes {
+        padding-top: 90px;
+    }
+}
+
+@media (max-width: 900px) {
+    .conteudo-notificacoes {
+        padding: 90px 20px 32px;
+        max-width: 100%;
+    }
+
+    .topo-notificacoes {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .barra-acoes-notif {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

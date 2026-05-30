@@ -98,3 +98,12 @@ export const getMeuPerfilMedico = async () => {
 export const getDoctorMe = async () => {
   return request("/doctor/me");
 };
+
+export const getMinhasNotificacoes = async (apenasNaoLidas = false) => {
+  const query = apenasNaoLidas ? "?apenasNaoLidas=true" : "";
+  return request(`/notificacoes/me${query}`);
+};
+
+export const marcarNotificacaoLida = async (id) => {
+  return request(`/notificacoes/${id}/lida`, { method: "POST" });
+};

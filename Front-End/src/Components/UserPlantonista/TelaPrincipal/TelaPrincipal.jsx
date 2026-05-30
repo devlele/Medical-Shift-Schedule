@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Bell, CircleUserRound } from "lucide-react";
+import { CircleUserRound } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import NotificacaoBell from "../Notificacoes/NotificacaoBell";
 import Sidebar from "../../Sidebar/Sidebar";
 import Calendario from "../../Calendario/Calendario";
 import {
@@ -160,7 +161,7 @@ export default function TelaPrincipal() {
           </div>
 
           <div className="topo-direita">
-            <Bell className="icone-topo" />
+            <NotificacaoBell className="icone-topo" />
 
             <div className="usuario-topo">
               <CircleUserRound className="perfilPlantonista" />

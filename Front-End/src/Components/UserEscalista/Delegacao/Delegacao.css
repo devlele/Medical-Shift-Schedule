@@ -12,6 +12,7 @@
     padding: 35px 40px;
     display: flex;
     flex-direction: column;
+    gap: 32px;
 }
 
 /* TOPO */
@@ -40,7 +41,6 @@
     display: flex;
     align-items: center;
     gap: 18px;
-
     background: var(--app-bg);
     padding: 10px 18px;
     border-radius: 50px;
@@ -66,14 +66,11 @@
     display: flex;
     align-items: center;
     gap: 10px;
-
     padding-left: 15px;
     border-left: 1px solid var(--medical-soft);
-
     font-weight: 600;
     color: var(--medical-text);
 }
-
 
 /* PAINEL */
 
@@ -81,37 +78,89 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 28px;
 }
 
-/* ESPAÇO CENTRAL */
+/* ESTADOS */
 
-.espaco-vazio {
-    flex: 1;
+.delegacao-loading,
+.delegacao-erro {
+    background: var(--gray-light);
+    border-radius: var(--border-radius-xl);
+    padding: 24px 26px;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
 }
 
-/* ATIVIDADE */
-
-.atividade {
-    width: 100%;
-    max-width: 760px;
-    margin: 60px 40px;
-    /* margin: 0 auto 20px auto; */
+.delegacao-loading {
+    color: var(--app-muted);
 }
 
-.atividade h2 {
-    font-size: 1.8rem;
-    margin-bottom: 25px;
+.delegacao-erro {
+    color: #d91f1f;
+    border-left: 4px solid #ff3b3b;
+}
+
+/* RESUMO */
+
+.resumo-ofertas {
+    display: flex;
+    gap: 16px;
+}
+
+.resumo-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 28px;
+    border-radius: var(--border-radius-xl);
+    background: var(--gray-light);
+    box-shadow: var(--shadow-sm);
+    min-width: 110px;
+    gap: 4px;
+}
+
+.resumo-card.aberta {
+    border-top: 4px solid #11b6a1;
+}
+
+.resumo-card.fechada {
+    border-top: 4px solid #7c6db3;
+}
+
+.resumo-card.total {
+    border-top: 4px solid var(--medical-soft);
+}
+
+.resumo-numero {
+    font-size: 2rem;
+    font-weight: 700;
     color: var(--medical-text);
+    line-height: 1;
 }
 
-/* LISTA */
+.resumo-label {
+    font-size: 0.85rem;
+    color: var(--app-muted);
+    font-weight: 600;
+}
 
-.lista-atividades {
+/* SEÇÃO */
+
+.secao-ofertas {
     display: flex;
     flex-direction: column;
     gap: 18px;
 }
+
+.secao-ofertas h2 {
+    font-size: 1.5rem;
+    color: var(--medical-text);
+    font-weight: 700;
+}
+
+/* EMPTY */
 
 .delegacao-empty {
     background: var(--gray-light);
@@ -122,75 +171,77 @@
     box-shadow: var(--shadow-sm);
 }
 
-/* CARD */
+/* TABELA */
 
-.card-atividade {
-    background: var(--gray-light);
-
+.tabela-ofertas-wrapper {
+    overflow-x: auto;
     border-radius: var(--border-radius-xl);
-
-    padding: 22px 26px;
-
-    position: relative;
-
     box-shadow: var(--shadow-sm);
-
-    overflow: hidden;
 }
 
-/* BARRA LATERAL */
-
-.card-atividade::before {
-    content: "";
-
-    position: absolute;
-    left: 0;
-    top: 0;
-
-    width: 5px;
-    height: 100%;
+.tabela-ofertas {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--gray-light);
+    font-size: 0.95rem;
 }
 
-/* CORES */
-
-.card-atividade.sucesso::before {
-    background: #11b6a1;
+.tabela-ofertas thead tr {
+    background: var(--medical-soft, #e8e4f4);
 }
 
-.card-atividade.erro::before {
-    background: #ff3b3b;
-}
-
-.card-atividade.neutro::before {
-    background: #b7a8d9;
-}
-
-/* TEXTOS */
-
-.tempo-atividade {
-    display: block;
-
-    font-size: 0.8rem;
-    font-weight: 600;
-
-    color: var(--app-muted);
-
-    margin-bottom: 8px;
-}
-
-.card-atividade h3 {
-    font-size: 1.5rem;
-    margin-bottom: 8px;
+.tabela-ofertas th {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 700;
     color: var(--medical-text);
+    white-space: nowrap;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
-.card-atividade.erro h3 {
-    color: #d91f1f;
+.tabela-ofertas td {
+    padding: 14px 16px;
+    color: var(--medical-text);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    vertical-align: middle;
 }
 
-.card-atividade p {
+.tabela-ofertas tbody tr:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.coluna-horario {
+    white-space: nowrap;
+}
+
+.celula-vazia {
     color: var(--app-muted);
-    font-size: 1rem;
+    font-style: italic;
+}
+
+/* BADGE STATUS */
+
+.badge-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.badge-aberta {
+    background: #d4f5ef;
+    color: #0a7a6b;
+}
+
+.badge-fechada {
+    background: #e8e4f4;
+    color: #5c4d8a;
 }
 
 /* RESPONSIVO */
@@ -215,7 +266,13 @@
         gap: 20px;
     }
 
-    .atividade{
-        max-width: 100%;
+    .resumo-ofertas {
+        flex-wrap: wrap;
+    }
+
+    .tabela-ofertas th,
+    .tabela-ofertas td {
+        padding: 10px 12px;
+        font-size: 0.85rem;
     }
 }
