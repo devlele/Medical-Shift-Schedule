@@ -151,19 +151,6 @@ class Plantao {
   +setSetor(Setor)
   +setMedicoTitular(Medico)
   +setMedicoResponsavelAtual(Medico)
-  +getMedicos()
-  +setMedicos(List)
-}
-
-class PlantaoMedico {
-  -Long id
-  -PlantaoStatus status
-  -LocalDateTime criadoEm
-  -LocalDateTime atualizadoEm
-  +getPlantao()
-  +setPlantao(Plantao)
-  +setMedicoTitular(Medico)
-  +setMedicoResponsavelAtual(Medico)
   +getPedidosCobertura()
 }
 
@@ -175,7 +162,6 @@ class PedidoCobertura {
   -LocalDateTime canceladoEm
   -LocalDateTime expiradoEm
   +setPlantao(Plantao)
-  +setPlantaoMedico(PlantaoMedico)
   +setMedicoSolicitante(Medico)
   +setMedicoCobridor(Medico)
   +isAberto()
@@ -265,18 +251,13 @@ RegraPlantaoFixo --> TipoRecorrenciaPlantao : recorrencia
 
 Plantao --> Setor : setor
 Plantao --> RegraPlantaoFixo : regra
-Plantao --> Medico : titular/responsavel
+Plantao "0..*" --> "1" Medico : titular/responsavel
 Plantao --> Escalista : criadoPor
 Plantao --> PlantaoTipo : tipo
 Plantao --> PlantaoTurno : turno
 Plantao --> PlantaoStatus : status
 
-PlantaoMedico --> Plantao : plantao
-PlantaoMedico --> Medico : titular/responsavel
-PlantaoMedico --> PlantaoStatus : status
-
-PedidoCobertura --> Plantao : plantao
-PedidoCobertura --> PlantaoMedico : alocacao
+PedidoCobertura "0..*" --> "1" Plantao : plantao
 PedidoCobertura --> Hospital : hospital
 PedidoCobertura --> Setor : setor
 PedidoCobertura --> Medico : solicitante/cobridor
@@ -300,6 +281,6 @@ Notificacao --> NotificacaoTipo : tipo
 - `RegraPlantaoFixo` define a recorrencia de plantoes fixos e gera registros concretos de `Plantao`.
 - `Plantao` representa uma ocorrencia concreta, avulsa ou gerada por regra fixa.
 - `PlantaoTurno.fromPeriodo(...)` e usado no codigo para classificar automaticamente o turno como diurno ou noturno.
-- `PlantaoMedico` representa cada medico alocado em um plantao. E essa classe que permite mais de um medico no mesmo plantao.
-- `PedidoCobertura` representa a oferta de uma alocacao de plantao para outro medico do mesmo setor assumir.
+- Cada `Plantao` possui um unico medico titular. O responsavel atual inicialmente e o titular e pode mudar quando uma cobertura for assumida.
+- `PedidoCobertura` representa a oferta de um plantao para outro medico do mesmo setor assumir.
 - `Notificacao` registra avisos ao usuario, especialmente quando outro medico assume um pedido de cobertura.
