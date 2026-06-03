@@ -139,6 +139,32 @@ public class DoctorServiceImple implements DoctorService {
     }
 
     @Override
+    public List<MedicoSetor> findActiveSetorLinksByDoctorIdAndHospitalId(Long doctorId, Long hospitalId) {
+        if (doctorId == null || hospitalId == null) {
+            return List.of();
+        }
+
+        return medicoSetorRepository.findByMedicoIdAndAtivoTrue(doctorId).stream()
+                .filter(vinculo -> vinculo.getSetor() != null
+                        && vinculo.getSetor().getHospital() != null
+                        && hospitalId.equals(vinculo.getSetor().getHospital().getId()))
+                .toList();
+    }
+
+    @Override
+    public List<MedicoSetor> findActiveSetorLinksByDoctorIdAndSetorIds(Long doctorId, List<Long> setorIds) {
+        if (doctorId == null || setorIds == null || setorIds.isEmpty()) {
+            return List.of();
+        }
+
+        return medicoSetorRepository.findByMedicoIdAndAtivoTrue(doctorId).stream()
+                .filter(vinculo -> vinculo.getSetor() != null
+                        && vinculo.getSetor().getId() != null
+                        && setorIds.contains(vinculo.getSetor().getId()))
+                .toList();
+    }
+
+    @Override
     public Doctor create(Doctor doctorToCreate) {
         if(doctorRepository.existsByCrm(doctorToCreate.getCrm())) {
             throw new IllegalArgumentException("This CRM is already registered");

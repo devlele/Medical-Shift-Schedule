@@ -77,4 +77,21 @@ public interface PlantaoMedicoRepository extends JpaRepository<PlantaoMedico, Lo
             @Param("statusIgnorado") PlantaoStatus statusIgnorado,
             @Param("dataFim") LocalDateTime dataFim,
             @Param("dataInicio") LocalDateTime dataInicio);
+
+    @Query("""
+            select count(pm) > 0
+            from PlantaoMedico pm
+            where pm.medicoResponsavelAtual.id = :medicoId
+              and pm.status <> :statusIgnorado
+              and pm.plantao.status <> :statusIgnorado
+              and pm.plantao.id <> :plantaoIdIgnorado
+              and pm.plantao.dataInicio < :dataFim
+              and pm.plantao.dataFim > :dataInicio
+            """)
+    boolean existsConflitoHorarioExcluindoPlantao(
+            @Param("medicoId") Long medicoId,
+            @Param("statusIgnorado") PlantaoStatus statusIgnorado,
+            @Param("plantaoIdIgnorado") Long plantaoIdIgnorado,
+            @Param("dataFim") LocalDateTime dataFim,
+            @Param("dataInicio") LocalDateTime dataInicio);
 }

@@ -19,12 +19,12 @@
 
 .notif-bell-ponto {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 9px;
-    height: 9px;
+    top: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
     background: #e04b4b;
     border-radius: 50%;
-    border: 1.5px solid white;
+    border: 2px solid #eef8f4;
     pointer-events: none;
 }

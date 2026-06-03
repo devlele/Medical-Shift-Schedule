@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,16 +17,20 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.mss.medShift.controller.dto.HospitalResponse;
 import com.mss.medShift.domain.model.Hospital;
+import com.mss.medShift.domain.model.Usuario;
 import com.mss.medShift.service.HospitalService;
+import com.mss.medShift.service.auth.AccessScopeService;
 
 @RestController
 @RequestMapping("/hospital")
 public class HospitalController {
 
     private final HospitalService hospitalService;
+    private final AccessScopeService accessScopeService;
 
-    public HospitalController(HospitalService hospitalService) {
+    public HospitalController(HospitalService hospitalService, AccessScopeService accessScopeService) {
         this.hospitalService = hospitalService;
+        this.accessScopeService = accessScopeService;
     }
 
     @PostMapping
@@ -51,6 +56,12 @@ public class HospitalController {
         return ResponseEntity.ok(hospitals.stream()
                 .map(HospitalResponse::from)
                 .toList());
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<HospitalResponse> getMeuHospital(@AuthenticationPrincipal Usuario usuarioLogado) {
+        var hospital = accessScopeService.requireHospitalProfile(usuarioLogado);
+        return ResponseEntity.ok(HospitalResponse.from(hospital));
     }
 
     @PutMapping("/{id}")

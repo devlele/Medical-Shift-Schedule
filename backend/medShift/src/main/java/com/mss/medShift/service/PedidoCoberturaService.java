@@ -10,6 +10,7 @@ public interface PedidoCoberturaService {
     PedidoCobertura abrirPedido(Long plantaoId, Long plantaoMedicoId, Doctor medicoSolicitante);
     List<PedidoCobertura> findDisponiveisParaMedico(Doctor medico);
     List<PedidoCobertura> findSolicitadosPorMedico(Doctor medico);
+    List<PedidoCobertura> findBySetorIds(List<Long> setorIds);
     PedidoCobertura assumir(Long pedidoId, Doctor medicoCobridor);
     PedidoCobertura cancelar(Long pedidoId, Doctor medicoSolicitante);
 }

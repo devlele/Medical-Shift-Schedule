@@ -260,15 +260,18 @@ public class PlantaoServiceImple implements PlantaoService {
     @Override
     public Plantao update(Long id, Plantao updatedPlantao) {
         Plantao plantao = findById(id);
+        Doctor medicoAtualizado = null;
 
         if (updatedPlantao.getSetor() != null) {
             plantao.setSetor(updatedPlantao.getSetor());
         }
         if (updatedPlantao.getMedicoTitular() != null) {
-            plantao.setMedicoTitular(updatedPlantao.getMedicoTitular());
+            medicoAtualizado = loadMedico(updatedPlantao.getMedicoTitular().getId());
+            plantao.setMedicoTitular(medicoAtualizado);
         }
         if (updatedPlantao.getMedicoResponsavelAtual() != null) {
-            plantao.setMedicoResponsavelAtual(updatedPlantao.getMedicoResponsavelAtual());
+            medicoAtualizado = loadMedico(updatedPlantao.getMedicoResponsavelAtual().getId());
+            plantao.setMedicoResponsavelAtual(medicoAtualizado);
         }
         if (updatedPlantao.getRegraPlantaoFixo() != null) {
             plantao.setRegraPlantaoFixo(updatedPlantao.getRegraPlantaoFixo());
@@ -297,7 +300,19 @@ public class PlantaoServiceImple implements PlantaoService {
         }
         plantao.setAtualizadoEm(LocalDateTime.now());
 
-        return plantaoRepository.save(plantao);
+        if (medicoAtualizado != null) {
+            validateMedicoAtuaNoSetor(medicoAtualizado, plantao.getSetor());
+            validateNoConflictsExcludingPlantao(medicoAtualizado, plantao);
+            plantao.setMedicoTitular(medicoAtualizado);
+            plantao.setMedicoResponsavelAtual(medicoAtualizado);
+        }
+
+        Plantao plantaoSalvo = plantaoRepository.save(plantao);
+        if (medicoAtualizado != null) {
+            plantaoSalvo.setMedicos(sincronizarAlocacaoUnica(plantaoSalvo, medicoAtualizado));
+        }
+
+        return plantaoSalvo;
     }
 
     @Override
@@ -457,6 +472,17 @@ public class PlantaoServiceImple implements PlantaoService {
         }
     }
 
+    private void validateNoConflictsExcludingPlantao(Doctor medico, Plantao plantao) {
+        if (plantaoMedicoRepository.existsConflitoHorarioExcluindoPlantao(
+                medico.getId(),
+                PlantaoStatus.CANCELADO,
+                plantao.getId(),
+                plantao.getDataFim(),
+                plantao.getDataInicio())) {
+            throw new ConflictException("Médico já possui plantão conflitante no período informado");
+        }
+    }
+
     private List<Long> normalizeMedicoIds(List<Long> medicoIds) {
         if (medicoIds == null) {
             return List.of();
@@ -467,10 +493,18 @@ public class PlantaoServiceImple implements PlantaoService {
                 .filter(id -> id != null)
                 .forEach(normalized::add);
 
-        if (normalized.size() > 4) {
-            throw new IllegalArgumentException("Um plantão pode ter no máximo 4 médicos");
+        if (normalized.size() > 1) {
+            throw new IllegalArgumentException("Um plantão pode ter no máximo 1 médico");
         }
         return List.copyOf(normalized);
+    }
+
+    private Doctor loadMedico(Long medicoId) {
+        if (medicoId == null) {
+            throw new IllegalArgumentException("Médico é obrigatório");
+        }
+        return doctorRepository.findById(medicoId)
+                .orElseThrow(() -> new IllegalArgumentException("Médico não encontrado: " + medicoId));
     }
 
     private List<Doctor> loadAndValidateMedicos(List<Long> medicoIds, Setor setor, List<PlantaoPeriodo> periodos) {
@@ -506,6 +540,27 @@ public class PlantaoServiceImple implements PlantaoService {
                 .toList();
 
         return plantaoMedicoRepository.saveAll(alocacoes);
+    }
+
+    private List<PlantaoMedico> sincronizarAlocacaoUnica(Plantao plantao, Doctor medico) {
+        LocalDateTime now = LocalDateTime.now();
+        List<PlantaoMedico> alocacoes = plantaoMedicoRepository.findByPlantaoId(plantao.getId());
+        PlantaoMedico alocacao = alocacoes.isEmpty() ? new PlantaoMedico() : alocacoes.get(0);
+
+        if (alocacoes.size() > 1) {
+            plantaoMedicoRepository.deleteAll(alocacoes.subList(1, alocacoes.size()));
+        }
+
+        alocacao.setPlantao(plantao);
+        alocacao.setMedicoTitular(medico);
+        alocacao.setMedicoResponsavelAtual(medico);
+        alocacao.setStatus(PlantaoStatus.AGENDADO);
+        if (alocacao.getCriadoEm() == null) {
+            alocacao.setCriadoEm(now);
+        }
+        alocacao.setAtualizadoEm(now);
+
+        return List.of(plantaoMedicoRepository.save(alocacao));
     }
 
     private TimeRange resolveTimeRange(PlantaoTurno turno, LocalTime horaInicio, LocalTime horaFim) {

@@ -122,7 +122,12 @@ public class PlantaoController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal Usuario usuarioLogado) {
+        Plantao plantaoAtual = plantaoService.findById(id);
+        if (plantaoAtual.getSetor() == null || plantaoAtual.getSetor().getId() == null) {
+            throw new IllegalArgumentException("Plantão sem setor");
+        }
+        accessScopeService.requireEscalistaCanAccessSetor(usuarioLogado, plantaoAtual.getSetor().getId());
         plantaoService.delete(id);
         return ResponseEntity.noContent().build();
     }

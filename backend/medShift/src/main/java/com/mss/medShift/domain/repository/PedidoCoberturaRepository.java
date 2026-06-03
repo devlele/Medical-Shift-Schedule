@@ -26,5 +26,6 @@ public interface PedidoCoberturaRepository extends JpaRepository<PedidoCobertura
     List<PedidoCobertura> findByMedicoSolicitanteId(Long medicoId);
     List<PedidoCobertura> findByMedicoSolicitanteIdOrderByAbertoEmDesc(Long medicoId);
     List<PedidoCobertura> findByMedicoCobridorId(Long medicoId);
+    List<PedidoCobertura> findBySetorIdInOrderByAbertoEmDesc(List<Long> setorIds);
     List<PedidoCobertura> findBySetorIdInAndStatusOrderByAbertoEmDesc(List<Long> setorIds, PedidoCoberturaStatus status);
 }

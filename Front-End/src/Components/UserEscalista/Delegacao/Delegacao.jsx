@@ -3,48 +3,7 @@ import "./Delegacao.css";
 import Sidebar from "../../Sidebar/Sidebar";
 import { getStoredUser } from "../../../utils/authStorage";
 import { Bell, CircleUserRound } from "lucide-react";
-
-// TODO: substituir por chamada real quando o endpoint GET /coberturas/setor/ofertas estiver disponível
-// import { getOfertasDoSetor } from "../../UserHospital/Setores/setorServices";
-
-const OFERTAS_MOCK = [
-    {
-        id: 1,
-        status: "ABERTO",
-        setorNome: "UTI Adulto",
-        medicoSolicitanteNome: "Dr. Carlos Mendes",
-        medicoCobridorNome: null,
-        abertoEm: "2026-05-29T14:30:00",
-        plantao: {
-            dataInicio: "2026-06-02T07:00:00",
-            dataFim: "2026-06-02T19:00:00",
-        },
-    },
-    {
-        id: 2,
-        status: "ASSUMIDO",
-        setorNome: "UTI Adulto",
-        medicoSolicitanteNome: "Dra. Ana Paula Lima",
-        medicoCobridorNome: "Dr. Rafael Costa",
-        abertoEm: "2026-05-28T09:15:00",
-        plantao: {
-            dataInicio: "2026-05-31T19:00:00",
-            dataFim: "2026-06-01T07:00:00",
-        },
-    },
-    {
-        id: 3,
-        status: "ABERTO",
-        setorNome: "UTI Adulto",
-        medicoSolicitanteNome: "Dr. João Ferreira",
-        medicoCobridorNome: null,
-        abertoEm: "2026-05-30T08:00:00",
-        plantao: {
-            dataInicio: "2026-06-05T07:00:00",
-            dataFim: "2026-06-05T19:00:00",
-        },
-    },
-];
+import { getCoberturasDoSetorEscalista } from "../../UserHospital/Setores/setorServices";
 
 const formatarData = (isoStr) => {
     if (!isoStr) return "—";
@@ -67,22 +26,36 @@ const Delegacao = () => {
     const [erro, setErro] = useState(null);
 
     useEffect(() => {
+        let ativo = true;
+
         const carregar = async () => {
             try {
-                // TODO: trocar por chamada real: const data = await getOfertasDoSetor();
-                await new Promise((r) => setTimeout(r, 400));
-                setOfertas(OFERTAS_MOCK);
+                setLoading(true);
+                setErro(null);
+                const data = await getCoberturasDoSetorEscalista();
+                if (ativo) {
+                    setOfertas(Array.isArray(data) ? data : []);
+                }
             } catch (e) {
-                setErro(e.message);
+                if (ativo) {
+                    setErro(e.message || "Não foi possível carregar as ofertas de plantão.");
+                    setOfertas([]);
+                }
             } finally {
-                setLoading(false);
+                if (ativo) {
+                    setLoading(false);
+                }
             }
         };
         carregar();
+
+        return () => {
+            ativo = false;
+        };
     }, []);
 
     const abertas = ofertas.filter((o) => o.status === "ABERTO");
-    const fechadas = ofertas.filter((o) => o.status === "ASSUMIDO");
+    const fechadas = ofertas.filter((o) => o.status !== "ABERTO");
 
     return (
         <div className="pagina-delegacao">
@@ -172,7 +145,7 @@ const Delegacao = () => {
                                                                         : "badge-fechada"
                                                                 }`}
                                                             >
-                                                                {oferta.status === "ABERTO" ? "Aberta" : "Fechada"}
+                                                            {oferta.status === "ABERTO" ? "Aberta" : "Fechada"}
                                                             </span>
                                                         </td>
                                                     </tr>

@@ -66,6 +66,16 @@ public class PedidoCoberturaController {
         return ResponseEntity.ok(pedidos);
     }
 
+    @GetMapping("/setor")
+    public ResponseEntity<List<PedidoCoberturaResponse>> getPedidosDoSetorDoEscalista(
+            @AuthenticationPrincipal Usuario usuarioLogado) {
+        var setorIds = accessScopeService.resolveEscalistaSetorIds(usuarioLogado);
+        var pedidos = pedidoCoberturaService.findBySetorIds(setorIds).stream()
+                .map(PedidoCoberturaResponse::from)
+                .toList();
+        return ResponseEntity.ok(pedidos);
+    }
+
     @PostMapping("/{id}/assumir")
     public ResponseEntity<PedidoCoberturaResponse> assumir(@PathVariable Long id,
             @AuthenticationPrincipal Usuario usuarioLogado) {

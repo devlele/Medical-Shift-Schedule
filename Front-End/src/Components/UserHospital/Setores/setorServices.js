@@ -84,6 +84,10 @@ export const getMinhaAgenda = async () => {
     return request("/agenda/me");
 };
 
+export const getCoberturasDoSetorEscalista = async () => {
+    return request("/coberturas/setor");
+};
+
 export const getMeuDashboard = async () => {
     return request("/dashboard/me");
 };

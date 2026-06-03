@@ -230,6 +230,21 @@ function normalizarPlantonista(doctor) {
     crm: doctor.crm || "",
     especialidade: doctor.specialty || doctor.especialidade || "",
     tipo: "plantonista",
-    setor: doctor.setorNome || "Sem setor vinculado",
+    setor: formatarSetoresMedico(doctor),
   };
+}
+
+function formatarSetoresMedico(doctor) {
+  const nomes = Array.isArray(doctor?.setores)
+    ? doctor.setores
+        .filter((setor) => setor?.ativo !== false)
+        .map((setor) => setor?.nome || setor?.setorNome)
+        .filter(Boolean)
+    : [];
+
+  if (nomes.length > 0) {
+    return [...new Set(nomes)].join(", ");
+  }
+
+  return doctor?.setorNome || "Sem setor vinculado";
 }

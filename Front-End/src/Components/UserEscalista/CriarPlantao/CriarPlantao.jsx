@@ -41,7 +41,7 @@ const initialFormData = {
   horaFim: "19:00",
   tipoTurno: "DIURNO",
   setorId: "",
-  medicoIds: [],
+  medicoId: "",
   openMedico: false,
   frequencia: "unico",
 };
@@ -114,21 +114,11 @@ export default function CriarPlantao() {
   }
 
   function toggleMedico(id) {
-    setFormData((prev) => {
-      const exists = prev.medicoIds.includes(id);
-
-      if (!exists && prev.medicoIds.length >= 4) {
-        setErro("Um plantão pode ter no máximo 4 médicos.");
-        return prev;
-      }
-
-      return {
-        ...prev,
-        medicoIds: exists
-          ? prev.medicoIds.filter((m) => m !== id)
-          : [...prev.medicoIds, id],
-      };
-    });
+    setFormData((prev) => ({
+      ...prev,
+      medicoId: prev.medicoId === id ? "" : id,
+      openMedico: false,
+    }));
   }
 
   function handleFrequencia(tipo) {
@@ -185,10 +175,8 @@ export default function CriarPlantao() {
     )
       return setErro("Horário obrigatório");
     if (!formData.setorId) return setErro("Setor obrigatório");
-    if (!formData.medicoIds.length)
-      return setErro("Selecione pelo menos um médico");
-    if (formData.medicoIds.length > 4)
-      return setErro("Um plantão pode ter no máximo 4 médicos");
+    if (!formData.medicoId)
+      return setErro("Selecione um médico");
     if (formData.frequencia !== "unico" && !formData.dataFimVigencia)
       return setErro("Data final da vigência é obrigatória para plantão fixo");
     if (
@@ -205,7 +193,7 @@ export default function CriarPlantao() {
       if (formData.frequencia === "unico") {
         await criarPlantaoAvulso({
           setorId: Number(formData.setorId),
-          medicoIds: formData.medicoIds.map(Number),
+          medicoId: Number(formData.medicoId),
           data:
             formData.tipoTurno === "PERSONALIZADO"
               ? null
@@ -232,7 +220,7 @@ export default function CriarPlantao() {
 
         await criarPlantaoFixo({
           setorId: Number(formData.setorId),
-          medicoIds: formData.medicoIds.map(Number),
+          medicoId: Number(formData.medicoId),
           tipoRecorrencia,
           diaSemana:
             tipoRecorrencia === "SEMANAL"
@@ -389,9 +377,9 @@ export default function CriarPlantao() {
             </div>
           </div>
 
-          {/* MÉDICOS DROPDOWN MULTISELECT */}
+          {/* MÉDICO DROPDOWN */}
           <div className="campo">
-            <label>Médicos responsáveis</label>
+            <label>Médico responsável</label>
 
             <div
               className="input-box"
@@ -405,23 +393,24 @@ export default function CriarPlantao() {
             >
               <UserRound size={18} />
               <span>
-                {formData.medicoIds.length > 0
-                  ? `${formData.medicoIds.length} selecionado(s)`
+                {formData.medicoId
+                  ? medicosDisponiveis.find((m) => String(m.id) === formData.medicoId)?.name || "1 selecionado"
                   : loadingDados
                     ? "Carregando médicos..."
-                    : "Selecione médicos"}
+                    : "Selecione um médico"}
               </span>
             </div>
 
             {formData.openMedico && (
               <div className="dropdown-medicos">
                 {medicosDisponiveis.map((m) => {
-                  const selected = formData.medicoIds.includes(String(m.id));
+                  const selected = formData.medicoId === String(m.id);
 
                   return (
                     <label key={m.id} className="dropdown-item">
                       <input
-                        type="checkbox"
+                        type="radio"
+                        name="medicoResponsavel"
                         checked={selected}
                         onChange={() => toggleMedico(String(m.id))}
                       />

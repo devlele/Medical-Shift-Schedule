@@ -15,37 +15,6 @@ const TIPO_CONFIG = {
     },
 };
 
-// TODO: remover quando integrado com o backend
-const NOTIFICACOES_MOCK = [
-    {
-        id: 1,
-        tipo: "COBERTURA_ASSUMIDA",
-        titulo: "Oferta aceita",
-        mensagem: "Dr. Rafael Costa aceitou sua oferta do dia 02/06/2026 do setor UTI Adulto do hospital Hospital São Lucas.",
-        lida: false,
-        criadoEm: new Date().toISOString(),
-        plantao: { setor: "UTI Adulto", hospital: "Hospital São Lucas", time: "07:00 - 19:00 (12h)" },
-    },
-    {
-        id: 2,
-        tipo: "COBERTURA_ASSUMIDA",
-        titulo: "Oferta aceita",
-        mensagem: "Dra. Camila Souza aceitou sua oferta do dia 31/05/2026 do setor UTI Adulto do hospital Hospital São Lucas.",
-        lida: false,
-        criadoEm: new Date(Date.now() - 86400000).toISOString(),
-        plantao: { setor: "UTI Adulto", hospital: "Hospital São Lucas", time: "19:00 - 07:00 (12h)" },
-    },
-    {
-        id: 3,
-        tipo: "COBERTURA_ASSUMIDA",
-        titulo: "Oferta aceita",
-        mensagem: "Dr. João Ferreira aceitou sua oferta do dia 28/05/2026 do setor UTI Adulto do hospital Hospital São Lucas.",
-        lida: true,
-        criadoEm: new Date(Date.now() - 86400000 * 3).toISOString(),
-        plantao: { setor: "UTI Adulto", hospital: "Hospital São Lucas", time: "07:00 - 19:00 (12h)" },
-    },
-];
-
 const formatarDataRelativa = (isoStr) => {
     if (!isoStr) return "";
     const d = new Date(isoStr);
@@ -69,13 +38,13 @@ export default function Notificacoes() {
 
     const carregar = useCallback(async () => {
         try {
+            setLoading(true);
             setErro(null);
-            // TODO: trocar por chamada real quando integrado com o backend
-            // const data = await getMinhasNotificacoes();
-            await new Promise((r) => setTimeout(r, 300));
-            setNotificacoes(NOTIFICACOES_MOCK);
+            const data = await getMinhasNotificacoes();
+            setNotificacoes(Array.isArray(data) ? data : []);
         } catch (e) {
-            setErro(e.message);
+            setErro(e.message || "Não foi possível carregar as notificações.");
+            setNotificacoes([]);
         } finally {
             setLoading(false);
         }
@@ -85,20 +54,46 @@ export default function Notificacoes() {
         carregar();
     }, [carregar]);
 
-    const marcarLida = (id) => {
-        // TODO: chamar marcarNotificacaoLida(id) quando integrado com o backend
-        setNotificacoes((prev) =>
-            prev.map((n) =>
-                n.id === id ? { ...n, lida: true, lidaEm: new Date().toISOString() } : n
-            )
-        );
+    const marcarLida = async (id) => {
+        try {
+            const atualizada = await marcarNotificacaoLida(id);
+            setNotificacoes((prev) =>
+                prev.map((n) =>
+                    n.id === id ? { ...n, ...atualizada, lida: true } : n
+                )
+            );
+            window.dispatchEvent(new Event("notificacoes-atualizadas"));
+        } catch (e) {
+            setErro(e.message || "Não foi possível marcar a notificação como lida.");
+        }
     };
 
-    const marcarTodasLidas = () => {
-        // TODO: chamar API para cada notificação quando integrado com o backend
-        setMarcandoTodas(true);
-        setNotificacoes((prev) => prev.map((n) => ({ ...n, lida: true })));
-        setMarcandoTodas(false);
+    const marcarTodasLidas = async () => {
+        try {
+            setMarcandoTodas(true);
+            setErro(null);
+            const atualizadas = await Promise.all(
+                notificacoes
+                    .filter((n) => !n.lida)
+                    .map((n) => marcarNotificacaoLida(n.id)),
+            );
+            const atualizadasPorId = new Map(
+                atualizadas.map((n) => [n.id, n]),
+            );
+
+            setNotificacoes((prev) =>
+                prev.map((n) =>
+                    atualizadasPorId.has(n.id)
+                        ? { ...n, ...atualizadasPorId.get(n.id), lida: true }
+                        : n,
+                )
+            );
+            window.dispatchEvent(new Event("notificacoes-atualizadas"));
+        } catch (e) {
+            setErro(e.message || "Não foi possível marcar todas como lidas.");
+        } finally {
+            setMarcandoTodas(false);
+        }
     };
 
     const naoLidas = notificacoes.filter((n) => !n.lida);

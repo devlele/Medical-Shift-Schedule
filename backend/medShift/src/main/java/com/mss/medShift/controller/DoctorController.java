@@ -53,6 +53,20 @@ public class DoctorController {
     @GetMapping
     public ResponseEntity<List<DoctorResponse>> getAllDoctors(@AuthenticationPrincipal Usuario user) {
         var doctors = findDoctorsForUser(user);
+        if (accessScopeService.isHospital(user)) {
+            Hospital hospital = accessScopeService.requireHospitalProfile(user);
+            return ResponseEntity.ok(doctors.stream()
+                    .map(doctor -> DoctorResponse.from(doctor,
+                            doctorService.findActiveSetorLinksByDoctorIdAndHospitalId(doctor.getId(), hospital.getId())))
+                    .toList());
+        }
+        if (accessScopeService.isEscalista(user)) {
+            var setorIds = accessScopeService.resolveEscalistaSetorIds(user);
+            return ResponseEntity.ok(doctors.stream()
+                    .map(doctor -> DoctorResponse.from(doctor,
+                            doctorService.findActiveSetorLinksByDoctorIdAndSetorIds(doctor.getId(), setorIds)))
+                    .toList());
+        }
         return ResponseEntity.ok(doctors.stream()
                 .map(DoctorResponse::from)
                 .toList());

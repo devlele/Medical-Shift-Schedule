@@ -110,6 +110,15 @@ public class PedidoCoberturaServiceImple implements PedidoCoberturaService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<PedidoCobertura> findBySetorIds(List<Long> setorIds) {
+        if (setorIds == null || setorIds.isEmpty()) {
+            return List.of();
+        }
+        return pedidoCoberturaRepository.findBySetorIdInOrderByAbertoEmDesc(setorIds);
+    }
+
+    @Override
     @Transactional
     public PedidoCobertura assumir(Long pedidoId, Doctor medicoCobridor) {
         if (pedidoId == null) {

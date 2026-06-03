@@ -1,182 +1,157 @@
-# Diagrama de classes do backend
+# Diagrama de classes - MedShift
 
-Versao enxuta do modelo de dominio, focada nos fluxos principais do MVP: autenticacao, estrutura hospitalar, vinculos por setor, criacao de plantoes, recorrencia, cobertura entre medicos e notificacoes.
+Este diagrama apresenta as classes de dominio do MedShift em uma forma proxima ao modelo logico. Ele prioriza as entidades, os atributos persistidos mais relevantes e as operacoes que definem o papel de cada classe nos principais casos de uso.
 
-No codigo atual, os conceitos de dominio `Escalista` e `Medico` aparecem como classes Java `Manager` e `Doctor`. Neste documento, os nomes do dominio foram mantidos para facilitar a leitura da banca.
+Os metodos representam responsabilidades de dominio e ficam na classe cujos dados sao criados, consultados ou alterados, nao no perfil que inicia a acao pela interface. Na implementacao, algumas dessas operacoes podem estar distribuidas entre entidades, services e controllers.
 
-## Convencao das setas
+## Notacao UML utilizada
 
-As setas do diagrama abaixo seguem a referencia do codigo/banco:
+- `--`: associacao entre classes relacionadas.
+- `o--`: agregacao. O losango vazio fica do lado do todo, mas a parte ainda pode fazer sentido separadamente.
+- `*--`: composicao. O losango preenchido fica do lado do todo, e a parte depende dele para existir no dominio.
+- `-`: atributo privado.
+- `+`: operacao publica.
+- Classes com estereotipo `enumeration` representam conjuntos fechados de valores usados como tipos dos atributos.
 
-- A seta sai da classe que guarda a referencia ou FK.
-- A seta aponta para a classe referenciada.
-- Exemplo: `Setor --> Hospital` significa que `Setor` pertence a um `Hospital` e guarda essa referencia.
-- Relacoes N:N foram representadas por classes associativas, como `MedicoSetor` e `MedicoEspecialidade`.
+## Diagrama Mermaid
 
 ```mermaid
 classDiagram
 direction LR
 
 class Usuario {
-  -Long id
-  -String nome
-  -String email
-  -String cpf
-  -String telefone
-  -UserRole role
-  -Boolean ativo
-  +getAuthorities()
-  +getUsername()
-  +getPassword()
-  +isEnabled()
+  -id: Long
+  -nome: String
+  -email: String
+  -senhaHash: String
+  -cpf: String
+  -dataNascimento: Date
+  -telefone: String
+  -role: UserRole
+  -ativo: Boolean
+  +autenticar(email: String, senha: String): Boolean
+  +trocarSenha(senhaAtual: String, novaSenha: String): void
+  +alterarDadosPessoais(dados): void
 }
 
 class Hospital {
-  -Long id
-  -String nomeFantasia
-  -String razaoSocial
-  -String cnpj
-  -String endereco
-  -String nomeGestor
-  -Boolean ativo
-  +getUsuario()
-  +setUsuario(Usuario)
-  +getSetores()
-  +getEmail()
+  -id: Long
+  -nomeFantasia: String
+  -razaoSocial: String
+  -cnpj: String
+  -telefone: String
+  -endereco: String
+  -nomeGestor: String
+  -ativo: Boolean
+  +cadastrar(dados): Hospital
+  +alterarDados(dados): void
+  +desativar(): void
 }
 
 class Setor {
-  -Long id
-  -String nome
-  -String descricao
-  -Boolean ativo
-  +getHospital()
-  +setHospital(Hospital)
-  +getMedicoSetores()
-  +getEscalista()
+  -id: Long
+  -nome: String
+  -descricao: String
+  -ativo: Boolean
+  +cadastrar(dados): Setor
+  +listarMedicos(): List
+  +definirEscalistaResponsavel(escalista: Escalista): void
+  +desativar(): void
 }
 
 class Escalista {
-  -Long id
-  -String cargo
-  -Boolean ativo
-  -UserRole role
-  +getUsuario()
-  +setUsuario(Usuario)
-  +getHospital()
-  +getSetor()
-  +setSetor(Setor)
-  +getPassword()
+  -id: Long
+  -cargo: String
+  -ativo: Boolean
+  +cadastrar(dados): Escalista
+  +alterarDados(dados): void
+  +desativar(): void
 }
 
 class Medico {
-  -Long id
-  -String crm
-  -String ufCrm
-  -String telefone
-  -String specialty
-  -Boolean ativo
-  +getUsuario()
-  +setUsuario(Usuario)
-  +getMedicoSetores()
-  +getMedicoEspecialidades()
-  +getPassword()
-}
-
-class Especialidade {
-  -Long id
-  -String nome
-  -String descricao
-  -Boolean ativo
-  +getMedicoEspecialidades()
+  -id: Long
+  -crm: String
+  -ufCrm: String
+  -telefone: String
+  -fotoPerfilUrl: String
+  -ativo: Boolean
+  +cadastrar(dados): Medico
+  +alterarDados(dados): void
+  +desativar(): void
 }
 
 class MedicoSetor {
-  -Long id
-  -Boolean ativo
-  -LocalDateTime vinculadoEm
-  -LocalDateTime desvinculadoEm
-  +getMedico()
-  +setMedico(Medico)
-  +getSetor()
-  +setSetor(Setor)
-  +getVinculadoPorEscalista()
+  -id: Long
+  -ativo: Boolean
+  -vinculadoEm: LocalDateTime
+  -desvinculadoEm: LocalDateTime
+  +vincular(medico: Medico, setor: Setor): MedicoSetor
+  +ativarVinculo(): void
+  +encerrarVinculo(): void
 }
 
-class MedicoEspecialidade {
-  -Long id
-  -Boolean principal
-  -LocalDateTime criadoEm
-  +getMedico()
-  +setMedico(Medico)
-  +getEspecialidade()
-  +setEspecialidade(Especialidade)
-}
-
-class EscalistaSetor {
-  -Long id
-  -Boolean ativo
-  -LocalDateTime vinculadoEm
-  -LocalDateTime desvinculadoEm
-  +getEscalista()
-  +setEscalista(Escalista)
-  +getSetor()
-  +setSetor(Setor)
+class Especialidade {
+  -id: Long
+  -nome: String
+  -descricao: String
+  -ativo: Boolean
+  +alterarDescricao(descricao: String): void
+  +desativar(): void
 }
 
 class RegraPlantaoFixo {
-  -Long id
-  -TipoRecorrenciaPlantao tipoRecorrencia
-  -String diaSemana
-  -Integer semanaDoMes
-  -Integer diaDoMes
-  -LocalTime horaInicio
-  -LocalTime horaFim
-  -LocalDate dataInicioVigencia
-  -LocalDate dataFimVigencia
-  -Boolean ativo
-  +setSetor(Setor)
-  +setMedicoTitular(Medico)
-  +getPlantoes()
+  -id: Long
+  -tipoRecorrencia: TipoRecorrenciaPlantao
+  -diaSemana: String
+  -semanaDoMes: Integer
+  -diaDoMes: Integer
+  -horaInicio: LocalTime
+  -horaFim: LocalTime
+  -dataInicioVigencia: LocalDate
+  -dataFimVigencia: LocalDate
+  -ativo: Boolean
+  +criar(dados): RegraPlantaoFixo
+  +gerarPlantoes(): List
+  +desativar(): void
 }
 
 class Plantao {
-  -Long id
-  -PlantaoTipo tipo
-  -PlantaoTurno turno
-  -LocalDateTime dataInicio
-  -LocalDateTime dataFim
-  -PlantaoStatus status
-  +getHospital()
-  +setSetor(Setor)
-  +setMedicoTitular(Medico)
-  +setMedicoResponsavelAtual(Medico)
-  +getPedidosCobertura()
+  -id: Long
+  -tipo: PlantaoTipo
+  -turno: PlantaoTurno
+  -dataInicio: LocalDateTime
+  -dataFim: LocalDateTime
+  -status: PlantaoStatus
+  +criarAvulso(dados): Plantao
+  +consultarEscala(periodo): List
+  +atribuirMedico(medico: Medico): void
+  +verificarConflito(): Boolean
+  +alterarResponsavel(medico: Medico): void
 }
 
 class PedidoCobertura {
-  -Long id
-  -PedidoCoberturaStatus status
-  -LocalDateTime abertoEm
-  -LocalDateTime assumidoEm
-  -LocalDateTime canceladoEm
-  -LocalDateTime expiradoEm
-  +setPlantao(Plantao)
-  +setMedicoSolicitante(Medico)
-  +setMedicoCobridor(Medico)
-  +isAberto()
+  -id: Long
+  -status: PedidoCoberturaStatus
+  -abertoEm: LocalDateTime
+  -assumidoEm: LocalDateTime
+  -canceladoEm: LocalDateTime
+  -expiradoEm: LocalDateTime
+  +abrir(): void
+  +assumir(medicoCobridor: Medico): void
+  +cancelar(): void
+  +estaAberto(): Boolean
 }
 
 class Notificacao {
-  -Long id
-  -NotificacaoTipo tipo
-  -String titulo
-  -String mensagem
-  -LocalDateTime lidaEm
-  -LocalDateTime criadoEm
-  +setUsuarioDestino(Usuario)
-  +setPedidoCobertura(PedidoCobertura)
-  +setPlantao(Plantao)
+  -id: Long
+  -tipo: NotificacaoTipo
+  -titulo: String
+  -mensagem: String
+  -lidaEm: LocalDateTime
+  -criadoEm: LocalDateTime
+  +criar(dados): Notificacao
+  +consultarPorDestinatario(): List
+  +marcarComoLida(): void
 }
 
 class UserRole {
@@ -196,14 +171,14 @@ class PlantaoTurno {
   <<enumeration>>
   DIURNO
   NOTURNO
+  PERSONALIZADO
 }
 
 class PlantaoStatus {
   <<enumeration>>
   AGENDADO
-  OFERECIDO
-  COBERTO
   CANCELADO
+  REALIZADO
 }
 
 class TipoRecorrenciaPlantao {
@@ -215,7 +190,7 @@ class TipoRecorrenciaPlantao {
 class PedidoCoberturaStatus {
   <<enumeration>>
   ABERTO
-  ACEITO
+  ASSUMIDO
   CANCELADO
   EXPIRADO
 }
@@ -223,64 +198,70 @@ class PedidoCoberturaStatus {
 class NotificacaoTipo {
   <<enumeration>>
   COBERTURA_ASSUMIDA
+  PLANTAO_ATRIBUIDO
+  PLANTAO_CANCELADO
 }
 
-Usuario --> UserRole : role
-Hospital --> Usuario : credenciais
-Escalista --> Usuario : credenciais
-Medico --> Usuario : credenciais
+Usuario "1" *-- "0..1" Hospital : perfil de acesso
+Usuario "1" *-- "0..1" Escalista : perfil de acesso
+Usuario "1" *-- "0..1" Medico : perfil de acesso
+Usuario ..> UserRole : utiliza
 
-Setor --> Hospital : hospital
-Escalista --> Setor : setorResponsavel
+Hospital "1" *-- "1..*" Setor : possui
+Setor "1" -- "0..1" Escalista : responsavel
 
-EscalistaSetor --> Escalista : escalista
-EscalistaSetor --> Setor : setor
+Medico "1" -- "0..*" MedicoSetor : possui
+Setor "1" -- "0..*" MedicoSetor : recebe
+Escalista "1" -- "0..*" MedicoSetor : vincula
 
-MedicoSetor --> Medico : medico
-MedicoSetor --> Setor : setor
-MedicoSetor --> Escalista : vinculadoPor
+Especialidade "1" -- "0..*" Medico : classifica
 
-MedicoEspecialidade --> Medico : medico
-MedicoEspecialidade --> Especialidade : especialidade
+Setor "1" *-- "0..*" Plantao : possui
+Escalista "1" -- "0..*" Plantao : cria
+Medico "1" -- "0..*" Plantao : titular
+Medico "1" -- "0..*" Plantao : responsavel atual
+Plantao ..> PlantaoTipo : utiliza
+Plantao ..> PlantaoTurno : utiliza
+Plantao ..> PlantaoStatus : utiliza
 
-RegraPlantaoFixo --> Hospital : hospital
-RegraPlantaoFixo --> Setor : setor
-RegraPlantaoFixo --> Medico : medicoTitular
-RegraPlantaoFixo --> Escalista : criadoPor
-RegraPlantaoFixo --> TipoRecorrenciaPlantao : recorrencia
+RegraPlantaoFixo "0..1" o-- "0..*" Plantao : gera
+Hospital "1" -- "0..*" RegraPlantaoFixo : possui
+Setor "1" -- "0..*" RegraPlantaoFixo : recebe
+Escalista "1" -- "0..*" RegraPlantaoFixo : define
+Medico "1" -- "0..*" RegraPlantaoFixo : titular
+RegraPlantaoFixo ..> TipoRecorrenciaPlantao : utiliza
 
-Plantao --> Setor : setor
-Plantao --> RegraPlantaoFixo : regra
-Plantao "0..*" --> "1" Medico : titular/responsavel
-Plantao --> Escalista : criadoPor
-Plantao --> PlantaoTipo : tipo
-Plantao --> PlantaoTurno : turno
-Plantao --> PlantaoStatus : status
+Plantao "1" *-- "0..*" PedidoCobertura : origina
+Hospital "1" -- "0..*" PedidoCobertura : restringe
+Setor "1" -- "0..*" PedidoCobertura : disponibiliza
+Medico "1" -- "0..*" PedidoCobertura : solicita
+Medico "0..1" -- "0..*" PedidoCobertura : assume
+PedidoCobertura ..> PedidoCoberturaStatus : utiliza
 
-PedidoCobertura "0..*" --> "1" Plantao : plantao
-PedidoCobertura --> Hospital : hospital
-PedidoCobertura --> Setor : setor
-PedidoCobertura --> Medico : solicitante/cobridor
-PedidoCobertura --> PedidoCoberturaStatus : status
-
-Notificacao --> Usuario : usuarioDestino
-Notificacao --> PedidoCobertura : pedido
-Notificacao --> Plantao : plantao
-Notificacao --> NotificacaoTipo : tipo
+PedidoCobertura "1" -- "0..*" Notificacao : dispara
+Plantao "1" -- "0..*" Notificacao : referencia
+Usuario "1" -- "0..*" Notificacao : recebe
+Notificacao ..> NotificacaoTipo : utiliza
 ```
 
-## Leitura rapida
+## Leitura das relacoes
 
-- `Usuario` e a fonte unica de credenciais, senha, role e permissoes.
-- `Hospital`, `Escalista` e `Medico` sao perfis vinculados a `Usuario`.
-- `Setor` pertence a um `Hospital`.
-- `Escalista` possui um unico `Setor` responsavel. Assim, o hospital do escalista e obtido pelo setor.
-- `EscalistaSetor` existe no codigo como historico/compatibilidade de vinculo, mas a regra atual do MVP considera um setor por escalista.
-- `MedicoSetor` permite que um medico esteja vinculado a varios setores, inclusive de hospitais diferentes.
-- `MedicoEspecialidade` representa a relacao N:N entre medicos e especialidades.
-- `RegraPlantaoFixo` define a recorrencia de plantoes fixos e gera registros concretos de `Plantao`.
-- `Plantao` representa uma ocorrencia concreta, avulsa ou gerada por regra fixa.
-- `PlantaoTurno.fromPeriodo(...)` e usado no codigo para classificar automaticamente o turno como diurno ou noturno.
-- Cada `Plantao` possui um unico medico titular. O responsavel atual inicialmente e o titular e pode mudar quando uma cobertura for assumida.
-- `PedidoCobertura` representa a oferta de um plantao para outro medico do mesmo setor assumir.
-- `Notificacao` registra avisos ao usuario, especialmente quando outro medico assume um pedido de cobertura.
+- `Usuario` compoe os perfis de acesso de `Hospital`, `Escalista` e `Medico`. Os dados de autenticacao ficam centralizados no usuario.
+- `Hospital` compoe seus `Setor`es. Um setor pertence a um unico hospital.
+- Cada `Setor` possui no maximo um `Escalista` responsavel, e cada escalista atua em um unico setor.
+- `MedicoSetor` representa a associacao N:N entre medicos e setores. O escalista responsavel realiza esse vinculo.
+- Cada `Medico` possui exatamente uma `Especialidade`. Uma especialidade pode classificar varios medicos.
+- Um `Setor` compoe seus `Plantao`es. Cada plantao possui exatamente um medico titular, que tambem e o responsavel atual ate que uma cobertura seja assumida.
+- `RegraPlantaoFixo` agrega os plantoes concretos gerados por sua recorrencia. Um plantao ainda representa uma ocorrencia valida mesmo que a regra seja posteriormente desativada.
+- Um `Plantao` pode originar pedidos de cobertura. O pedido depende do plantao para existir.
+- Um `PedidoCobertura` pode disparar notificacoes. A notificacao informa ao medico solicitante que outro profissional assumiu o plantao.
+- Dependencias tracejadas indicam que uma classe utiliza uma enumeracao como tipo de atributo.
+
+## Imagem para apresentacao
+
+A versao diagramada para uso no documento e na apresentacao esta disponivel em:
+
+- `DIAGRAMA-CLASSES-APRESENTACAO.svg`: versao vetorial recomendada para o TCC.
+- `DIAGRAMA-CLASSES-APRESENTACAO.png`: versao rasterizada com fundo branco.
+
+As imagens sao geradas por `gerar_diagrama_classes_apresentacao.py`, que preserva as relacoes deste documento e utiliza um layout controlado para melhorar a legibilidade.

@@ -33,7 +33,7 @@ export default function GerenciarPlantao() {
 
   const [plantao, setPlantao] = useState(null);
   const [todosMedicos, setTodosMedicos] = useState([]);
-  const [medicoIdsSelecionados, setMedicoIdsSelecionados] = useState([]);
+  const [medicoIdSelecionado, setMedicoIdSelecionado] = useState("");
   const [openMedico, setOpenMedico] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -60,19 +60,19 @@ export default function GerenciarPlantao() {
 
       const medicosFiltrados = Array.isArray(medicosData)
         ? medicosData.filter(
-            (m) => m.ativo !== false && m.setorId == plantaoData?.setorId
+            (m) => m.ativo !== false && medicoEstaNoSetor(m, plantaoData?.setorId)
           )
         : [];
       setTodosMedicos(medicosFiltrados);
 
-      const idsAtuais = Array.isArray(plantaoData?.medicos)
+      const idAtual = Array.isArray(plantaoData?.medicos)
         ? plantaoData.medicos
             .map((m) =>
               String(m.medicoResponsavelAtualId || m.medicoTitularId || "")
             )
-            .filter(Boolean)
-        : [];
-      setMedicoIdsSelecionados(idsAtuais);
+            .filter(Boolean)[0] || ""
+        : String(plantaoData?.doctorId || "");
+      setMedicoIdSelecionado(idAtual);
     } catch (err) {
       setErro(err.message || "Erro ao carregar dados do plantão.");
     } finally {
@@ -83,21 +83,12 @@ export default function GerenciarPlantao() {
   function toggleMedico(medicoId) {
     setErro("");
     setSucesso("");
-    setMedicoIdsSelecionados((prev) => {
-      const exists = prev.includes(medicoId);
-      if (!exists && prev.length >= 4) {
-        setErro("Um plantão pode ter no máximo 4 médicos.");
-        return prev;
-      }
-      return exists
-        ? prev.filter((m) => m !== medicoId)
-        : [...prev, medicoId];
-    });
+    setMedicoIdSelecionado((prev) => (prev === medicoId ? "" : medicoId));
   }
 
   async function handleSalvar() {
-    if (!medicoIdsSelecionados.length) {
-      setErro("Selecione pelo menos um médico.");
+    if (!medicoIdSelecionado) {
+      setErro("Selecione um médico.");
       return;
     }
     try {
@@ -105,8 +96,8 @@ export default function GerenciarPlantao() {
       setErro("");
       setSucesso("");
       await atualizarPlantao(id, {
-        medicoTitular: { id: Number(medicoIdsSelecionados[0]) },
-        medicoResponsavelAtual: { id: Number(medicoIdsSelecionados[0]) },
+        medicoTitular: { id: Number(medicoIdSelecionado) },
+        medicoResponsavelAtual: { id: Number(medicoIdSelecionado) },
       });
       setSucesso("Plantão atualizado com sucesso!");
     } catch (err) {
@@ -249,9 +240,9 @@ export default function GerenciarPlantao() {
                 >
                   <UserRound size={18} />
                   <span>
-                    {medicoIdsSelecionados.length > 0
-                      ? `${medicoIdsSelecionados.length} selecionado(s)`
-                      : "Selecione médicos"}
+                    {medicoIdSelecionado
+                      ? todosMedicos.find((m) => String(m.id) === medicoIdSelecionado)?.name || "1 selecionado"
+                      : "Selecione um médico"}
                   </span>
                 </div>
 
@@ -265,10 +256,9 @@ export default function GerenciarPlantao() {
                       todosMedicos.map((m) => (
                         <label key={m.id} className="dropdown-item">
                           <input
-                            type="checkbox"
-                            checked={medicoIdsSelecionados.includes(
-                              String(m.id)
-                            )}
+                            type="radio"
+                            name="medicoPlantao"
+                            checked={medicoIdSelecionado === String(m.id)}
                             onChange={() => toggleMedico(String(m.id))}
                           />
                           {m.name}
@@ -279,9 +269,9 @@ export default function GerenciarPlantao() {
                 )}
               </div>
 
-              {medicoIdsSelecionados.length > 0 && (
+              {medicoIdSelecionado && (
                 <div className="medicos-chips">
-                  {medicoIdsSelecionados.map((mid) => {
+                  {[medicoIdSelecionado].map((mid) => {
                     const medico = todosMedicos.find(
                       (m) => String(m.id) === mid
                     );
@@ -354,4 +344,14 @@ function CampoFixo({ icon, label, value }) {
       </div>
     </div>
   );
+}
+
+function medicoEstaNoSetor(medico, setorId) {
+  const setores = Array.isArray(medico?.setores) ? medico.setores : [];
+
+  if (setores.some((setor) => setor?.ativo !== false && Number(setor.id) === Number(setorId))) {
+    return true;
+  }
+
+  return Number(medico?.setorId) === Number(setorId);
 }

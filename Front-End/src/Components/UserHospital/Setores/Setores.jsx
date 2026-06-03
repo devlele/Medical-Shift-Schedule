@@ -52,7 +52,7 @@ export default function Setores() {
 
       const setoresComDados = setoresData.map((setor) => {
         const quantidadeMedicos = doctorsData.filter(
-          (doctor) => doctor.setorId === setor.id,
+          (doctor) => medicoEstaNoSetor(doctor, setor.id),
         ).length;
 
         const temEscalista =
@@ -343,4 +343,14 @@ export default function Setores() {
       )}
     </div>
   );
+}
+
+function medicoEstaNoSetor(doctor, setorId) {
+  const setores = Array.isArray(doctor?.setores) ? doctor.setores : [];
+
+  if (setores.some((setor) => setor?.ativo !== false && Number(setor.id) === Number(setorId))) {
+    return true;
+  }
+
+  return Number(doctor?.setorId) === Number(setorId);
 }
