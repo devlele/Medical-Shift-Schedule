@@ -25,6 +25,7 @@ import {
   getMinhaAgenda,
   atualizarPlantao,
   excluirPlantao,
+  criarPedidoCoberturaEscalista,
 } from "../../UserHospital/Setores/setorServices.js";
 import { getStoredUser } from "../../../utils/authStorage";
 import "./MedicosSetor.css";
@@ -191,8 +192,15 @@ export default function MedicosSetor() {
         for (const plantao of plantoesMedico) {
           await excluirPlantao(plantao.id);
         }
+      } else {
+        for (const plantao of plantoesMedico) {
+          await criarPedidoCoberturaEscalista(
+            plantao.id,
+            medicoParaRemover.id,
+            getPlantaoMedicoId(plantao, medicoParaRemover.id),
+          );
+        }
       }
-      // "ofertar" — será implementado quando o backend suportar a ação pelo escalista
 
       await desvincularMedicoSetor(medicoParaRemover.id, setorId);
       await Promise.all([recarregarMedicos(), buscarCandidatos(setorId, termo)]);
@@ -384,6 +392,21 @@ export default function MedicosSetor() {
       )}
     </div>
   );
+}
+
+function getPlantaoMedicoId(plantao, medicoId) {
+  if (!Array.isArray(plantao?.medicos)) {
+    return null;
+  }
+
+  const alocacao = plantao.medicos.find((m) =>
+    [m.medicoResponsavelAtualId, m.medicoTitularId]
+      .filter(Boolean)
+      .map(String)
+      .includes(String(medicoId)),
+  );
+
+  return alocacao?.id || null;
 }
 
 function ModalRemocaoMedico({

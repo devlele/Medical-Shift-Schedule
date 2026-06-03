@@ -88,6 +88,13 @@ export const getCoberturasDoSetorEscalista = async () => {
     return request("/coberturas/setor");
 };
 
+export const criarPedidoCoberturaEscalista = async (plantaoId, medicoSolicitanteId, plantaoMedicoId = null) => {
+    return request("/coberturas/escalista", {
+        method: "POST",
+        body: JSON.stringify({ plantaoId, medicoSolicitanteId, plantaoMedicoId }),
+    });
+};
+
 export const getMeuDashboard = async () => {
     return request("/dashboard/me");
 };
