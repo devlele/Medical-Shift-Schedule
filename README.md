@@ -113,7 +113,6 @@ Empresas e cooperativas médicas que organizam escalas de múltiplos profissiona
 - Marcos Vinicius do Nascimento Marciano;
 - Maria Eduarda Rodrigues Simões;
 - Rafaela Yumi Shimoda
-- Vinícius de Sousa Andrade
 
 <!--  IDEIAS: Futuro Desenvolvimento
 -
