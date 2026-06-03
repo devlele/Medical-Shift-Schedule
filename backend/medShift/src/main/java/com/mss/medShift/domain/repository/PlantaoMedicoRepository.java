@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -21,6 +22,10 @@ public interface PlantaoMedicoRepository extends JpaRepository<PlantaoMedico, Lo
     Optional<PlantaoMedico> findByPlantaoIdAndMedicoResponsavelAtualId(Long plantaoId, Long medicoId);
 
     Optional<PlantaoMedico> findByPlantaoIdAndMedicoTitularId(Long plantaoId, Long medicoId);
+
+    @Modifying
+    @Query("delete from PlantaoMedico plantaoMedico where plantaoMedico.plantao.id = :plantaoId")
+    void deleteByPlantaoId(@Param("plantaoId") Long plantaoId);
 
     @Query("""
             select distinct pm.plantao

@@ -29,6 +29,8 @@ import com.mss.medShift.domain.model.Setor;
 import com.mss.medShift.domain.model.TipoRecorrenciaPlantao;
 import com.mss.medShift.domain.repository.DoctorRepository;
 import com.mss.medShift.domain.repository.MedicoSetorRepository;
+import com.mss.medShift.domain.repository.NotificacaoRepository;
+import com.mss.medShift.domain.repository.PedidoCoberturaRepository;
 import com.mss.medShift.domain.repository.PlantaoMedicoRepository;
 import com.mss.medShift.domain.repository.PlantaoRepository;
 import com.mss.medShift.domain.repository.RegraPlantaoFixoRepository;
@@ -46,16 +48,21 @@ public class PlantaoServiceImple implements PlantaoService {
     private final MedicoSetorRepository medicoSetorRepository;
     private final PlantaoMedicoRepository plantaoMedicoRepository;
     private final RegraPlantaoFixoRepository regraPlantaoFixoRepository;
+    private final PedidoCoberturaRepository pedidoCoberturaRepository;
+    private final NotificacaoRepository notificacaoRepository;
 
     public PlantaoServiceImple(PlantaoRepository plantaoRepository, SetorRepository setorRepository,
             DoctorRepository doctorRepository, MedicoSetorRepository medicoSetorRepository,
-            PlantaoMedicoRepository plantaoMedicoRepository, RegraPlantaoFixoRepository regraPlantaoFixoRepository) {
+            PlantaoMedicoRepository plantaoMedicoRepository, RegraPlantaoFixoRepository regraPlantaoFixoRepository,
+            PedidoCoberturaRepository pedidoCoberturaRepository, NotificacaoRepository notificacaoRepository) {
         this.plantaoRepository = plantaoRepository;
         this.setorRepository = setorRepository;
         this.doctorRepository = doctorRepository;
         this.medicoSetorRepository = medicoSetorRepository;
         this.plantaoMedicoRepository = plantaoMedicoRepository;
         this.regraPlantaoFixoRepository = regraPlantaoFixoRepository;
+        this.pedidoCoberturaRepository = pedidoCoberturaRepository;
+        this.notificacaoRepository = notificacaoRepository;
     }
 
     @Override
@@ -316,12 +323,16 @@ public class PlantaoServiceImple implements PlantaoService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        if (plantaoRepository.existsById(id)) {
-            plantaoRepository.deleteById(id);
-            return;
-        }
-        throw new NoSuchElementException("Plantao not found with id: " + id);
+        Plantao plantao = plantaoRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Plantao not found with id: " + id));
+
+        notificacaoRepository.deleteByPedidoCoberturaPlantaoId(id);
+        notificacaoRepository.deleteByPlantaoId(id);
+        pedidoCoberturaRepository.deleteByPlantaoId(id);
+        plantaoMedicoRepository.deleteByPlantaoId(id);
+        plantaoRepository.delete(plantao);
     }
 
     private void validateCreateAvulsoRequest(Long setorId, List<Long> medicoIds, LocalDateTime dataInicio,

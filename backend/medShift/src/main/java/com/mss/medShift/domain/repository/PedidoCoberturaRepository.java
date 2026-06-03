@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import jakarta.persistence.LockModeType;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -28,4 +29,8 @@ public interface PedidoCoberturaRepository extends JpaRepository<PedidoCobertura
     List<PedidoCobertura> findByMedicoCobridorId(Long medicoId);
     List<PedidoCobertura> findBySetorIdInOrderByAbertoEmDesc(List<Long> setorIds);
     List<PedidoCobertura> findBySetorIdInAndStatusOrderByAbertoEmDesc(List<Long> setorIds, PedidoCoberturaStatus status);
+
+    @Modifying
+    @Query("delete from PedidoCobertura pedido where pedido.plantao.id = :plantaoId")
+    void deleteByPlantaoId(@Param("plantaoId") Long plantaoId);
 }
