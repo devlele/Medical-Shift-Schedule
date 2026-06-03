@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
 
+import { recuperarSenha } from "../../services/api";
 import { validarEmail } from "../../utils/validacoes";
 import logo from "../../assets/Logo-H.png";
 import "./RecuperarSenha.css";
@@ -34,29 +35,16 @@ const RecuperarSenha = () => {
     if (Object.keys(novoErros).length === 0) {
       setEnviando(true);
       try {
-        // Chamar API para enviar email de recuperação
-        const response = await fetch(
-          `http://localhost:8080/auth/recuperar-senha?email=${encodeURIComponent(email)}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          },
+        const response = await recuperarSenha(email.trim());
+        setEnviado(true);
+        setMensagem(
+          response?.message ||
+            "Uma nova senha foi gerada e enviada para seu e-mail.",
         );
-
-        if (response.ok) {
-          setEnviado(true);
-          setMensagem(
-            "Email de recuperação enviado com sucesso! Verifique sua caixa de entrada.",
-          );
-          setEmail("");
-          setTimeout(() => {
-            navigate("/login");
-          }, 3000);
-        } else {
-          setMensagem("Não foi possível processar sua solicitação.");
-        }
+        setEmail("");
+        setTimeout(() => {
+          navigate("/Login");
+        }, 3000);
       } catch (error) {
         setMensagem(
           error.message.includes("Failed to fetch")
@@ -108,7 +96,7 @@ const RecuperarSenha = () => {
             <p className="texto-redirect">
               Você será redirecionado para o login em alguns segundos...
             </p>
-            <Link to="/login" className="botao-voltar">
+            <Link to="/Login" className="botao-voltar">
               Voltar para Login
             </Link>
           </div>
@@ -127,14 +115,14 @@ const RecuperarSenha = () => {
 
         {/* CARD */}
         <div className="cartao-recuperar">
-          <Link to="/login" className="botao-voltar-header">
+          <Link to="/Login" className="botao-voltar-header">
             <ArrowLeft size={18} />
             Voltar
           </Link>
 
           <h1 className="titulo-recuperar">Recuperar Senha</h1>
           <p className="descricao-recuperar">
-            Digite seu email e enviaremos um link para resetar sua senha.
+            Digite seu email e enviaremos uma nova senha temporária.
           </p>
 
           <form onSubmit={handleSubmit}>
@@ -182,7 +170,7 @@ const RecuperarSenha = () => {
           <div className="rodape-recuperar">
             <p>
               Lembrou a senha?{" "}
-              <Link to="/login" className="link-login-recuperar">
+              <Link to="/Login" className="link-login-recuperar">
                 Voltar para o login
               </Link>
             </p>

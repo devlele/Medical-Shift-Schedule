@@ -6,6 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.mail.MailException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -45,6 +46,13 @@ public class ApiExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNotFound(NoSuchElementException exception,
             HttpServletRequest request) {
         return build(HttpStatus.NOT_FOUND, exception.getMessage(), request);
+    }
+
+    @ExceptionHandler(MailException.class)
+    public ResponseEntity<ErrorResponse> handleMailError(MailException exception,
+            HttpServletRequest request) {
+        return build(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Falha ao enviar e-mail. Verifique as configurações SMTP do backend.", request);
     }
 
     @ExceptionHandler({

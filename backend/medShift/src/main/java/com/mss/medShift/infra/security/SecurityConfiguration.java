@@ -43,6 +43,7 @@ public class SecurityConfiguration {
 
                         // Public endpoints
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/recuperar-senha").permitAll()
                         .requestMatchers(HttpMethod.POST, "/hospital").permitAll()
                         .requestMatchers(HttpMethod.POST, "/doctor/register").permitAll()
 

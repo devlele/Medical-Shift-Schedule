@@ -10,7 +10,10 @@ async function request(path, options = {}) {
   });
 
   if (!response.ok) {
-    const message = await response.text();
+    const contentType = response.headers.get("content-type") || "";
+    const message = contentType.includes("application/json")
+      ? (await response.json()).message
+      : await response.text();
     throw new Error(message || "Nao foi possivel concluir a requisicao.");
   }
 
@@ -41,5 +44,11 @@ export function cadastrarMedico(payload) {
   return request("/doctor/register", {
     method: "POST",
     body: JSON.stringify(payload),
+  });
+}
+
+export function recuperarSenha(email) {
+  return request(`/auth/recuperar-senha?email=${encodeURIComponent(email)}`, {
+    method: "POST",
   });
 }
