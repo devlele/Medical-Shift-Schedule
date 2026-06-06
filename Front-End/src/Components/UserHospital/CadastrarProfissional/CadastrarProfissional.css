@@ -129,6 +129,7 @@
 .mensagem-erro {
   margin-top: 6px;
   font-size: 12px;
+  font-weight: bold;
   color: #dc3545;
   display: flex;
   align-items: center;
@@ -142,7 +143,7 @@
   padding: 12px 14px;
   border-radius: 12px;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: bold;
 }
 
 .alerta-formulario.erro {

@@ -16,6 +16,7 @@ import {
   cancelarPedidoCobertura,
   getCoberturasDisponiveis,
   getMeusPedidosCobertura,
+  getDoctorMe,
 } from "../../../services/doctorServices";
 import {
   formatDateLong,
@@ -31,15 +32,19 @@ export default function PlantoesOfertados() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
   const [erro, setErro] = useState("");
+  const [errosPorCard, setErrosPorCard] = useState({});
+  const [filtro, setFiltro] = useState("disponivel");
+  const [meuSetorIds, setMeuSetorIds] = useState(new Set());
 
   async function carregarCoberturas() {
     try {
       setLoading(true);
       setErro("");
 
-      const [disponiveisData, meusPedidosData] = await Promise.all([
+      const [disponiveisData, meusPedidosData, perfilData] = await Promise.all([
         getCoberturasDisponiveis(),
         getMeusPedidosCobertura(),
+        getDoctorMe(),
       ]);
 
       setDisponiveis(
@@ -52,6 +57,15 @@ export default function PlantoesOfertados() {
           normalizePedidoCobertura,
         ),
       );
+
+      const setorIds = new Set();
+      if (perfilData?.setorId) setorIds.add(perfilData.setorId);
+      if (Array.isArray(perfilData?.setores)) {
+        perfilData.setores
+          .filter((s) => s.ativo !== false)
+          .forEach((s) => s.id && setorIds.add(s.id));
+      }
+      setMeuSetorIds(setorIds);
     } catch (error) {
       setErro(error.message || "Nao foi possivel carregar as ofertas.");
     } finally {
@@ -66,11 +80,14 @@ export default function PlantoesOfertados() {
   async function handleAssumir(pedidoId) {
     try {
       setActionLoading(`assumir-${pedidoId}`);
-      setErro("");
+      setErrosPorCard((prev) => ({ ...prev, [pedidoId]: "" }));
       await assumirCobertura(pedidoId);
       await carregarCoberturas();
     } catch (error) {
-      setErro(error.message || "Nao foi possivel assumir o plantao.");
+      setErrosPorCard((prev) => ({
+        ...prev,
+        [pedidoId]: error.message || "Não foi possível assumir o plantão.",
+      }));
     } finally {
       setActionLoading(null);
     }
@@ -98,9 +115,20 @@ export default function PlantoesOfertados() {
   function renderCard(pedido, modo) {
     const isDisponivel = modo === "disponivel";
     const isAberto = pedido.status === "ABERTO";
+    const podecancelar = isAberto && meuSetorIds.has(pedido.raw.setorId);
+
+    const statusClass =
+      pedido.status === "ABERTO"
+        ? "status-aberto"
+        : pedido.status === "ASSUMIDO"
+          ? "status-assumido"
+          : "status-cancelado";
 
     return (
-      <div className="shift-card" key={`${modo}-${pedido.id}`}>
+      <div
+        className={`shift-card${pedido.status === "CANCELADO" ? " shift-card--cancelado" : ""}`}
+        key={`${modo}-${pedido.id}`}
+      >
         <div className="card-header">
           <div className="card-title-section">
             <div>
@@ -109,7 +137,7 @@ export default function PlantoesOfertados() {
             </div>
           </div>
 
-          <span className={`badge ${isDisponivel ? "urgent" : "routine"}`}>
+          <span className={`badge ${statusClass}`}>
             {pedido.status}
           </span>
         </div>
@@ -137,6 +165,12 @@ export default function PlantoesOfertados() {
           </div>
         </div>
 
+        {errosPorCard[pedido.id] && (
+          <div className="card-erro">
+            {errosPorCard[pedido.id]}
+          </div>
+        )}
+
         <div className="card-buttons">
           <button
             className="details-btn"
@@ -145,7 +179,7 @@ export default function PlantoesOfertados() {
             Ver Detalhes
           </button>
 
-          {isDisponivel ? (
+          {isDisponivel && (
             <button
               className="accept-btn"
               disabled={actionLoading === `assumir-${pedido.id}`}
@@ -155,10 +189,12 @@ export default function PlantoesOfertados() {
                 ? "Assumindo..."
                 : "Aceitar Plantão"}
             </button>
-          ) : (
+          )}
+
+          {!isDisponivel && podecancelar && (
             <button
               className="accept-btn"
-              disabled={!isAberto || actionLoading === `cancelar-${pedido.id}`}
+              disabled={actionLoading === `cancelar-${pedido.id}`}
               onClick={() => handleCancelar(pedido.id)}
             >
               {actionLoading === `cancelar-${pedido.id}`
@@ -204,27 +240,40 @@ export default function PlantoesOfertados() {
           </button>
         </div>
 
+        <div className="filtro-tabs">
+          <button
+            className={`filtro-tab${filtro === "disponivel" ? " filtro-tab--ativo" : ""}`}
+            onClick={() => setFiltro("disponivel")}
+          >
+            Disponíveis para assumir
+            {!loading && (
+              <span className="filtro-contagem">{disponiveis.length}</span>
+            )}
+          </button>
+          <button
+            className={`filtro-tab${filtro === "meu" ? " filtro-tab--ativo" : ""}`}
+            onClick={() => setFiltro("meu")}
+          >
+            Meus pedidos de cobertura
+            {!loading && (
+              <span className="filtro-contagem">
+                {meusPedidos.filter((p) => p.status === "ABERTO").length}
+              </span>
+            )}
+          </button>
+        </div>
+
         {erro && <div className="alerta-login erro">{erro}</div>}
 
         <section className="cards-grid">
-          <div className="section-heading">
-            <h2>Disponíveis para assumir</h2>
-          </div>
-
           {loading ? (
-            <p>Carregando ofertas...</p>
-          ) : disponiveis.length > 0 ? (
-            disponiveis.map((pedido) => renderCard(pedido, "disponivel"))
-          ) : (
-            <p>Nenhum plantão disponível para cobertura no momento.</p>
-          )}
-
-          <div className="section-heading">
-            <h2>Meus pedidos de cobertura</h2>
-          </div>
-
-          {loading ? (
-            <p>Carregando pedidos...</p>
+            <p>Carregando...</p>
+          ) : filtro === "disponivel" ? (
+            disponiveis.length > 0 ? (
+              disponiveis.map((pedido) => renderCard(pedido, "disponivel"))
+            ) : (
+              <p>Nenhum plantão disponível para cobertura no momento.</p>
+            )
           ) : meusPedidos.length > 0 ? (
             meusPedidos.map((pedido) => renderCard(pedido, "meu"))
           ) : (

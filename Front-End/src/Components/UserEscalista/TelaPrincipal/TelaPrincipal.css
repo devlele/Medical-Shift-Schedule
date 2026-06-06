@@ -440,6 +440,7 @@
   margin-bottom: 24px;
   background: #fff5f5;
   color: #b42318;
+  font-weight: bold;
 }
 
 @media (max-width: 1400px) {

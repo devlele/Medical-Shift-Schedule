@@ -120,6 +120,7 @@
     border-radius: var(--border-radius-lg);
     background: #fff5f5;
     color: #b42318;
+    font-weight: bold;
 }
 
 .doctor-right h4 {

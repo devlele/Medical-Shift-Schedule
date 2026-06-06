@@ -17,6 +17,7 @@
 .mensagem-erro {
   color: var(--error);
   font-size: var(--font-size-xs);
+  font-weight: bold;
   margin-top: 4px;
   display: flex;
   align-items: center;
@@ -26,6 +27,7 @@
 .mensagem-sucesso {
   color: var(--success);
   font-size: var(--font-size-xs);
+  font-weight: bold;
   margin-top: 4px;
   display: flex;
   align-items: center;

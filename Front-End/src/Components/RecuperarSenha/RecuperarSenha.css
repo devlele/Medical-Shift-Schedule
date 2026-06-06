@@ -153,7 +153,7 @@
   padding: var(--spacing-md);
   border-radius: 12px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: bold;
   margin-bottom: var(--spacing-lg);
   line-height: 1.4;
 }

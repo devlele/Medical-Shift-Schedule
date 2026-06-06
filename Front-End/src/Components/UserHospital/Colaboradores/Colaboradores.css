@@ -129,6 +129,7 @@ tbody tr:hover {
   border-radius: 12px;
   background: #fee2e2;
   color: #991b1b;
+  font-weight: bold;
   text-align: left;
 }
 

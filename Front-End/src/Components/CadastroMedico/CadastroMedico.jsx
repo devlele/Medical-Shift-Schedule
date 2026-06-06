@@ -78,6 +78,13 @@ function CadastroUsuario() {
 
     if (!validarCampoObrigatorio(formData.dataNascimento)) {
       novoErros.dataNascimento = "Data de nascimento é obrigatória";
+    } else {
+      const [ano] = formData.dataNascimento.split("-");
+      if (ano.length > 4) {
+        novoErros.dataNascimento = "Ano inválido";
+      } else if (new Date(formData.dataNascimento) > new Date()) {
+        novoErros.dataNascimento = "Data de nascimento não pode ser no futuro";
+      }
     }
 
     if (!validarCampoObrigatorio(formData.telefone)) {
@@ -114,6 +121,11 @@ function CadastroUsuario() {
       novoValor = formatarTelefone(value);
     } else if (name === "cpf") {
       novoValor = formatarCPF(value);
+    } else if (name === "dataNascimento") {
+      if (value) {
+        const [ano] = value.split("-");
+        if (ano.length > 4) return;
+      }
     }
 
     setFormData({ ...formData, [name]: novoValor });
@@ -353,6 +365,7 @@ function CadastroUsuario() {
                   type="date"
                   name="dataNascimento"
                   value={formData.dataNascimento}
+                  max={new Date().toISOString().split("T")[0]}
                   onChange={handleChange}
                   onBlur={() => handleBlur("dataNascimento")}
                 />

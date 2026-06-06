@@ -85,6 +85,13 @@ export default function CadastrarProfissional() {
 
     if (!validarCampoObrigatorio(dados.nascimento)) {
       novoErros.nascimento = "Data de nascimento é obrigatória";
+    } else {
+      const [ano] = dados.nascimento.split("-");
+      if (ano.length > 4) {
+        novoErros.nascimento = "Ano inválido";
+      } else if (new Date(dados.nascimento) > new Date()) {
+        novoErros.nascimento = "Data de nascimento não pode ser no futuro";
+      }
     }
 
     // if (!validarCampoObrigatorio(dados.cargo)) {
@@ -112,6 +119,10 @@ export default function CadastrarProfissional() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === "nascimento" && value) {
+      const [ano] = value.split("-");
+      if (ano.length > 4) return;
+    }
     const novoValor = name === "cpf" ? formatarCPF(value) : value;
     const dadosAtualizados = { ...formData, [name]: novoValor };
 
@@ -243,6 +254,7 @@ export default function CadastrarProfissional() {
                   type="date"
                   name="nascimento"
                   value={formData.nascimento}
+                  max={new Date().toISOString().split("T")[0]}
                   onChange={handleChange}
                   className={submitted && erros.nascimento ? "input-erro" : ""}
                 />

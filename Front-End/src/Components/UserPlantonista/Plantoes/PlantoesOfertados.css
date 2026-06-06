@@ -58,6 +58,52 @@
   transform: translateY(-2px);
 }
 
+/* FILTRO TABS */
+.filtro-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.filtro-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 2px solid #dbeee5;
+  background: #fff;
+  color: #4a6a60;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.filtro-tab:hover {
+  border-color: #1f4739;
+  color: #1f4739;
+}
+
+.filtro-tab--ativo {
+  background: #1f4739;
+  border-color: #1f4739;
+  color: #fff;
+}
+
+.filtro-contagem {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.filtro-tab:not(.filtro-tab--ativo) .filtro-contagem {
+  background: #dbeee5;
+  color: #1f4739;
+}
+
 /* CARDS */
 .cards-grid {
   display: grid;
@@ -133,15 +179,26 @@
   font-weight: bold;
 }
 
-/* TAGS */
-.urgent {
+/* STATUS BADGES */
+.status-aberto {
   background: #ffd7d7;
-  color: #b13434;
+  color: #b91c1c;
 }
 
-.routine {
-  background: #c8f3f5;
-  color: #147d82;
+.status-assumido {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-cancelado {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* CARD CANCELADO */
+.shift-card--cancelado {
+  opacity: 0.5;
+  filter: grayscale(60%);
 }
 
 /* INFO */
@@ -163,6 +220,18 @@
   flex-wrap: wrap;
   width: 100%;
   justify-content: flex-start;
+}
+
+.card-erro {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: #fee2e2;
+  color: #b91c1c;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  line-height: 1.5;
+  width: 100%;
 }
 
 .details-btn,

@@ -56,6 +56,14 @@ export default function DetalhesOferta() {
     }
   }
 
+  const statusClass = pedido
+    ? pedido.status === "ABERTO"
+      ? "status-aberto"
+      : pedido.status === "ASSUMIDO"
+        ? "status-assumido"
+        : "status-cancelado"
+    : "";
+
   return (
     <div className="detalhes-layout">
       <Sidebar />
@@ -105,9 +113,11 @@ export default function DetalhesOferta() {
               <p>Selecione uma oferta na lista para visualizar os detalhes.</p>
             ) : (
               <>
-                <span className="shift-badge">{pedido.status}</span>
+                {erro && <div className="erro-oferta">{erro}</div>}
 
-                {erro && <p>{erro}</p>}
+                <span className={`shift-badge ${statusClass}`}>
+                  {pedido.status}
+                </span>
 
                 <div className="info-container">
                   <div className="info-item">

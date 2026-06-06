@@ -122,6 +122,7 @@
 
 .notif-erro {
     color: #d91f1f;
+    font-weight: bold;
     border-left: 4px solid #ff3b3b;
 }
 

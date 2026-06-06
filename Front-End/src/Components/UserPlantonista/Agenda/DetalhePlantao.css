@@ -124,6 +124,126 @@
   max-width: 760px;
 }
 
+/* ALERTA DE SUCESSO */
+
+.alerta-sucesso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #d4f4e2;
+  color: #1a5c3a;
+  border: 1px solid #a3dbbf;
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+/* MODAL */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 24px;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.modal-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #dbeee5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1f4739;
+}
+
+.modal-box h2 {
+  font-size: 1.4rem;
+  color: #1f3730;
+  margin: 0;
+}
+
+.modal-box p {
+  color: #505c58;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.modal-erro {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #b91c1c;
+  font-size: 0.88rem;
+  font-weight: bold;
+  background: #fee2e2;
+  border-radius: 8px;
+  padding: 10px 14px;
+  width: 100%;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.modal-btn-cancelar,
+.modal-btn-confirmar {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.2s;
+}
+
+.modal-btn-cancelar:disabled,
+.modal-btn-confirmar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal-btn-cancelar {
+  background: #e8f5ef;
+  color: #1f4739;
+}
+
+.modal-btn-cancelar:hover:not(:disabled) {
+  background: #d0ece0;
+}
+
+.modal-btn-confirmar {
+  background: #1f4739;
+  color: #fff;
+}
+
+.modal-btn-confirmar:hover:not(:disabled) {
+  background: #163429;
+}
+
 /* LOCAL
 .location {
     display: flex;
