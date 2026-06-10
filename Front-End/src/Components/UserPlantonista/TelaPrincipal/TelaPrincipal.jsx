@@ -77,12 +77,19 @@ export default function TelaPrincipal() {
   const nomeUsuario = dashboard?.name || usuario?.name || "medico";
 
   const plantoesNormalizados = useMemo(() => {
-    const base = dashboard?.proximosPlantoes?.length
-      ? dashboard.proximosPlantoes
-      : plantoes;
-
-    return base.map(normalizePlantao);
-  }, [dashboard, plantoes]);
+    return plantoes
+      .filter((plantao) => {
+        const dataPlantao = getPlantaoDate(plantao);
+        return dataPlantao && new Date(`${dataPlantao}T23:59:59`) >= new Date();
+      })
+      .sort((a, b) => {
+        const dataA = getPlantaoDate(a) || "";
+        const dataB = getPlantaoDate(b) || "";
+        return dataA.localeCompare(dataB);
+      })
+      .slice(0, 5)
+      .map(normalizePlantao);
+  }, [plantoes]);
 
   const eventosCalendario = useMemo(() => {
     const plantaoIdsComPedidoProprio = new Set(

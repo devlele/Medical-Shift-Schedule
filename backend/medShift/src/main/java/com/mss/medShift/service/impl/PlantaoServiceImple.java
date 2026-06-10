@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.mss.medShift.domain.model.Doctor;
 import com.mss.medShift.domain.model.Manager;
+import com.mss.medShift.domain.model.PedidoCobertura;
 import com.mss.medShift.domain.model.Plantao;
 import com.mss.medShift.domain.model.PlantaoMedico;
 import com.mss.medShift.domain.model.PlantaoStatus;
@@ -328,11 +329,31 @@ public class PlantaoServiceImple implements PlantaoService {
         Plantao plantao = plantaoRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Plantao not found with id: " + id));
 
-        notificacaoRepository.deleteByPedidoCoberturaPlantaoId(id);
-        notificacaoRepository.deleteByPlantaoId(id);
-        pedidoCoberturaRepository.deleteByPlantaoId(id);
-        plantaoMedicoRepository.deleteByPlantaoId(id);
+        List<PedidoCobertura> pedidos = pedidoCoberturaRepository.findByPlantaoId(id);
+        List<Long> pedidoIds = pedidos.stream()
+                .map(PedidoCobertura::getId)
+                .toList();
+
+        var notificacoes = new ArrayList<>(notificacaoRepository.findByPlantaoId(id));
+        if (!pedidoIds.isEmpty()) {
+            notificacoes.addAll(notificacaoRepository.findByPedidoCoberturaIdIn(pedidoIds));
+        }
+        if (!notificacoes.isEmpty()) {
+            notificacaoRepository.deleteAll(notificacoes.stream()
+                    .filter(notificacao -> notificacao.getId() != null)
+                    .collect(java.util.stream.Collectors.toMap(
+                            notificacao -> notificacao.getId(),
+                            notificacao -> notificacao,
+                            (primeira, segunda) -> primeira))
+                    .values());
+            notificacaoRepository.flush();
+        }
+        pedidoCoberturaRepository.deleteAll(pedidos);
+        pedidoCoberturaRepository.flush();
+        plantaoMedicoRepository.deleteAll(plantaoMedicoRepository.findByPlantaoId(id));
+        plantaoMedicoRepository.flush();
         plantaoRepository.delete(plantao);
+        plantaoRepository.flush();
     }
 
     private void validateCreateAvulsoRequest(Long setorId, List<Long> medicoIds, LocalDateTime dataInicio,

@@ -174,10 +174,10 @@ export default function MedicosSetor() {
             Array.isArray(p.medicos)
               ? p.medicos.some(
                   (m) =>
-                    m.medicoResponsavelAtualId === medicoParaRemover.id ||
-                    m.medicoTitularId === medicoParaRemover.id
+                    idsIguais(m.medicoResponsavelAtualId, medicoParaRemover.id) ||
+                    idsIguais(m.medicoTitularId, medicoParaRemover.id)
                 )
-              : p.doctorId === medicoParaRemover.id
+              : idsIguais(p.doctorId, medicoParaRemover.id)
           )
         : [];
 
@@ -383,7 +383,7 @@ export default function MedicosSetor() {
           onOpcaoChange={setOpcaoRemocao}
           medicoDestinoId={medicoDestinoId}
           onMedicoDestinoChange={setMedicoDestinoId}
-          outrosMedicos={medicos.filter((m) => m.id !== medicoParaRemover.id)}
+          outrosMedicos={medicos.filter((m) => !idsIguais(m.id, medicoParaRemover.id))}
           erro={erroModal}
           processando={processandoRemocao}
           onConfirmar={confirmarRemocao}
@@ -407,6 +407,10 @@ function getPlantaoMedicoId(plantao, medicoId) {
   );
 
   return alocacao?.id || null;
+}
+
+function idsIguais(a, b) {
+  return a != null && b != null && String(a) === String(b);
 }
 
 function ModalRemocaoMedico({
