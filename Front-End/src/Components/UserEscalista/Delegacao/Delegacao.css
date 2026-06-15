@@ -160,6 +160,49 @@
     font-weight: 700;
 }
 
+/* CABEÇALHO DA SEÇÃO + FILTROS */
+
+.cabecalho-secao-ofertas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.filtros-ofertas {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filtro-select {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #dcdcdc;
+    background: var(--gray-light);
+    color: var(--medical-text);
+    font-size: 0.9rem;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+}
+
+.busca-input {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #dcdcdc;
+    background: var(--gray-light);
+    color: var(--medical-text);
+    font-size: 0.9rem;
+    outline: none;
+    min-width: 240px;
+}
+
+.busca-input:focus {
+    border-color: var(--medical-soft);
+}
+
 /* EMPTY */
 
 .delegacao-empty {
@@ -244,6 +287,11 @@
     color: #5c4d8a;
 }
 
+.badge-cancelada {
+    background: #fde2e2;
+    color: #b42318;
+}
+
 /* RESPONSIVO */
 
 @media (max-width: 1024px) {
@@ -268,6 +316,21 @@
 
     .resumo-ofertas {
         flex-wrap: wrap;
+    }
+
+    .cabecalho-secao-ofertas {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filtros-ofertas {
+        width: 100%;
+    }
+
+    .filtro-select,
+    .busca-input {
+        flex: 1;
+        min-width: 0;
     }
 
     .tabela-ofertas th,

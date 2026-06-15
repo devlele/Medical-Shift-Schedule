@@ -268,20 +268,6 @@ export default function CriarPlantao() {
         </header>
 
         <form className="plantao-card" onSubmit={handleSubmit}>
-          {erro && (
-            <div className="alerta-plantao erro">
-              <AlertCircle size={18} />
-              <span>{erro}</span>
-            </div>
-          )}
-
-          {sucesso && (
-            <div className="alerta-plantao sucesso">
-              <CheckCircle size={18} />
-              <span>{sucesso}</span>
-            </div>
-          )}
-
           <div className="campo">
             <label>Tipo de Turno</label>
 
@@ -466,6 +452,20 @@ export default function CriarPlantao() {
           </div>
 
           <div className="divider" />
+
+          {erro && (
+            <div className="alerta-plantao erro">
+              <AlertCircle size={18} />
+              <span>{erro}</span>
+            </div>
+          )}
+
+          {sucesso && (
+            <div className="alerta-plantao sucesso">
+              <CheckCircle size={18} />
+              <span>{sucesso}</span>
+            </div>
+          )}
 
           {/* FOOTER */}
           <div className="footer-form">

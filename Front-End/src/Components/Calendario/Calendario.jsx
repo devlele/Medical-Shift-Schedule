@@ -17,6 +17,7 @@ export default function Calendario({ eventos }) {
       color: evento.color || "#1f7a63",
       kind: evento.kind || evento.dotType || "plantao",
       targetPath: evento.targetPath,
+      state: evento.state,
     }))
     .filter((evento) => evento.date);
 
@@ -69,6 +70,7 @@ export default function Calendario({ eventos }) {
           color: e.color,
           extendedProps: {
             targetPath: e.targetPath,
+            state: e.state,
           },
         }))}
         dayCellContent={renderDayCell}
@@ -79,6 +81,7 @@ export default function Calendario({ eventos }) {
           if (found && found.id) {
             navigate(
               found.targetPath || `/UserPlantonista/DetalhePlantao/${found.id}`,
+              found.state ? { state: found.state } : undefined,
             );
           }
         }}
@@ -87,6 +90,9 @@ export default function Calendario({ eventos }) {
             navigate(
               info.event.extendedProps.targetPath ||
                 `/UserPlantonista/DetalhePlantao/${info.event.id}`,
+              info.event.extendedProps.state
+                ? { state: info.event.extendedProps.state }
+                : undefined,
             );
           }
         }}

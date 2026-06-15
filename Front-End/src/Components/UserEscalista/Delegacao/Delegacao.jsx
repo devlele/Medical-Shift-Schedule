@@ -24,6 +24,9 @@ const Delegacao = () => {
     const [ofertas, setOfertas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [erro, setErro] = useState(null);
+    const [statusFiltro, setStatusFiltro] = useState("todos");
+    const [ordenacao, setOrdenacao] = useState("recentes");
+    const [busca, setBusca] = useState("");
 
     useEffect(() => {
         let ativo = true;
@@ -56,6 +59,40 @@ const Delegacao = () => {
 
     const abertas = ofertas.filter((o) => o.status === "ABERTO");
     const fechadas = ofertas.filter((o) => o.status !== "ABERTO");
+
+    const getStatusInfo = (status) => {
+        if (status === "ABERTO") return { label: "Aberta", className: "badge-aberta" };
+        if (status === "CANCELADO") return { label: "Cancelado", className: "badge-cancelada" };
+        return { label: "Ofertado", className: "badge-fechada" };
+    };
+
+    const getDataPlantao = (oferta) =>
+        oferta.plantao?.dataInicio ? new Date(oferta.plantao.dataInicio).getTime() : 0;
+
+    const getDataAbertura = (oferta) =>
+        oferta.abertoEm ? new Date(oferta.abertoEm).getTime() : 0;
+
+    const ofertasFiltradas = ofertas
+        .filter((o) => {
+            if (statusFiltro === "ABERTO") return o.status === "ABERTO";
+            if (statusFiltro === "FECHADO") return o.status !== "ABERTO";
+            return true;
+        })
+        .filter((o) => {
+            const termo = busca.trim().toLowerCase();
+            if (!termo) return true;
+            return (
+                (o.setorNome || "").toLowerCase().includes(termo) ||
+                (o.medicoSolicitanteNome || "").toLowerCase().includes(termo) ||
+                (o.medicoCobridorNome || "").toLowerCase().includes(termo)
+            );
+        })
+        .slice()
+        .sort((a, b) => {
+            if (ordenacao === "proximas") return getDataPlantao(a) - getDataPlantao(b);
+            if (ordenacao === "distantes") return getDataPlantao(b) - getDataPlantao(a);
+            return getDataAbertura(b) - getDataAbertura(a);
+        });
 
     return (
         <div className="pagina-delegacao">
@@ -102,11 +139,47 @@ const Delegacao = () => {
                             </div>
 
                             <div className="secao-ofertas">
-                                <h2>Ofertas de Plantão</h2>
+                                <div className="cabecalho-secao-ofertas">
+                                    <h2>Ofertas de Plantão</h2>
+
+                                    <div className="filtros-ofertas">
+                                        <input
+                                            type="text"
+                                            className="busca-input"
+                                            placeholder="Buscar por..."
+                                            value={busca}
+                                            onChange={(e) => setBusca(e.target.value)}
+                                        />
+
+                                        <select
+                                            className="filtro-select"
+                                            value={statusFiltro}
+                                            onChange={(e) => setStatusFiltro(e.target.value)}
+                                        >
+                                            <option value="todos">Todos os status</option>
+                                            <option value="ABERTO">Aberto</option>
+                                            <option value="FECHADO">Fechado</option>
+                                        </select>
+
+                                        <select
+                                            className="filtro-select"
+                                            value={ordenacao}
+                                            onChange={(e) => setOrdenacao(e.target.value)}
+                                        >
+                                            <option value="recentes">Mais recentes</option>
+                                            <option value="proximas">Plantões mais próximos</option>
+                                            <option value="distantes">Plantões mais distantes</option>
+                                        </select>
+                                    </div>
+                                </div>
 
                                 {ofertas.length === 0 ? (
                                     <div className="delegacao-empty">
                                         Nenhuma oferta de plantão registrada no momento.
+                                    </div>
+                                ) : ofertasFiltradas.length === 0 ? (
+                                    <div className="delegacao-empty">
+                                        Nenhuma oferta encontrada para o filtro selecionado.
                                     </div>
                                 ) : (
                                     <div className="tabela-ofertas-wrapper">
@@ -123,33 +196,32 @@ const Delegacao = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {ofertas.map((oferta) => (
-                                                    <tr key={oferta.id}>
-                                                        <td>{formatarData(oferta.plantao?.dataInicio)}</td>
-                                                        <td className="coluna-horario">
-                                                            {formatarHora(oferta.plantao?.dataInicio)}
-                                                            {" – "}
-                                                            {formatarHora(oferta.plantao?.dataFim)}
-                                                        </td>
-                                                        <td>{oferta.setorNome || "—"}</td>
-                                                        <td>{oferta.medicoSolicitanteNome || "—"}</td>
-                                                        <td className={oferta.medicoCobridorNome ? "" : "celula-vazia"}>
-                                                            {oferta.medicoCobridorNome || "Aguardando"}
-                                                        </td>
-                                                        <td>{formatarData(oferta.abertoEm)}</td>
-                                                        <td>
-                                                            <span
-                                                                className={`badge-status ${
-                                                                    oferta.status === "ABERTO"
-                                                                        ? "badge-aberta"
-                                                                        : "badge-fechada"
-                                                                }`}
-                                                            >
-                                                            {oferta.status === "ABERTO" ? "Aberta" : "Fechada"}
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                ))}
+                                                {ofertasFiltradas.map((oferta) => {
+                                                    const cancelada = oferta.status === "CANCELADO";
+                                                    const statusInfo = getStatusInfo(oferta.status);
+
+                                                    return (
+                                                        <tr key={oferta.id}>
+                                                            <td>{formatarData(oferta.plantao?.dataInicio)}</td>
+                                                            <td className="coluna-horario">
+                                                                {formatarHora(oferta.plantao?.dataInicio)}
+                                                                {" – "}
+                                                                {formatarHora(oferta.plantao?.dataFim)}
+                                                            </td>
+                                                            <td>{oferta.setorNome || "—"}</td>
+                                                            <td>{oferta.medicoSolicitanteNome || "—"}</td>
+                                                            <td className={!cancelada && oferta.medicoCobridorNome ? "" : "celula-vazia"}>
+                                                                {cancelada ? "—" : (oferta.medicoCobridorNome || "Aguardando")}
+                                                            </td>
+                                                            <td>{formatarData(oferta.abertoEm)}</td>
+                                                            <td>
+                                                                <span className={`badge-status ${statusInfo.className}`}>
+                                                                    {statusInfo.label}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
                                             </tbody>
                                         </table>
                                     </div>

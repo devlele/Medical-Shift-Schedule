@@ -92,16 +92,19 @@ export default function TelaPrincipal() {
   }, [plantoes]);
 
   const eventosCalendario = useMemo(() => {
-    const plantaoIdsComPedidoProprio = new Set(
-      meusPedidosCobertura
-        .filter((pedido) => pedido.status === "ABERTO")
-        .map((pedido) => pedido.plantao?.id)
-        .filter((id) => id != null),
-    );
+    const pedidosProprioPorPlantaoId = new Map();
+    meusPedidosCobertura
+      .filter((pedido) => pedido.status === "ABERTO")
+      .forEach((pedido) => {
+        if (pedido.plantao?.id != null) {
+          pedidosProprioPorPlantaoId.set(pedido.plantao.id, pedido);
+        }
+      });
 
     const eventosPlantao = plantoes.map((plantao) => {
       const type = getPlantaoType(plantao);
-      const hasPedidoProprio = plantaoIdsComPedidoProprio.has(plantao.id);
+      const pedidoProprio = pedidosProprioPorPlantaoId.get(plantao.id);
+      const hasPedidoProprio = !!pedidoProprio;
       const kind = hasPedidoProprio ? "pedido-proprio" : "plantao";
 
       return {
@@ -116,8 +119,9 @@ export default function TelaPrincipal() {
             ? "#3c8f75"
             : "#1f7a63",
         targetPath: hasPedidoProprio
-          ? "/UserPlantonista/PlantoesOfertados"
+          ? "/UserPlantonista/DetalhesOferta"
           : `/UserPlantonista/DetalhePlantao/${plantao.id}`,
+        state: hasPedidoProprio ? { pedido: pedidoProprio, modo: "meu" } : undefined,
       };
     });
 
@@ -130,7 +134,8 @@ export default function TelaPrincipal() {
         date: cobertura.plantao.date,
         kind: "cobertura",
         color: "#d64545",
-        targetPath: "/UserPlantonista/PlantoesOfertados",
+        targetPath: "/UserPlantonista/DetalhesOferta",
+        state: { pedido, modo: "disponivel" },
       };
     });
 
