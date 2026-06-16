@@ -122,19 +122,19 @@ function InfoCampo({ label, value }) {
   return (
     <div className="grupo-campo">
       <label>{label}</label>
-      <div className="campo-fixo">{value || "Nao informado"}</div>
+      <div className="campo-fixo">{value || "Não informado"}</div>
     </div>
   );
 }
 
 function formatarData(value) {
   if (!value) {
-    return "Nao informada";
+    return "Não informada";
   }
 
   const date = new Date(value);
   return Number.isNaN(date.getTime())
-    ? "Nao informada"
+    ? "Não informada"
     : date.toLocaleDateString("pt-BR");
 }
 

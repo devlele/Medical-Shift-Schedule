@@ -33,7 +33,7 @@ export default function DetalhesOferta() {
       await assumirCobertura(pedido.id);
       navigate("/UserPlantonista/PlantoesOfertados");
     } catch (error) {
-      setErro(error.message || "Nao foi possivel assumir este plantao.");
+      setErro(error.message || "Não foi possível assumir este plantão.");
     } finally {
       setLoading(false);
     }
@@ -50,7 +50,7 @@ export default function DetalhesOferta() {
       await cancelarPedidoCobertura(pedido.id);
       navigate("/UserPlantonista/PlantoesOfertados");
     } catch (error) {
-      setErro(error.message || "Nao foi possivel cancelar este pedido.");
+      setErro(error.message || "Não foi possível cancelar este pedido.");
     } finally {
       setLoading(false);
     }

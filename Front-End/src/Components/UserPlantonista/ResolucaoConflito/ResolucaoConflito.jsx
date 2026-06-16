@@ -41,7 +41,7 @@ export default function ResolucaoConflito() {
         }
       } catch (error) {
         if (ativo) {
-          setErro(error.message || "Nao foi possivel carregar conflitos.");
+          setErro(error.message || "Não foi possível carregar conflitos.");
         }
       } finally {
         if (ativo) {
@@ -75,8 +75,8 @@ export default function ResolucaoConflito() {
       title: plantao.setor || "Plantão",
       subtitle: formatDateLong(getPlantaoDate(plantao)),
       horario: formatPlantaoTime(plantao),
-      setor: plantao.setor || "Setor nao informado",
-      hospital: plantao.hospital || "Hospital nao informado",
+      setor: plantao.setor || "Setor não informado",
+      hospital: plantao.hospital || "Hospital não informado",
     };
   }
 

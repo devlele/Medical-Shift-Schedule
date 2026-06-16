@@ -27,13 +27,13 @@ export function formatTurno(plantao) {
 
 export function formatDateLong(value) {
   if (!value) {
-    return "Data nao informada";
+    return "Data não informada";
   }
 
   const date = new Date(value.length === 10 ? `${value}T00:00:00` : value);
 
   if (Number.isNaN(date.getTime())) {
-    return "Data nao informada";
+    return "Data não informada";
   }
 
   return date.toLocaleDateString("pt-BR", {
@@ -82,14 +82,14 @@ export function formatPlantaoTime(plantao) {
   }
 
   if (!plantao?.dataInicio || !plantao?.dataFim) {
-    return "Horario nao informado";
+    return "Horário não informado";
   }
 
   const inicio = new Date(plantao.dataInicio);
   const fim = new Date(plantao.dataFim);
 
   if (Number.isNaN(inicio.getTime()) || Number.isNaN(fim.getTime())) {
-    return "Horario nao informado";
+    return "Horário não informado";
   }
 
   const horaInicio = inicio.toLocaleTimeString("pt-BR", {
@@ -138,9 +138,9 @@ export function formatPlantaoRecorrencia(plantao) {
 export function normalizePlantao(plantao) {
   return {
     id: plantao.id,
-    setor: plantao.setor || "Setor nao informado",
-    hospital: plantao.hospital || "Hospital nao informado",
-    local: plantao.local || plantao.hospital || "Local nao informado",
+    setor: plantao.setor || "Setor não informado",
+    hospital: plantao.hospital || "Hospital não informado",
+    local: plantao.local || plantao.hospital || "Local não informado",
     doctor: resolvePlantaoDoctors(plantao),
     date: getPlantaoDate(plantao),
     time: formatPlantaoTime(plantao),
@@ -167,7 +167,7 @@ function resolvePlantaoDoctors(plantao) {
     return `${nomes.slice(0, 2).join(", ")}${nomes.length > 2 ? ` +${nomes.length - 2}` : ""}`;
   }
 
-  return plantao?.doctor || "Medico nao informado";
+  return plantao?.doctor || "Médico não informado";
 }
 
 export function normalizePedidoCobertura(pedido) {
@@ -178,7 +178,7 @@ export function normalizePedidoCobertura(pedido) {
     status: pedido.status,
     hospital: pedido.hospitalNome || plantao.hospital,
     setor: pedido.setorNome || plantao.setor,
-    medicoSolicitante: pedido.medicoSolicitanteNome || "Medico solicitante",
+    medicoSolicitante: pedido.medicoSolicitanteNome || "Médico solicitante",
     medicoCobridor: pedido.medicoCobridorNome,
     abertoEm: pedido.abertoEm,
     plantao,

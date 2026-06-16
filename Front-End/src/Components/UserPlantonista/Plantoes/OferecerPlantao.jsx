@@ -67,7 +67,7 @@ export default function OferecerPlantao() {
         setAppointments(normalizados);
       } catch (error) {
         if (ativo) {
-          setErro(error.message || "Nao foi possivel carregar seus plantoes.");
+          setErro(error.message || "Não foi possível carregar seus plantões.");
         }
       } finally {
         if (ativo) {
@@ -98,7 +98,7 @@ export default function OferecerPlantao() {
       await criarPedidoCobertura(selectedAppointment.id);
       navigate("/UserPlantonista/PlantoesOfertados");
     } catch (error) {
-      setErro(error.message || "Nao foi possivel oferecer este plantao.");
+      setErro(error.message || "Não foi possível oferecer este plantão.");
     } finally {
       setSubmitting(false);
     }

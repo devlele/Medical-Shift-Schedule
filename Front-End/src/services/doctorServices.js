@@ -44,7 +44,7 @@ const request = async (path, options = {}) => {
     const message =
       typeof data === "string"
         ? data
-        : data?.message || "Nao foi possivel concluir a requisicao.";
+        : data?.message || "Não foi possível concluir a requisição.";
 
     throw new Error(message);
   }

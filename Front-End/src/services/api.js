@@ -14,7 +14,7 @@ async function request(path, options = {}) {
     const message = contentType.includes("application/json")
       ? (await response.json()).message
       : await response.text();
-    throw new Error(message || "Nao foi possivel concluir a requisicao.");
+    throw new Error(message || "Não foi possível concluir a requisição.");
   }
 
   if (response.status === 204) {

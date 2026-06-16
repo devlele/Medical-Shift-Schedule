@@ -12,6 +12,7 @@ import {
 import {
   criarEscalista,
   getSetores,
+  getEscalistas,
 } from "../Setores/setorServices.js";
 
 import "./CadastrarProfissional.css";
@@ -44,8 +45,23 @@ export default function CadastrarProfissional() {
   const carregarSetores = async () => {
     try {
       setLoadingSetores(true);
-      const setoresData = await getSetores();
-      setSetores(Array.isArray(setoresData) ? setoresData : []);
+      const [setoresData, escalistasData] = await Promise.all([
+        getSetores(),
+        getEscalistas(),
+      ]);
+
+      const setoresList = Array.isArray(setoresData) ? setoresData : [];
+      const escalistas = Array.isArray(escalistasData) ? escalistasData : [];
+
+      const setoresOcupados = new Set(
+        escalistas
+          .filter((e) => e.ativo !== false)
+          .flatMap((e) => [e.setorId, e.setor?.id])
+          .filter(Boolean)
+          .map(Number),
+      );
+
+      setSetores(setoresList.filter((s) => !setoresOcupados.has(Number(s.id))));
     } catch (error) {
       console.error(error);
       setErroEnvio("Não foi possível carregar os setores do hospital.");

@@ -37,7 +37,7 @@ export default function DetalhePlantao() {
         }
       } catch (error) {
         if (ativo) {
-          setErro(error.message || "Nao foi possivel carregar o plantao.");
+          setErro(error.message || "Não foi possível carregar o plantão.");
         }
       } finally {
         if (ativo) {

@@ -67,7 +67,7 @@ export default function PlantoesOfertados() {
       }
       setMeuSetorIds(setorIds);
     } catch (error) {
-      setErro(error.message || "Nao foi possivel carregar as ofertas.");
+      setErro(error.message || "Não foi possível carregar as ofertas.");
     } finally {
       setLoading(false);
     }
@@ -100,7 +100,7 @@ export default function PlantoesOfertados() {
       await cancelarPedidoCobertura(pedidoId);
       await carregarCoberturas();
     } catch (error) {
-      setErro(error.message || "Nao foi possivel cancelar o pedido.");
+      setErro(error.message || "Não foi possível cancelar o pedido.");
     } finally {
       setActionLoading(null);
     }

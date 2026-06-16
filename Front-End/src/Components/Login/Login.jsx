@@ -75,7 +75,7 @@ const Login = () => {
       } catch (error) {
         setErroLogin(
           error.message.includes("Failed to fetch")
-            ? "Nao foi possivel conectar à API. Confirme se o backend está rodando em http://localhost:8080."
+            ? "Não foi possível conectar à API. Confirme se o backend está rodando em http://localhost:8080."
             : "Email ou senha inválidos.",
         );
       } finally {

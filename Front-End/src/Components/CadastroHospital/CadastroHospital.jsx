@@ -128,8 +128,8 @@ export default function CadastroHospital() {
       } catch (error) {
         setErroEnvio(
           error.message.includes("Failed to fetch")
-            ? "Nao foi possivel conectar à API. Confirme se o backend está rodando em http://localhost:8080."
-            : "Nao foi possivel cadastrar o hospital. Verifique se email ou CNPJ já estao cadastrados.",
+            ? "Não foi possível conectar à API. Confirme se o backend está rodando em http://localhost:8080."
+            : "Não foi possível cadastrar o hospital. Verifique se email ou CNPJ já estão cadastrados.",
         );
       } finally {
         setEnviando(false);

@@ -66,7 +66,7 @@ export default function Agenda() {
         );
       } catch (error) {
         if (ativo) {
-          setErro(error.message || "Nao foi possivel carregar a agenda.");
+          setErro(error.message || "Não foi possível carregar a agenda.");
         }
       } finally {
         if (ativo) {

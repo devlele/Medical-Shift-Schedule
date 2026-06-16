@@ -38,7 +38,6 @@ const Perfil = () => {
 
   const nome = perfil?.nomeFantasia || perfil?.nome || perfil?.name || usuario?.name || "Hospital";
   const cnpj = perfil?.cnpj || "Não disponível";
-  const telefone = perfil?.telefone || perfil?.phone || "Não disponível";
   const endereco = perfil?.endereco || perfil?.address || "Não disponível";
   const gestor = perfil?.nomeGestor || usuario?.name || "Não informado";
   const email = perfil?.email || usuario?.email || "Não informado";
@@ -78,7 +77,7 @@ const Perfil = () => {
 
           <div className="dados-perfil">
             <h2>{loading ? "Carregando..." : nome}</h2>
-            <p>Representando: {nome}</p>
+            <p>Representado por: {gestor}</p>
           </div>
         </section>
 
@@ -87,11 +86,9 @@ const Perfil = () => {
             <h3>Informações do Hospital</h3>
 
             <InfoCampo label="HOSPITAL REPRESENTADO" value={nome} />
-            <InfoCampo label="E-MAIL" value={email} />
-
             <div className="linha-dupla">
+              <InfoCampo label="E-MAIL" value={email} />
               <InfoCampo label="CNPJ" value={cnpj} />
-              <InfoCampo label="TELEFONE" value={telefone} />
             </div>
 
             <div className="linha-dupla">
@@ -109,7 +106,7 @@ function InfoCampo({ label, value }) {
   return (
     <div className="grupo-campo">
       <label>{label}</label>
-      <div className="campo-fixo">{value || "Nao informado"}</div>
+      <div className="campo-fixo">{value || "Não informado"}</div>
     </div>
   );
 }

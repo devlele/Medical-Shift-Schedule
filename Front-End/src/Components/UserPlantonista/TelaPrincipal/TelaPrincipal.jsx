@@ -58,7 +58,7 @@ export default function TelaPrincipal() {
         );
       } catch (error) {
         if (ativo) {
-          setErro(error.message || "Nao foi possivel carregar o painel.");
+          setErro(error.message || "Não foi possível carregar o painel.");
         }
       } finally {
         if (ativo) {
@@ -109,7 +109,7 @@ export default function TelaPrincipal() {
 
       return {
         id: plantao.id,
-        title: plantao.hospital || plantao.setor || "Plantao",
+        title: plantao.hospital || plantao.setor || "Plantão",
         date: getPlantaoDate(plantao),
         tipo: `${plantao.setor || "Setor"} • ${formatPlantaoTime(plantao)}`,
         kind,
@@ -187,12 +187,12 @@ export default function TelaPrincipal() {
         {/* CARDS */}
         <section className="cards">
           <div className="card">
-            <p>PLANTOES NO MES</p>
+            <p>PLANTÕES NO MÊS</p>
             <h2>{plantoesNoMes}</h2>
           </div>
 
           <NavLink to="/UserPlantonista/PlantoesOfertados" className="card">
-            <p>OFERTAS DISPONIVEIS</p>
+            <p>OFERTAS DISPONÍVEIS</p>
             <h2>{coberturas.length}</h2>
           </NavLink>
         </section>
